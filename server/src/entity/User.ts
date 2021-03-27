@@ -1,18 +1,17 @@
-import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import { Bookmark } from './Bookmark';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
 @Entity()
 export class User {
-
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    firstName: string;
+    @Column({ unique: true })
+    email: string;
 
     @Column()
-    lastName: string;
+    name: string;
 
-    @Column()
-    age: number;
-
+    @OneToMany(() => Bookmark, (bookmark) => bookmark.user)
+    bookmarks: Bookmark[];
 }
