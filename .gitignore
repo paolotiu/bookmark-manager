@@ -1,0 +1,11 @@
+
+*/node_modules
+dist/
+build/
+.env
+dea/
+.vscode/
+tmp/
+temp/
+ormconfig.json
+yarn-error.log
