@@ -1,11 +1,12 @@
 {
     "name": "server",
     "version": "1.0.0",
-    "main": "index.js",
     "license": "MIT",
     "devDependencies": {
         "@graphql-codegen/cli": "1.21.3",
+        "@graphql-codegen/introspection": "1.18.1",
         "@graphql-codegen/typescript": "1.21.1",
+        "@graphql-codegen/typescript-resolvers": "1.19.0",
         "@types/node": "^8.0.29",
         "@typescript-eslint/eslint-plugin": "^4.19.0",
         "@typescript-eslint/parser": "^4.19.0",
@@ -15,12 +16,13 @@
         "eslint-plugin-prettier": "^3.3.1",
         "nodemon": "^2.0.7",
         "prettier": "^2.2.1",
+        "ts-loader": "^8.0.18",
         "ts-node": "^9.1.1",
-        "@graphql-codegen/typescript-resolvers": "1.19.0",
-        "@graphql-codegen/introspection": "1.18.1"
+        "tsconfig-paths": "^3.9.0"
     },
     "dependencies": {
         "apollo-server-express": "^2.22.1",
+        "esbuild": "^0.10.2",
         "express": "^4.17.1",
         "graphql": "^15.5.0",
         "pg": "^8.5.1",
@@ -30,7 +32,7 @@
     },
     "scripts": {
         "start": "ts-node src/index.ts",
-        "dev": "concurrently \"nodemon --exec ts-node-transpile-only src/index.ts\"",
+        "dev": "concurrently \"nodemon --exec ts-node-transpile-only -r tsconfig-paths/register src/index.ts\" \"yarn generate --watch\"",
         "generate": "graphql-codegen --config codegen.yml"
     }
 }
