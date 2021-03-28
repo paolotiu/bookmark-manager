@@ -7,6 +7,7 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
+import { BookmarkToCategory } from './BookmarkToCategory';
 import { User } from './User';
 
 @Entity()
@@ -31,4 +32,8 @@ export class Bookmark extends BaseEntity {
 
     @ManyToOne(() => User, (user) => user.bookmarks)
     user: User;
+
+    @ManyToOne(() => BookmarkToCategory, (btc) => btc.bookmarkId)
+    categoryConnection: Promise<BookmarkToCategory[]>;
 }
+export type BookmarkModel = Bookmark;
