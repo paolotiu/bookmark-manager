@@ -4,7 +4,12 @@ documents: null
 generates:
     ./src/graphql/types.ts:
         config:
+            useIndexSignature: true
             maybeValue: T  | undefined
+            mappers:
+                User: ../entity/User#UserModel
+                Bookmark: ../entity/Bookmark#BookmarkModel
+                Category: ../entity/Category#CategoryModel
         plugins:
             - 'typescript'
             - 'typescript-resolvers'
