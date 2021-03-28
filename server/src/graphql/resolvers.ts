@@ -1,10 +1,10 @@
+import { createTokens } from './../auth';
 import { BookmarkToCategory } from '@entity/BookmarkToCategory';
 import { Bookmark } from '@entity/Bookmark';
 import { User } from '@entity/User';
 import { UserInputError } from 'apollo-server-errors';
 import { Resolvers } from '@gql/types';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
 import { unNullifyObj } from 'util/unNullifyObj';
 
@@ -58,10 +58,8 @@ export const resolvers: Resolvers = {
             if (!user) return null;
             const isValid = await bcrypt.compare(password, user.password);
             if (!isValid) return null;
-            const refreshToken = jwt.sign({ userId: user.id, count: user.count }, process.env.JWT_SECRET as string, {
-                expiresIn: '7d',
-            });
-            const accessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: '15min' });
+
+            const { refreshToken, accessToken } = createTokens(user);
 
             res.cookie('refresh-token', refreshToken, { maxAge: 1000 * 60 * 60 * 24 * 7 }); // 7 days
             res.cookie('access-token', accessToken, { maxAge: 1000 * 60 * 15 }); //15 minutes
