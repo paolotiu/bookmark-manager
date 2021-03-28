@@ -10,6 +10,9 @@ export const startServer = async (): Promise<void> => {
         typeDefs,
         resolvers,
         tracing: true,
+        context: ({ req, res }) => {
+            return { req, res };
+        },
     });
 
     apolloServer.applyMiddleware({ app, path: '/graphql' });

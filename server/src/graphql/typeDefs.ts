@@ -4,12 +4,14 @@ export const typeDefs = gql`
     type User {
         id: Int!
         email: String!
+        name: String!
         bookmarks: [Bookmark]!
     }
 
     type Bookmark {
         id: Int!
         title: String!
+        url: String!
         description: String
         categories: [Category]!
     }
@@ -32,7 +34,8 @@ export const typeDefs = gql`
     }
 
     type Mutation {
-        signUp(email: String!, name: String!): User!
+        register(email: String!, name: String!, password: String!): Boolean!
+        login(email: String!, password: String!): User
         createBookmark(data: CreateBookmarkInput!): Bookmark!
     }
 `;

@@ -5,7 +5,7 @@ generates:
     ./src/graphql/types.ts:
         config:
             useIndexSignature: true
-            maybeValue: T  | undefined
+            maybeValue: T  | null | undefined
             mappers:
                 User: ../entity/User#UserModel
                 Bookmark: ../entity/Bookmark#BookmarkModel

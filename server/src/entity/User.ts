@@ -12,6 +12,12 @@ export class User extends BaseEntity {
     @Column()
     name: string;
 
+    @Column({ type: 'int', default: 0 })
+    count: string;
+
+    @Column()
+    password: string;
+
     @OneToMany(() => Bookmark, (bookmark) => bookmark.user)
     bookmarks: Bookmark[];
 }

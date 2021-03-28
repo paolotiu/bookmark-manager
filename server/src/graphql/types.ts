@@ -2,7 +2,7 @@ import { GraphQLResolveInfo } from 'graphql';
 import { UserModel } from '../entity/User';
 import { BookmarkModel } from '../entity/Bookmark';
 import { CategoryModel } from '../entity/Category';
-export type Maybe<T> = T  | undefined;
+export type Maybe<T> = T  | null | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -20,6 +20,7 @@ export type Bookmark = {
   __typename?: 'Bookmark';
   id: Scalars['Int'];
   title: Scalars['String'];
+  url: Scalars['String'];
   description?: Maybe<Scalars['String']>;
   categories: Array<Maybe<Category>>;
 };
@@ -39,14 +40,22 @@ export type CreateBookmarkInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  signUp: User;
+  register: Scalars['Boolean'];
+  login?: Maybe<User>;
   createBookmark: Bookmark;
 };
 
 
-export type MutationSignUpArgs = {
+export type MutationRegisterArgs = {
   email: Scalars['String'];
   name: Scalars['String'];
+  password: Scalars['String'];
+};
+
+
+export type MutationLoginArgs = {
+  email: Scalars['String'];
+  password: Scalars['String'];
 };
 
 
@@ -69,6 +78,7 @@ export type User = {
   __typename?: 'User';
   id: Scalars['Int'];
   email: Scalars['String'];
+  name: Scalars['String'];
   bookmarks: Array<Maybe<Bookmark>>;
 };
 
@@ -157,9 +167,9 @@ export type ResolversTypes = ResolversObject<{
   Category: ResolverTypeWrapper<CategoryModel>;
   CreateBookmarkInput: CreateBookmarkInput;
   Mutation: ResolverTypeWrapper<{}>;
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Query: ResolverTypeWrapper<{}>;
   User: ResolverTypeWrapper<UserModel>;
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -170,14 +180,15 @@ export type ResolversParentTypes = ResolversObject<{
   Category: CategoryModel;
   CreateBookmarkInput: CreateBookmarkInput;
   Mutation: {};
+  Boolean: Scalars['Boolean'];
   Query: {};
   User: UserModel;
-  Boolean: Scalars['Boolean'];
 }>;
 
 export type BookmarkResolvers<ContextType = any, ParentType extends ResolversParentTypes['Bookmark'] = ResolversParentTypes['Bookmark']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   categories?: Resolver<Array<Maybe<ResolversTypes['Category']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -191,7 +202,8 @@ export type CategoryResolvers<ContextType = any, ParentType extends ResolversPar
 }>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  signUp?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationSignUpArgs, 'email' | 'name'>>;
+  register?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
+  login?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   createBookmark?: Resolver<ResolversTypes['Bookmark'], ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
 }>;
 
@@ -203,6 +215,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
