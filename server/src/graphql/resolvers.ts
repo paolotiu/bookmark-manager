@@ -1,8 +1,26 @@
+import { BookmarkToCategory } from '@entity/BookmarkToCategory';
 import { Bookmark } from '@entity/Bookmark';
 import { User } from '@entity/User';
 import { UserInputError } from 'apollo-server-errors';
-import { Resolvers } from './types';
+import { Resolvers } from '@gql/types';
 export const resolvers: Resolvers = {
+    Category: {
+        bookmarks: async (parent) => {
+            const res = await BookmarkToCategory.find({ where: { categoryId: parent.id }, relations: ['bookmark'] });
+            const bookmarks = res.map((x) => x.bookmark);
+            return bookmarks;
+        },
+    },
+    Bookmark: {
+        categories: async (parent) => {
+            const res = await BookmarkToCategory.find({
+                where: { bookmarkId: parent.id },
+                relations: ['category'],
+            });
+            const categories = res.map((item) => item.category);
+            return categories;
+        },
+    },
     Query: {
         helloWorld: () => `Hello world`,
         bookmark: async (_, { id }) => {
@@ -12,7 +30,11 @@ export const resolvers: Resolvers = {
         },
     },
     Mutation: {
-        signUp: (_, args) => User.create(args).save(),
+        signUp: async (_, args) => {
+            const user = await User.create(args).save();
+
+            return user;
+        },
         createBookmark: (_, { data }) => Bookmark.create(data).save(),
     },
 };
