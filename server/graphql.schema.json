@@ -374,13 +374,9 @@
               }
             ],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Bookmark",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "Bookmark",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -451,6 +447,18 @@
                 "name": "Bookmark",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "me",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "User",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null

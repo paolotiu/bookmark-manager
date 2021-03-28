@@ -4,6 +4,7 @@ import {
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
+    JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -30,7 +31,11 @@ export class Bookmark extends BaseEntity {
     @DeleteDateColumn()
     deletedDate: Date;
 
+    @Column()
+    userId: number;
+
     @ManyToOne(() => User, (user) => user.bookmarks)
+    @JoinColumn({ name: 'userId' })
     user: User;
 
     @ManyToOne(() => BookmarkToCategory, (btc) => btc.bookmarkId)

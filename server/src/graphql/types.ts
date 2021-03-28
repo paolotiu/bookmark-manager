@@ -43,7 +43,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   register: Scalars['Boolean'];
   login?: Maybe<User>;
-  createBookmark: Bookmark;
+  createBookmark?: Maybe<Bookmark>;
 };
 
 
@@ -206,7 +206,7 @@ export type CategoryResolvers<ContextType = MyContext, ParentType extends Resolv
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   register?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
   login?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
-  createBookmark?: Resolver<ResolversTypes['Bookmark'], ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
+  createBookmark?: Resolver<Maybe<ResolversTypes['Bookmark']>, ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
 }>;
 
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{

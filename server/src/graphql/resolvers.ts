@@ -7,6 +7,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
 import { unNullifyObj } from 'util/unNullifyObj';
+
 config();
 
 export const resolvers: Resolvers = {
@@ -27,12 +28,19 @@ export const resolvers: Resolvers = {
             return categories;
         },
     },
+    User: {
+        bookmarks: (parent) => Bookmark.find({ where: { userId: parent.id } }),
+    },
     Query: {
         helloWorld: () => `Hello world`,
         bookmark: async (_, { id }) => {
             const bookmark = await Bookmark.findOne(id);
             if (!bookmark) throw new UserInputError('No bookmark with that id');
             return bookmark;
+        },
+        me: (_, _a, { req }) => {
+            if (!req.userId) return null;
+            return User.findOne(req.userId);
         },
     },
     Mutation: {
@@ -60,9 +68,14 @@ export const resolvers: Resolvers = {
 
             return user;
         },
-        createBookmark: (_, { data }) => {
+        createBookmark: (_, { data }, { req }) => {
+            if (!req.userId) return null;
+            const userId = parseInt(req.userId);
             const cleaned = unNullifyObj(data);
-            return Bookmark.create(cleaned).save();
+            return Bookmark.create({
+                ...cleaned,
+                userId,
+            }).save();
         },
     },
 };

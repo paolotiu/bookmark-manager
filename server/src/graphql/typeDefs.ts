@@ -31,11 +31,12 @@ export const typeDefs = gql`
     type Query {
         helloWorld: String!
         bookmark(id: Int!): Bookmark!
+        me: User
     }
 
     type Mutation {
         register(email: String!, name: String!, password: String!): Boolean!
         login(email: String!, password: String!): User
-        createBookmark(data: CreateBookmarkInput!): Bookmark!
+        createBookmark(data: CreateBookmarkInput!): Bookmark
     }
 `;
