@@ -74,5 +74,20 @@ export const resolvers: Resolvers = {
                 userId,
             }).save();
         },
+        invalidateTokens: async (_, _a, { userId }) => {
+            if (!userId) return false;
+
+            const user = await User.findOne(userId);
+
+            if (!user) return false;
+
+            // This will invalidate the refresh-token
+            await User.createQueryBuilder()
+                .update(user)
+                .set({ count: () => 'count + 1' })
+                .execute();
+
+            return true;
+        },
     },
 };

@@ -38,5 +38,6 @@ export const typeDefs = gql`
         register(email: String!, name: String!, password: String!): Boolean!
         login(email: String!, password: String!): User
         createBookmark(data: CreateBookmarkInput!): Bookmark
+        invalidateTokens: Boolean!
     }
 `;
