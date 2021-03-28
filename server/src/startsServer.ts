@@ -23,11 +23,12 @@ export const startServer = async (): Promise<void> => {
         },
     });
     app.use(cookieParser());
-    app.use((req, res, next) => {
+    app.use((req, _, next) => {
         const accessToken = req.cookies['access-token'];
-        if (!accessToken) return next();
-        const data = jwt.verify(accessToken, process.env.JWT_SECRET as string) as AccessTokenPayload;
-        req.userId = data.userId;
+        try {
+            const data = jwt.verify(accessToken, process.env.JWT_SECRET as string) as AccessTokenPayload;
+            req.userId = data.userId;
+        } catch {}
 
         next();
     });
