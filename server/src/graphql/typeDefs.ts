@@ -11,6 +11,13 @@ export const typeDefs = gql`
         id: Int!
         title: String!
         description: String
+        categories: [Category]!
+    }
+
+    type Category {
+        id: Int!
+        name: String!
+        bookmarks: [Bookmark]!
     }
 
     input CreateBookmarkInput {

@@ -1,4 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql';
+import { UserModel } from '../entity/User';
+import { BookmarkModel } from '../entity/Bookmark';
+import { CategoryModel } from '../entity/Category';
 export type Maybe<T> = T  | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -18,6 +21,14 @@ export type Bookmark = {
   id: Scalars['Int'];
   title: Scalars['String'];
   description?: Maybe<Scalars['String']>;
+  categories: Array<Maybe<Category>>;
+};
+
+export type Category = {
+  __typename?: 'Category';
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  bookmarks: Array<Maybe<Bookmark>>;
 };
 
 export type CreateBookmarkInput = {
@@ -61,7 +72,8 @@ export type User = {
   bookmarks: Array<Maybe<Bookmark>>;
 };
 
-
+export type WithIndex<TObject> = TObject & Record<string, any>;
+export type ResolversObject<TObject> = WithIndex<TObject>;
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
@@ -138,59 +150,70 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 ) => TResult | Promise<TResult>;
 
 /** Mapping between all available schema types and the resolvers types */
-export type ResolversTypes = {
-  Bookmark: ResolverTypeWrapper<Bookmark>;
+export type ResolversTypes = ResolversObject<{
+  Bookmark: ResolverTypeWrapper<BookmarkModel>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Category: ResolverTypeWrapper<CategoryModel>;
   CreateBookmarkInput: CreateBookmarkInput;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
-  User: ResolverTypeWrapper<User>;
+  User: ResolverTypeWrapper<UserModel>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
-};
+}>;
 
 /** Mapping between all available schema types and the resolvers parents */
-export type ResolversParentTypes = {
-  Bookmark: Bookmark;
+export type ResolversParentTypes = ResolversObject<{
+  Bookmark: BookmarkModel;
   Int: Scalars['Int'];
   String: Scalars['String'];
+  Category: CategoryModel;
   CreateBookmarkInput: CreateBookmarkInput;
   Mutation: {};
   Query: {};
-  User: User;
+  User: UserModel;
   Boolean: Scalars['Boolean'];
-};
+}>;
 
-export type BookmarkResolvers<ContextType = any, ParentType extends ResolversParentTypes['Bookmark'] = ResolversParentTypes['Bookmark']> = {
+export type BookmarkResolvers<ContextType = any, ParentType extends ResolversParentTypes['Bookmark'] = ResolversParentTypes['Bookmark']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  categories?: Resolver<Array<Maybe<ResolversTypes['Category']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+export type CategoryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   signUp?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationSignUpArgs, 'email' | 'name'>>;
   createBookmark?: Resolver<ResolversTypes['Bookmark'], ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
-};
+}>;
 
-export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   helloWorld?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   bookmark?: Resolver<ResolversTypes['Bookmark'], ParentType, ContextType, RequireFields<QueryBookmarkArgs, 'id'>>;
-};
+}>;
 
-export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
+export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
+}>;
 
-export type Resolvers<ContextType = any> = {
+export type Resolvers<ContextType = any> = ResolversObject<{
   Bookmark?: BookmarkResolvers<ContextType>;
+  Category?: CategoryResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
-};
+}>;
 
 
 /**
