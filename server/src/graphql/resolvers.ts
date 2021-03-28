@@ -68,9 +68,8 @@ export const resolvers: Resolvers = {
 
             return user;
         },
-        createBookmark: (_, { data }, { req }) => {
-            if (!req.userId) return null;
-            const userId = parseInt(req.userId);
+        createBookmark: (_, { data }, { userId }) => {
+            if (!userId) return null;
             const cleaned = unNullifyObj(data);
             return Bookmark.create({
                 ...cleaned,

@@ -6,6 +6,12 @@ import 'reflect-metadata';
 import { typeDefs } from '@gql/typeDefs';
 import { resolvers } from '@gql/resolvers';
 import cookieParser from 'cookie-parser';
+
+interface AccessTokenPayload {
+    userId: string;
+    iat: number;
+    exp: number;
+}
 export const startServer = async (): Promise<void> => {
     const app = express();
     const apolloServer = new ApolloServer({
@@ -13,14 +19,14 @@ export const startServer = async (): Promise<void> => {
         resolvers,
         tracing: true,
         context: ({ req, res }) => {
-            return { req, res };
+            return { req, res, userId: req.userId ? parseInt(req.userId) : undefined };
         },
     });
     app.use(cookieParser());
     app.use((req, res, next) => {
         const accessToken = req.cookies['access-token'];
         if (!accessToken) return next();
-        const data = jwt.verify(accessToken, process.env.JWT_SECRET as string) as any;
+        const data = jwt.verify(accessToken, process.env.JWT_SECRET as string) as AccessTokenPayload;
         req.userId = data.userId;
 
         next();
