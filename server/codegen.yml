@@ -6,6 +6,7 @@ generates:
         config:
             useIndexSignature: true
             maybeValue: T  | null | undefined
+            contextType: ./contextType#MyContext
             mappers:
                 User: ../entity/User#UserModel
                 Bookmark: ../entity/Bookmark#BookmarkModel
