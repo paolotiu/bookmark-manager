@@ -15,3 +15,4 @@ export class User extends BaseEntity {
     @OneToMany(() => Bookmark, (bookmark) => bookmark.user)
     bookmarks: Bookmark[];
 }
+export type UserModel = User;
