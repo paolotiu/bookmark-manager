@@ -25,7 +25,8 @@
         "baseUrl": "src",
         "paths": {
             "@entity/*": ["entity/*"],
-            "@gql/*": ["graphql/*"]
+            "@gql/*": ["graphql/*"],
+            "@util/*": ["util/*"]
         }
     },
     "exclude": ["node_modules"],
