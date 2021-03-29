@@ -7,6 +7,7 @@ import { Resolvers } from '@gql/types';
 import bcrypt from 'bcryptjs';
 import { config } from 'dotenv';
 import { unNullifyObj } from 'util/unNullifyObj';
+import { Category } from '@entity/Category';
 
 config();
 
@@ -30,6 +31,7 @@ export const resolvers: Resolvers = {
     },
     User: {
         bookmarks: (parent) => Bookmark.find({ where: { userId: parent.id } }),
+        categories: (parent) => Category.find({ where: { userId: parent.id } }),
     },
     Query: {
         helloWorld: () => `Hello world`,
@@ -66,13 +68,22 @@ export const resolvers: Resolvers = {
 
             return user;
         },
-        createBookmark: (_, { data }, { userId }) => {
+        createBookmark: async (_, { data: { title, description, url, categories } }, { userId }) => {
             if (!userId) return null;
-            const cleaned = unNullifyObj(data);
-            return Bookmark.create({
+            const cleaned = unNullifyObj({ title, description, url });
+
+            const bookmark = await Bookmark.create({
                 ...cleaned,
                 userId,
             }).save();
+
+            await Promise.allSettled(
+                categories?.map((cat) =>
+                    BookmarkToCategory.create({ bookmarkId: bookmark.id, categoryId: cat }).save(),
+                ) || [],
+            );
+
+            return bookmark;
         },
         invalidateTokens: async (_, _a, { userId }) => {
             if (!userId) return false;
@@ -88,6 +99,17 @@ export const resolvers: Resolvers = {
                 .execute();
 
             return true;
+        },
+        createCategory: async (_, { data: { name, bookmarks } }, { userId }) => {
+            if (!userId) return null;
+            const category = await Category.create({ name, userId }).save();
+
+            if (bookmarks?.length) {
+                await Promise.allSettled(
+                    bookmarks.map((id) => BookmarkToCategory.create({ categoryId: category.id, bookmarkId: id })),
+                );
+            }
+            return category;
         },
     },
 };

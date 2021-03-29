@@ -37,6 +37,12 @@ export type CreateBookmarkInput = {
   title: Scalars['String'];
   url: Scalars['String'];
   description?: Maybe<Scalars['String']>;
+  categories?: Maybe<Array<Scalars['Int']>>;
+};
+
+export type CreateCategoryInput = {
+  name: Scalars['String'];
+  bookmarks?: Maybe<Array<Scalars['Int']>>;
 };
 
 export type Mutation = {
@@ -44,6 +50,7 @@ export type Mutation = {
   register: Scalars['Boolean'];
   login?: Maybe<User>;
   createBookmark?: Maybe<Bookmark>;
+  createCategory?: Maybe<Category>;
   invalidateTokens: Scalars['Boolean'];
 };
 
@@ -65,6 +72,11 @@ export type MutationCreateBookmarkArgs = {
   data: CreateBookmarkInput;
 };
 
+
+export type MutationCreateCategoryArgs = {
+  data: CreateCategoryInput;
+};
+
 export type Query = {
   __typename?: 'Query';
   helloWorld: Scalars['String'];
@@ -83,6 +95,7 @@ export type User = {
   email: Scalars['String'];
   name: Scalars['String'];
   bookmarks: Array<Maybe<Bookmark>>;
+  categories: Array<Maybe<Category>>;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -169,6 +182,7 @@ export type ResolversTypes = ResolversObject<{
   String: ResolverTypeWrapper<Scalars['String']>;
   Category: ResolverTypeWrapper<CategoryModel>;
   CreateBookmarkInput: CreateBookmarkInput;
+  CreateCategoryInput: CreateCategoryInput;
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Query: ResolverTypeWrapper<{}>;
@@ -182,6 +196,7 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String'];
   Category: CategoryModel;
   CreateBookmarkInput: CreateBookmarkInput;
+  CreateCategoryInput: CreateCategoryInput;
   Mutation: {};
   Boolean: Scalars['Boolean'];
   Query: {};
@@ -208,6 +223,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   register?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
   login?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   createBookmark?: Resolver<Maybe<ResolversTypes['Bookmark']>, ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
+  createCategory?: Resolver<Maybe<ResolversTypes['Category']>, ParentType, ContextType, RequireFields<MutationCreateCategoryArgs, 'data'>>;
   invalidateTokens?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 }>;
 
@@ -222,6 +238,7 @@ export type UserResolvers<ContextType = MyContext, ParentType extends ResolversP
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
+  categories?: Resolver<Array<Maybe<ResolversTypes['Category']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

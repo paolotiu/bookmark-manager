@@ -6,6 +6,7 @@ export const typeDefs = gql`
         email: String!
         name: String!
         bookmarks: [Bookmark]!
+        categories: [Category]!
     }
 
     type Bookmark {
@@ -26,6 +27,12 @@ export const typeDefs = gql`
         title: String!
         url: String!
         description: String
+        categories: [Int!]
+    }
+
+    input CreateCategoryInput {
+        name: String!
+        bookmarks: [Int!]
     }
 
     type Query {
@@ -38,6 +45,7 @@ export const typeDefs = gql`
         register(email: String!, name: String!, password: String!): Boolean!
         login(email: String!, password: String!): User
         createBookmark(data: CreateBookmarkInput!): Bookmark
+        createCategory(data: CreateCategoryInput!): Category
         invalidateTokens: Boolean!
     }
 `;
