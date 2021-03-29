@@ -46,6 +46,7 @@ export const authResolvers: Resolvers = {
             await User.createQueryBuilder()
                 .update(user)
                 .set({ count: () => 'count + 1' })
+                .where('id = :id', { id: userId })
                 .execute();
 
             return true;
