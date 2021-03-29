@@ -1,0 +1,12 @@
+"User"
+type User {
+    id: ID!
+    email: String!
+    name: String!
+    bookmarks: [Bookmark]!
+    categories: [Category]!
+}
+
+type Query {
+    me: User
+}

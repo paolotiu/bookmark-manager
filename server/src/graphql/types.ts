@@ -17,9 +17,21 @@ export type Scalars = {
   Float: number;
 };
 
+export type AddBookmarkToCategoriesInput = {
+  bookmarkId: Scalars['Int'];
+  /** Category ids */
+  categories: Array<Scalars['Int']>;
+};
+
+export type BaseError = {
+  __typename?: 'BaseError';
+  message: Scalars['String'];
+  path: Scalars['String'];
+};
+
 export type Bookmark = {
   __typename?: 'Bookmark';
-  id: Scalars['Int'];
+  id: Scalars['ID'];
   title: Scalars['String'];
   url: Scalars['String'];
   description?: Maybe<Scalars['String']>;
@@ -28,7 +40,7 @@ export type Bookmark = {
 
 export type Category = {
   __typename?: 'Category';
-  id: Scalars['Int'];
+  id: Scalars['ID'];
   name: Scalars['String'];
   bookmarks: Array<Maybe<Bookmark>>;
 };
@@ -47,24 +59,20 @@ export type CreateCategoryInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  register: Scalars['Boolean'];
-  login?: Maybe<User>;
+  addBookmarkToCategories?: Maybe<Bookmark>;
+  /** Returns null if bookmark wasn't created */
   createBookmark?: Maybe<Bookmark>;
   createCategory?: Maybe<Category>;
   invalidateTokens: Scalars['Boolean'];
+  /** Returns null if login failed */
+  login?: Maybe<UserResult>;
+  /** true => success | false => fail */
+  register: Scalars['Boolean'];
 };
 
 
-export type MutationRegisterArgs = {
-  email: Scalars['String'];
-  name: Scalars['String'];
-  password: Scalars['String'];
-};
-
-
-export type MutationLoginArgs = {
-  email: Scalars['String'];
-  password: Scalars['String'];
+export type MutationAddBookmarkToCategoriesArgs = {
+  data?: Maybe<AddBookmarkToCategoriesInput>;
 };
 
 
@@ -77,9 +85,21 @@ export type MutationCreateCategoryArgs = {
   data: CreateCategoryInput;
 };
 
+
+export type MutationLoginArgs = {
+  email: Scalars['String'];
+  password: Scalars['String'];
+};
+
+
+export type MutationRegisterArgs = {
+  email: Scalars['String'];
+  name: Scalars['String'];
+  password: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
-  helloWorld: Scalars['String'];
   bookmark: Bookmark;
   me?: Maybe<User>;
 };
@@ -89,14 +109,17 @@ export type QueryBookmarkArgs = {
   id: Scalars['Int'];
 };
 
+/** User */
 export type User = {
   __typename?: 'User';
-  id: Scalars['Int'];
+  id: Scalars['ID'];
   email: Scalars['String'];
   name: Scalars['String'];
   bookmarks: Array<Maybe<Bookmark>>;
   categories: Array<Maybe<Category>>;
 };
+
+export type UserResult = BaseError | User;
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
@@ -177,9 +200,12 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
-  Bookmark: ResolverTypeWrapper<BookmarkModel>;
+  AddBookmarkToCategoriesInput: AddBookmarkToCategoriesInput;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  BaseError: ResolverTypeWrapper<BaseError>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Bookmark: ResolverTypeWrapper<BookmarkModel>;
+  ID: ResolverTypeWrapper<Scalars['ID']>;
   Category: ResolverTypeWrapper<CategoryModel>;
   CreateBookmarkInput: CreateBookmarkInput;
   CreateCategoryInput: CreateCategoryInput;
@@ -187,13 +213,17 @@ export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Query: ResolverTypeWrapper<{}>;
   User: ResolverTypeWrapper<UserModel>;
+  UserResult: ResolversTypes['BaseError'] | ResolversTypes['User'];
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
-  Bookmark: BookmarkModel;
+  AddBookmarkToCategoriesInput: AddBookmarkToCategoriesInput;
   Int: Scalars['Int'];
+  BaseError: BaseError;
   String: Scalars['String'];
+  Bookmark: BookmarkModel;
+  ID: Scalars['ID'];
   Category: CategoryModel;
   CreateBookmarkInput: CreateBookmarkInput;
   CreateCategoryInput: CreateCategoryInput;
@@ -201,10 +231,17 @@ export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean'];
   Query: {};
   User: UserModel;
+  UserResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['User'];
+}>;
+
+export type BaseErrorResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['BaseError'] = ResolversParentTypes['BaseError']> = ResolversObject<{
+  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  path?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type BookmarkResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Bookmark'] = ResolversParentTypes['Bookmark']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -213,28 +250,28 @@ export type BookmarkResolvers<ContextType = MyContext, ParentType extends Resolv
 }>;
 
 export type CategoryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  register?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
-  login?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
+  addBookmarkToCategories?: Resolver<Maybe<ResolversTypes['Bookmark']>, ParentType, ContextType, RequireFields<MutationAddBookmarkToCategoriesArgs, never>>;
   createBookmark?: Resolver<Maybe<ResolversTypes['Bookmark']>, ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
   createCategory?: Resolver<Maybe<ResolversTypes['Category']>, ParentType, ContextType, RequireFields<MutationCreateCategoryArgs, 'data'>>;
   invalidateTokens?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  login?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
+  register?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
 }>;
 
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  helloWorld?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   bookmark?: Resolver<ResolversTypes['Bookmark'], ParentType, ContextType, RequireFields<QueryBookmarkArgs, 'id'>>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
 }>;
 
 export type UserResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
@@ -242,12 +279,18 @@ export type UserResolvers<ContextType = MyContext, ParentType extends ResolversP
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type UserResultResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['UserResult'] = ResolversParentTypes['UserResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'BaseError' | 'User', ParentType, ContextType>;
+}>;
+
 export type Resolvers<ContextType = MyContext> = ResolversObject<{
+  BaseError?: BaseErrorResolvers<ContextType>;
   Bookmark?: BookmarkResolvers<ContextType>;
   Category?: CategoryResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  UserResult?: UserResultResolvers<ContextType>;
 }>;
 
 

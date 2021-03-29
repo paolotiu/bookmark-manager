@@ -1,0 +1,31 @@
+type Bookmark {
+    id: ID!
+    title: String!
+    url: String!
+    description: String
+    categories: [Category]!
+}
+
+input CreateBookmarkInput {
+    title: String!
+    url: String!
+    description: String
+    categories: [Int!]
+}
+
+input AddBookmarkToCategoriesInput {
+    bookmarkId: Int!
+    """
+    Category ids
+    """
+    categories: [Int!]!
+}
+type Query {
+    bookmark(id: Int!): Bookmark!
+}
+
+type Mutation {
+    "Returns null if bookmark wasn't created"
+    createBookmark(data: CreateBookmarkInput!): Bookmark
+    addBookmarkToCategories(data: AddBookmarkToCategoriesInput): Bookmark
+}

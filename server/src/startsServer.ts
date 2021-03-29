@@ -4,8 +4,8 @@ import { createConnection } from 'typeorm';
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import 'reflect-metadata';
-import { typeDefs } from '@gql/typeDefs';
-import { resolvers } from '@gql/resolvers';
+import { resolvers } from '@gql/resolvers/index';
+import { typeDefs } from '@gql/schema/typeDefs';
 import cookieParser from 'cookie-parser';
 import { User } from '@entity/User';
 
@@ -21,6 +21,7 @@ interface RefreshTokenPayload extends AccessTokenPayload {
 
 export const startServer = async (): Promise<void> => {
     const app = express();
+
     const apolloServer = new ApolloServer({
         typeDefs,
         resolvers,

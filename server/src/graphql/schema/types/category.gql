@@ -1,0 +1,19 @@
+type BaseError {
+    message: String!
+    path: String!
+}
+
+type Category {
+    id: ID!
+    name: String!
+    bookmarks: [Bookmark]!
+}
+
+input CreateCategoryInput {
+    name: String!
+    bookmarks: [Int!]
+}
+
+type Mutation {
+    createCategory(data: CreateCategoryInput!): Category
+}
