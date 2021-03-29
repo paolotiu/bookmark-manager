@@ -4,8 +4,7 @@ import { createConnection } from 'typeorm';
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import 'reflect-metadata';
-import { resolvers } from '@gql/resolvers/index';
-import { typeDefs } from '@gql/schema/typeDefs';
+import { schema } from '@util/schema';
 import cookieParser from 'cookie-parser';
 import { User } from '@entity/User';
 
@@ -23,8 +22,7 @@ export const startServer = async (): Promise<void> => {
     const app = express();
 
     const apolloServer = new ApolloServer({
-        typeDefs,
-        resolvers,
+        schema,
         tracing: true,
         context: ({ req, res }) => {
             return { req, res, userId: req.userId || undefined };
