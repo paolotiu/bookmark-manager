@@ -1,11 +1,11 @@
+import { createTypeormConn } from '@utils/createTypeormConn';
 import { createTokens } from './auth';
 import jwt from 'jsonwebtoken';
-import { createConnection } from 'typeorm';
 import express from 'express';
 import 'reflect-metadata';
 import cookieParser from 'cookie-parser';
 import { User } from '@entity/User';
-import { createApolloServer } from 'createApolloServer';
+import { createApolloServer } from '@utils/createApolloServer';
 
 interface AccessTokenPayload {
     userId: number;
@@ -56,9 +56,10 @@ export const startServer = async (): Promise<void> => {
         req.userId = user.id;
         next();
     });
-    const apolloServer = await createApolloServer(app);
 
-    createConnection().then(async () => {
-        app.listen(4000, () => console.log(`Live on http://localhost:4000${apolloServer.graphqlPath}`));
+    const apolloServer = createApolloServer(app);
+    await createTypeormConn();
+    app.listen(4000, () => {
+        console.log(`Listening on http://localhost:4000${apolloServer.graphqlPath}`);
     });
 };
