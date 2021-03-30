@@ -102,6 +102,7 @@ export type Query = {
   __typename?: 'Query';
   bookmark: Bookmark;
   me?: Maybe<User>;
+  ping: Scalars['String'];
 };
 
 
@@ -268,6 +269,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   bookmark?: Resolver<ResolversTypes['Bookmark'], ParentType, ContextType, RequireFields<QueryBookmarkArgs, 'id'>>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 }>;
 
 export type UserResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{

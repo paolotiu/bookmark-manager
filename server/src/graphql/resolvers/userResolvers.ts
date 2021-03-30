@@ -19,6 +19,7 @@ export const userResolvers: Resolvers = {
             if (!req.userId) return null;
             return User.findOne(req.userId);
         },
+        ping: () => 'pong',
     },
 };
 
