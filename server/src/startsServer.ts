@@ -2,11 +2,10 @@ import { createTokens } from './auth';
 import jwt from 'jsonwebtoken';
 import { createConnection } from 'typeorm';
 import express from 'express';
-import { ApolloServer } from 'apollo-server-express';
 import 'reflect-metadata';
-import { schema } from '@utils/schema';
 import cookieParser from 'cookie-parser';
 import { User } from '@entity/User';
+import { createApolloServer } from 'createApolloServer';
 
 interface AccessTokenPayload {
     userId: number;
@@ -21,13 +20,6 @@ interface RefreshTokenPayload extends AccessTokenPayload {
 export const startServer = async (): Promise<void> => {
     const app = express();
 
-    const apolloServer = new ApolloServer({
-        schema,
-        tracing: true,
-        context: ({ req, res }) => {
-            return { req, res, userId: req.userId || undefined };
-        },
-    });
     app.use(cookieParser());
     app.use(async (req, res, next) => {
         const accessToken = req.cookies['access-token'];
@@ -64,8 +56,7 @@ export const startServer = async (): Promise<void> => {
         req.userId = user.id;
         next();
     });
-
-    apolloServer.applyMiddleware({ app, path: '/graphql' });
+    const apolloServer = await createApolloServer(app);
 
     createConnection().then(async () => {
         app.listen(4000, () => console.log(`Live on http://localhost:4000${apolloServer.graphqlPath}`));
