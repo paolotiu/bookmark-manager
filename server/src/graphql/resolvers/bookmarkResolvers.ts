@@ -2,7 +2,7 @@ import { Bookmark } from '@entity/Bookmark';
 import { BookmarkToCategory } from '@entity/BookmarkToCategory';
 import { Resolvers } from '@gql/types';
 import { UserInputError } from 'apollo-server-express';
-import { unNullifyObj } from 'util/unNullifyObj';
+import { unNullifyObj } from '@utils/unNullifyObj';
 export const bookmarkResolvers: Resolvers = {
     Bookmark: {
         categories: async (parent) => {

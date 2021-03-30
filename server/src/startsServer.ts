@@ -4,7 +4,7 @@ import { createConnection } from 'typeorm';
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import 'reflect-metadata';
-import { schema } from '@util/schema';
+import { schema } from '@utils/schema';
 import cookieParser from 'cookie-parser';
 import { User } from '@entity/User';
 
