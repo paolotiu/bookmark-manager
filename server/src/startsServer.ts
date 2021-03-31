@@ -6,6 +6,7 @@ import 'reflect-metadata';
 import cookieParser from 'cookie-parser';
 import { User } from '@entity/User';
 import { createApolloServer } from '@utils/createApolloServer';
+import cors from 'cors';
 
 interface AccessTokenPayload {
     userId: number;
@@ -20,6 +21,11 @@ interface RefreshTokenPayload extends AccessTokenPayload {
 export const startServer = async (): Promise<void> => {
     const app = express();
 
+    app.use(
+        cors({
+            credentials: true,
+        }),
+    );
     app.use(cookieParser());
     app.use(async (req, res, next) => {
         const accessToken = req.cookies['access-token'];
@@ -51,8 +57,18 @@ export const startServer = async (): Promise<void> => {
         if (!user || user.count !== data.count) return next();
 
         const tokens = createTokens(user);
-        res.cookie('refresh-token', tokens.refreshToken, { maxAge: 1000 * 60 * 60 * 24 * 7 }); // 7 days
-        res.cookie('access-token', tokens.accessToken, { maxAge: 1000 * 60 * 15 }); //15 minutes
+        res.cookie('refresh-token', tokens.refreshToken, {
+            maxAge: 1000 * 60 * 60 * 24 * 7,
+            sameSite: 'none',
+            secure: true,
+            httpOnly: true,
+        }); // 7 days
+        res.cookie('access-token', tokens.accessToken, {
+            maxAge: 1000 * 60 * 15,
+            sameSite: 'none',
+            secure: true,
+            httpOnly: true,
+        }); //15 minutes
         req.userId = user.id;
         next();
     });
