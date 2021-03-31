@@ -1,3 +1,4 @@
+import { Category } from './Category';
 import {
     BaseEntity,
     Column,
@@ -8,7 +9,6 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
-import { BookmarkToCategory } from './BookmarkToCategory';
 import { User } from './User';
 
 @Entity()
@@ -25,20 +25,24 @@ export class Bookmark extends BaseEntity {
     @Column()
     url: string;
 
-    @CreateDateColumn()
-    createdDate: Date;
-
-    @DeleteDateColumn()
-    deletedDate: Date;
-
-    @Column()
+    @Column('int')
     userId: number;
+
+    @Column({ type: 'int', nullable: true })
+    categoryId: number;
 
     @ManyToOne(() => User, (user) => user.bookmarks)
     @JoinColumn({ name: 'userId' })
     user: User;
 
-    @ManyToOne(() => BookmarkToCategory, (btc) => btc.bookmarkId)
-    categoryConnection: Promise<BookmarkToCategory[]>;
+    @ManyToOne(() => Category, (category) => category.bookmarks)
+    @JoinColumn({ name: 'categoryId' })
+    category: Category;
+
+    @CreateDateColumn()
+    createdDate: Date;
+
+    @DeleteDateColumn()
+    deletedDate: Date;
 }
 export type BookmarkModel = Bookmark;
