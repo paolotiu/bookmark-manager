@@ -1,8 +1,3 @@
-type BaseError {
-    message: String!
-    path: String!
-}
-
 type Category {
     id: ID!
     name: String!
@@ -14,6 +9,13 @@ input CreateCategoryInput {
     bookmarks: [Int!]
 }
 
+type DeleteCategoryResult {
+    category: Category
+    errors: [BaseError]
+}
+
 type Mutation {
     createCategory(data: CreateCategoryInput!): Category
+    "Pass in category id"
+    deleteCategory(id: Int!): Boolean!
 }

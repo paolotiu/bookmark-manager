@@ -1,0 +1,6 @@
+scalar Date
+
+type BaseError {
+    message: String!
+    path: String!
+}

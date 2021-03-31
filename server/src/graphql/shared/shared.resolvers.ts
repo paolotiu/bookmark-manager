@@ -17,11 +17,4 @@ export const resolvers: Resolvers = {
             return null;
         },
     }),
-    Custom: new GraphQLScalarType({
-        name: 'Custom',
-        description: 'Some Desccc',
-        serialize() {
-            return 'CUSSS';
-        },
-    }),
 };

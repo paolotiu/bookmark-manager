@@ -5,7 +5,6 @@ type Bookmark {
     description: String
     categories: [Category]!
     createdDate: Date!
-    custom: Custom!
 }
 input CreateBookmarkInput {
     title: String!
