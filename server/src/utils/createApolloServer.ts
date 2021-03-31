@@ -9,6 +9,7 @@ export const createApolloServer = (app?: Express): ApolloServer => {
         context: ({ req, res }) => {
             return { req, res, userId: req.userId || undefined };
         },
+        tracing: true,
     });
 
     if (app) {
