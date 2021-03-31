@@ -1,8 +1,9 @@
+import { genSchema } from '@gql/genSchema';
 import { ApolloServer } from 'apollo-server-express';
-import { schema } from '@utils/schema';
 import { Express } from 'express';
 
 export const createApolloServer = (app?: Express): ApolloServer => {
+    const schema = genSchema();
     const apolloServer = new ApolloServer({
         schema,
         context: ({ req, res }) => {

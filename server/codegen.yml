@@ -1,11 +1,12 @@
 overwrite: true
-schema: './src/graphql/schema/types/*.gql'
+schema: './src/graphql/**/*.gql'
 documents: null
 generates:
     ./src/graphql/types.ts:
         config:
+            scalars:
+                Date: Date
             useIndexSignature: true
-            maybeValue: T  | null | undefined
             contextType: ./contextType#MyContext
             mappers:
                 User: ../entity/User#UserModel

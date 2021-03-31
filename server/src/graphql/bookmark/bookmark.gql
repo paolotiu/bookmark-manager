@@ -4,8 +4,9 @@ type Bookmark {
     url: String!
     description: String
     categories: [Category]!
+    createdDate: Date!
+    custom: Custom!
 }
-
 input CreateBookmarkInput {
     title: String!
     url: String!

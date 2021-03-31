@@ -3,7 +3,7 @@ import { BookmarkToCategory } from '@entity/BookmarkToCategory';
 import { Resolvers } from '@gql/types';
 import { UserInputError } from 'apollo-server-express';
 import { unNullifyObj } from '@utils/unNullifyObj';
-export const bookmarkResolvers: Resolvers = {
+export const resolvers: Resolvers = {
     Bookmark: {
         categories: async (parent) => {
             const res = await BookmarkToCategory.find({
@@ -13,6 +13,7 @@ export const bookmarkResolvers: Resolvers = {
             const categories = res.map((item) => item.category);
             return categories;
         },
+        custom: () => 'hey',
     },
     Query: {
         bookmark: async (_, { id }) => {

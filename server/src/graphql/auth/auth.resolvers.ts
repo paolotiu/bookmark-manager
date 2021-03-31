@@ -1,9 +1,9 @@
 import { Resolvers } from '@gql/types';
 import bcrypt from 'bcryptjs';
-import { createTokens } from '../../auth';
+import { createTokens } from '@utils/createTokens';
 import { User } from '@entity/User';
 
-export const authResolvers: Resolvers = {
+export const resolvers: Resolvers = {
     Mutation: {
         register: async (_, { email, password, name }) => {
             const hashedPassword = await bcrypt.hash(password, 10);

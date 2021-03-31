@@ -5,7 +5,7 @@ import { Category } from '@entity/Category';
 
 config();
 
-export const categoryResolvers: Resolvers = {
+export const resolvers: Resolvers = {
     Category: {
         bookmarks: async (parent) => {
             const res = await BookmarkToCategory.find({ where: { categoryId: parent.id }, relations: ['bookmark'] });

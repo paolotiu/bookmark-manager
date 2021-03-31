@@ -1,9 +1,9 @@
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { UserModel } from '../entity/User';
 import { BookmarkModel } from '../entity/Bookmark';
 import { CategoryModel } from '../entity/Category';
 import { MyContext } from './contextType';
-export type Maybe<T> = T  | null | undefined;
+export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -15,6 +15,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  Custom: any;
+  Date: Date;
 };
 
 export type AddBookmarkToCategoriesInput = {
@@ -36,6 +38,8 @@ export type Bookmark = {
   url: Scalars['String'];
   description?: Maybe<Scalars['String']>;
   categories: Array<Maybe<Category>>;
+  createdDate: Scalars['Date'];
+  custom: Scalars['Custom'];
 };
 
 export type Category = {
@@ -56,6 +60,8 @@ export type CreateCategoryInput = {
   name: Scalars['String'];
   bookmarks?: Maybe<Array<Scalars['Int']>>;
 };
+
+
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -210,6 +216,8 @@ export type ResolversTypes = ResolversObject<{
   Category: ResolverTypeWrapper<CategoryModel>;
   CreateBookmarkInput: CreateBookmarkInput;
   CreateCategoryInput: CreateCategoryInput;
+  Custom: ResolverTypeWrapper<Scalars['Custom']>;
+  Date: ResolverTypeWrapper<Scalars['Date']>;
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Query: ResolverTypeWrapper<{}>;
@@ -228,6 +236,8 @@ export type ResolversParentTypes = ResolversObject<{
   Category: CategoryModel;
   CreateBookmarkInput: CreateBookmarkInput;
   CreateCategoryInput: CreateCategoryInput;
+  Custom: Scalars['Custom'];
+  Date: Scalars['Date'];
   Mutation: {};
   Boolean: Scalars['Boolean'];
   Query: {};
@@ -247,6 +257,8 @@ export type BookmarkResolvers<ContextType = MyContext, ParentType extends Resolv
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   categories?: Resolver<Array<Maybe<ResolversTypes['Category']>>, ParentType, ContextType>;
+  createdDate?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  custom?: Resolver<ResolversTypes['Custom'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -256,6 +268,14 @@ export type CategoryResolvers<ContextType = MyContext, ParentType extends Resolv
   bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
+
+export interface CustomScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Custom'], any> {
+  name: 'Custom';
+}
+
+export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
+  name: 'Date';
+}
 
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   addBookmarkToCategories?: Resolver<Maybe<ResolversTypes['Bookmark']>, ParentType, ContextType, RequireFields<MutationAddBookmarkToCategoriesArgs, never>>;
@@ -289,6 +309,8 @@ export type Resolvers<ContextType = MyContext> = ResolversObject<{
   BaseError?: BaseErrorResolvers<ContextType>;
   Bookmark?: BookmarkResolvers<ContextType>;
   Category?: CategoryResolvers<ContextType>;
+  Custom?: GraphQLScalarType;
+  Date?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   User?: UserResolvers<ContextType>;

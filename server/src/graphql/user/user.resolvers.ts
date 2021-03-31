@@ -3,7 +3,7 @@ import { Category } from '@entity/Category';
 import { User } from '@entity/User';
 import { Resolvers, BaseError } from '@gql/types';
 
-export const userResolvers: Resolvers = {
+export const resolvers: Resolvers = {
     UserResult: {
         __resolveType: (obj) => {
             if (isBaseError(obj)) return 'BaseError';
@@ -15,9 +15,10 @@ export const userResolvers: Resolvers = {
         categories: (parent) => Category.find({ where: { userId: parent.id } }),
     },
     Query: {
-        me: (_, _a, { req }) => {
-            if (!req.userId) return null;
-            return User.findOne(req.userId);
+        me: async (_, _a, { userId }) => {
+            if (!userId) return null;
+            const user = await User.findOne(userId);
+            return user ? user : null;
         },
         ping: () => 'pong',
     },

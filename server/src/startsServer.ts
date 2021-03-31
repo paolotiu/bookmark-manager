@@ -1,5 +1,5 @@
 import { createTypeormConn } from '@utils/createTypeormConn';
-import { createTokens } from './auth';
+import { createTokens } from '@utils/createTokens';
 import jwt from 'jsonwebtoken';
 import express from 'express';
 import 'reflect-metadata';
