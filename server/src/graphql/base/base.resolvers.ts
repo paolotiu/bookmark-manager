@@ -8,11 +8,9 @@ export const resolvers: Resolvers = {
             return value.getTime();
         },
         parseValue(value) {
-            console.log(value);
             return new Date(value);
         },
         parseLiteral(ast) {
-            console.log(ast);
             if (ast.kind === Kind.INT) {
                 return new Date(parseInt(ast.value, 10));
             }
