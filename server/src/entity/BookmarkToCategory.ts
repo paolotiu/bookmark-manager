@@ -1,21 +1,24 @@
-import { Bookmark } from '@entity/Bookmark';
-import { BaseEntity, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { Category } from './Category';
+// import { Bookmark } from '@entity/Bookmark';
+// import { BaseEntity, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+// import { Category } from './Category';
 
-@Entity()
-export class BookmarkToCategory extends BaseEntity {
-    @PrimaryColumn('int')
-    bookmarkId: number;
+// @Entity()
+// export class BookmarkToCategory extends BaseEntity {
+//     @PrimaryColumn('int')
+//     bookmarkId: number;
 
-    @PrimaryColumn('int')
-    categoryId: number;
+//     @PrimaryColumn('int')
+//     categoryId: number;
 
-    @ManyToOne(() => Bookmark, (bookmark) => bookmark.categoryConnection)
-    @JoinColumn({ name: 'bookmarkId' })
-    bookmark: Bookmark;
+//     @PrimaryColumn('int')
+//     userId: number;
 
-    @ManyToOne(() => Category, (cat) => cat.bookConnection)
-    @JoinColumn({ name: 'categoryId' })
-    category: Category;
-}
-export type BookMarkToCategoryModel = BookmarkToCategory;
+//     @ManyToOne(() => Bookmark, (bookmark) => bookmark.categoryConnection)
+//     @JoinColumn({ name: 'bookmarkId' })
+//     bookmark: Bookmark;
+
+//     @ManyToOne(() => Category, (cat) => cat.bookConnection)
+//     @JoinColumn({ name: 'categoryId' })
+//     category: Category;
+// }
+// export type BookMarkToCategoryModel = BookmarkToCategory;
