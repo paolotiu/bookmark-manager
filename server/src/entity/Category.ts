@@ -1,6 +1,17 @@
+import { Bookmark } from '@entity/Bookmark';
 import { User } from '@entity/User';
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
-import { BookmarkToCategory } from './BookmarkToCategory';
+import {
+    BaseEntity,
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    Unique,
+} from 'typeorm';
 
 @Unique(['name', 'userId'])
 @Entity()
@@ -11,14 +22,19 @@ export class Category extends BaseEntity {
     @Column()
     name: string;
 
-    @OneToMany(() => BookmarkToCategory, (btc) => btc.category)
-    bookConnection: Promise<BookmarkToCategory[]>;
-
     @Column('int')
     userId: number;
 
     @ManyToOne(() => User, (user) => user.categories)
     @JoinColumn({ name: 'userId' })
     user: User;
+
+    @OneToMany(() => Bookmark, (bookmark) => bookmark.category)
+    bookmarks: Bookmark[];
+
+    @CreateDateColumn()
+    createdDate: Date;
+
+    @DeleteDateColumn()
+    deletedDate: Date;
 }
-export type CategoryModel = Category;

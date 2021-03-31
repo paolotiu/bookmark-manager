@@ -9,13 +9,15 @@ input CreateCategoryInput {
     bookmarks: [Int!]
 }
 
-type DeleteCategoryResult {
-    category: Category
-    errors: [BaseError]
+type NoErrorCategoryDeletion {
+    success: Boolean!
 }
 
+union CreateCategoryResult = BaseError | Category
+union DeleteCategoryResult = BaseError | NoErrorCategoryDeletion
+
 type Mutation {
-    createCategory(data: CreateCategoryInput!): Category
+    createCategory(data: CreateCategoryInput!): CreateCategoryResult!
     "Pass in category id"
-    deleteCategory(id: Int!): Boolean!
+    deleteCategory(id: Int!): DeleteCategoryResult!
 }
