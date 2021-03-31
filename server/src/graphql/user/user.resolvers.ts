@@ -1,18 +1,16 @@
 import { Bookmark } from '@entity/Bookmark';
 import { Category } from '@entity/Category';
 import { User } from '@entity/User';
-import { Resolvers, BaseError } from '@gql/types';
+import { isBaseError } from '@gql/shared/errorMessages';
+import { Resolvers } from '@gql/types';
 
 export const resolvers: Resolvers = {
     UserResult: {
-        __resolveType: (obj) => {
-            if (isBaseError(obj)) return 'BaseError';
-            return 'User';
-        },
+        __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'User'),
     },
     User: {
-        bookmarks: (parent) => Bookmark.find({ where: { userId: parent.id } }),
-        categories: (parent) => Category.find({ where: { userId: parent.id } }),
+        bookmarks: (parent) => Bookmark.find({ where: { userId: parent.id }, relations: ['category'] }),
+        categories: (parent) => Category.find({ where: { userId: parent.id }, relations: ['bookmarks'] }),
     },
     Query: {
         me: async (_, _a, { userId }) => {
@@ -23,7 +21,3 @@ export const resolvers: Resolvers = {
         ping: () => 'pong',
     },
 };
-
-function isBaseError(obj: unknown): obj is BaseError {
-    return (obj as BaseError).message !== undefined && (obj as BaseError).path !== undefined;
-}
