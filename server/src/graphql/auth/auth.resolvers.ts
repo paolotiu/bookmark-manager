@@ -1,8 +1,13 @@
+import { BaseError } from './../types';
 import { Resolvers } from '@gql/types';
 import bcrypt from 'bcryptjs';
 import { createTokens } from '@utils/createTokens';
 import { User } from '@entity/User';
 
+const loginError: BaseError = {
+    path: 'login',
+    message: 'Email or password is incorrect',
+};
 export const resolvers: Resolvers = {
     Mutation: {
         register: async (_, { email, password, name }) => {
@@ -16,22 +21,25 @@ export const resolvers: Resolvers = {
         },
         login: async (_, { email, password }, { res }) => {
             const user = await User.findOne({ where: { email } });
-            if (!user)
-                return {
-                    path: 'login',
-                    message: 'email or password is incorrect',
-                };
+            if (!user) return loginError;
+
             const isValid = await bcrypt.compare(password, user.password);
-            if (!isValid)
-                return {
-                    path: 'login',
-                    message: 'Email or password is incorrect',
-                };
+            if (!isValid) return loginError;
 
             const { refreshToken, accessToken } = createTokens(user);
 
-            res.cookie('refresh-token', refreshToken, { maxAge: 1000 * 60 * 60 * 24 * 7 }); // 7 days
-            res.cookie('access-token', accessToken, { maxAge: 1000 * 60 * 15 }); //15 minutes
+            res.cookie('refresh-token', refreshToken, {
+                maxAge: 1000 * 60 * 60 * 24 * 7,
+                sameSite: 'none',
+                secure: true,
+                httpOnly: true,
+            }); // 7 days
+            res.cookie('access-token', accessToken, {
+                maxAge: 1000 * 60 * 15,
+                sameSite: 'none',
+                secure: true,
+                httpOnly: true,
+            }); //15 minutes
 
             return user;
         },
