@@ -66,6 +66,7 @@ export const resolvers: Resolvers = {
             const updateObj: {
                 [key: string]: string | number | Date | null;
             } = unNullifyObj({ description, title, url });
+
             const bookmark = await Bookmark.findOne(id, { where: { userId }, relations: ['category'] });
             if (!bookmark) {
                 return {
@@ -74,36 +75,57 @@ export const resolvers: Resolvers = {
                 };
             }
 
-            Object.assign(updateObj, bookmark);
+            Object.assign(bookmark, updateObj);
             await bookmark.save();
 
-            // TODO: Make logic less messy
-            if (typeof categoryId !== 'undefined') {
-                if (categoryId === null) {
-                    if (bookmark.categoryId !== null) {
-                        const category = await Category.findOne(bookmark.categoryId, {
-                            where: { userId },
-                            relations: ['bookmarks'],
-                        });
-                        if (category) {
-                            category.bookmarks = category.bookmarks.filter((val) => {
-                                console.log(bookmark.id !== val.id);
-                                return val.id !== bookmark.id;
-                            });
-                            await category.save();
-                        }
-                    }
-                } else {
-                    // Check if user owns the category
-                    const category = await Category.findOne({ where: { id: categoryId, userId } });
+            // No category changes made
+            if (typeof categoryId === 'undefined' || categoryId === bookmark.categoryId) return bookmark;
+
+            if (categoryId === null) {
+                removeFromCategory(bookmark);
+            } else {
+                addToCategory(bookmark, categoryId);
+            }
+            const newBookmark = await Bookmark.findOne(id, { where: { userId }, relations: ['category'] });
+
+            return (
+                newBookmark || {
+                    path: 'updateBookmark',
+                    message: "Somehting wrong happened. You shouldn't be recieving this error",
+                }
+            );
+
+            async function addToCategory(bookmark: Bookmark, categoryId: number) {
+                // Check if user owns the category
+                const category = await Category.findOne(categoryId, {
+                    where: { userId },
+                    relations: ['bookmarks'],
+                });
+
+                if (category) {
+                    category.bookmarks ? category.bookmarks.push(bookmark) : (category.bookmarks = [bookmark]);
+                    await category.save();
+                }
+            }
+
+            async function removeFromCategory(bookmark: Bookmark) {
+                // null check to please typescript
+                if (bookmark.categoryId !== null) {
+                    const category = await Category.findOne(bookmark.categoryId, {
+                        where: { userId },
+                        relations: ['bookmarks'],
+                    });
+
                     if (category) {
-                        category.bookmarks ? category.bookmarks.push(bookmark) : (category.bookmarks = [bookmark]);
+                        // Category found
+                        // Remove bookmark
+                        category.bookmarks = category.bookmarks.filter((val) => {
+                            return val.id !== bookmark.id;
+                        });
                         await category.save();
                     }
                 }
             }
-
-            return Bookmark.findOne(id, { where: { userId }, relations: ['category'] });
         },
     },
 };
