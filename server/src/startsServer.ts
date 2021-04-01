@@ -22,11 +22,7 @@ interface RefreshTokenPayload extends AccessTokenPayload {
 export const startServer = async (): Promise<void> => {
     const app = express();
 
-    app.use(
-        cors({
-            credentials: true,
-        }),
-    );
+    app.use(cors());
     app.use(cookieParser());
     app.use(async (req, res, next) => {
         const accessToken = req.cookies['access-token'];
