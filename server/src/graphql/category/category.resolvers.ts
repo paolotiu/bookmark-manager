@@ -7,11 +7,17 @@ import { isBaseError, unauthorizedError } from '@gql/shared/errorMessages';
 config();
 
 export const resolvers: Resolvers = {
-    CreateBookmarkResult: {
-        __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmark'),
-    },
     DeleteCategoryResult: {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'NoErrorCategoryDeletion'),
+    },
+    CreateCategoryResult: {
+        __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Category'),
+    },
+    Category: {
+        bookmarks: (parent, _, { userId }) => {
+            if (parent.bookmarks) return parent.bookmarks;
+            return Bookmark.find({ where: { categoryId: parent.id, userId } });
+        },
     },
     Mutation: {
         createCategory: async (_, { data: { name, bookmarks } }, { userId }) => {
