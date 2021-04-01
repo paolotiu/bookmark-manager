@@ -3,6 +3,7 @@ import { Resolvers } from '@gql/types';
 import bcrypt from 'bcryptjs';
 import { createTokens } from '@utils/createTokens';
 import { User } from '@entity/User';
+import { CookieOptions, Response } from 'express';
 
 const loginError: BaseError = {
     path: 'login',
@@ -27,19 +28,7 @@ export const resolvers: Resolvers = {
             if (!isValid) return loginError;
 
             const { refreshToken, accessToken } = createTokens(user);
-
-            res.cookie('refresh-token', refreshToken, {
-                maxAge: 1000 * 60 * 60 * 24 * 7,
-                sameSite: 'none',
-                secure: true,
-                httpOnly: true,
-            }); // 7 days
-            res.cookie('access-token', accessToken, {
-                maxAge: 1000 * 60 * 15,
-                sameSite: 'none',
-                secure: true,
-                httpOnly: true,
-            }); //15 minutes
+            setTokenCookies(res, { refreshToken, accessToken });
 
             return user;
         },
@@ -61,3 +50,19 @@ export const resolvers: Resolvers = {
         },
     },
 };
+function getCookieOptions(time: number): CookieOptions {
+    return {
+        maxAge: time,
+        sameSite: 'none',
+        secure: true,
+        httpOnly: true,
+    };
+}
+
+export function setTokenCookies(
+    res: Response,
+    { refreshToken, accessToken }: { refreshToken: string; accessToken: string },
+): void {
+    res.cookie('refresh-token', refreshToken, getCookieOptions(1000 * 60 * 60 * 7)); // 7 days
+    res.cookie('access-token', accessToken, getCookieOptions(1000 * 60 * 15)); //15 minutes
+}

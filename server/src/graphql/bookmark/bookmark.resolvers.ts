@@ -1,6 +1,5 @@
 import { Bookmark } from '@entity/Bookmark';
 import { Resolvers } from '@gql/types';
-import { UserInputError } from 'apollo-server-express';
 import { unNullifyObj } from '@utils/unNullifyObj';
 import { unauthorizedError, isBaseError } from '@gql/shared/errorMessages';
 import { Category } from '@entity/Category';
@@ -60,13 +59,13 @@ export const resolvers: Resolvers = {
     },
 };
 
-async function checkIfUserOwnsCategories(ids: number[], userId: number) {
-    // Check if use rincluded a category that's not their's
-    const cats = await Category.createQueryBuilder('c')
-        .select()
-        .where('c.userId != :userId', { userId })
-        .andWhereInIds(ids)
-        .execute();
-    if (cats.length) return false;
-    return true;
-}
+// async function checkIfUserOwnsCategories(ids: number[], userId: number) {
+//     // Check if use rincluded a category that's not their's
+//     const cats = await Category.createQueryBuilder('c')
+//         .select()
+//         .where('c.userId != :userId', { userId })
+//         .andWhereInIds(ids)
+//         .execute();
+//     if (cats.length) return false;
+//     return true;
+// }

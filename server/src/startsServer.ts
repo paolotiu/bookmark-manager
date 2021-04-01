@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import { User } from '@entity/User';
 import { createApolloServer } from '@utils/createApolloServer';
 import cors from 'cors';
+import { setTokenCookies } from '@gql/auth/auth.resolvers';
 
 interface AccessTokenPayload {
     userId: number;
@@ -57,18 +58,7 @@ export const startServer = async (): Promise<void> => {
         if (!user || user.count !== data.count) return next();
 
         const tokens = createTokens(user);
-        res.cookie('refresh-token', tokens.refreshToken, {
-            maxAge: 1000 * 60 * 60 * 24 * 7,
-            sameSite: 'none',
-            secure: true,
-            httpOnly: true,
-        }); // 7 days
-        res.cookie('access-token', tokens.accessToken, {
-            maxAge: 1000 * 60 * 15,
-            sameSite: 'none',
-            secure: true,
-            httpOnly: true,
-        }); //15 minutes
+        setTokenCookies(res, tokens);
         req.userId = user.id;
         next();
     });
