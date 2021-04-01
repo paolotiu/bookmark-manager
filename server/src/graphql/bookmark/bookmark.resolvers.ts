@@ -60,9 +60,8 @@ export const resolvers: Resolvers = {
 
             return bookmark.save();
         },
-        updateBookmark: async (_, { data: { id, categoryId, description, title, url } }) => {
-            // if (!userId) return unauthorizedError('updateBookmark');
-            const userId = 1;
+        updateBookmark: async (_, { data: { id, categoryId, description, title, url } }, { userId }) => {
+            if (!userId) return unauthorizedError('updateBookmark');
             const updateObj: {
                 [key: string]: string | number | Date | null;
             } = unNullifyObj({ description, title, url });
