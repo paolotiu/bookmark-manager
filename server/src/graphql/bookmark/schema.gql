@@ -19,15 +19,24 @@ input AddBookmarkToCategoriesInput {
     """
     categoryId: Int!
 }
+
+input UpdateBookmarkInput {
+    id: Int!
+    title: String
+    description: String
+    url: String
+    categoryId: Int
+}
 type Query {
     bookmark(id: Int!): BookmarkResult!
 }
 union BookmarkResult = BaseError | Bookmark
 union CreateBookmarkResult = BaseError | Bookmark
 union AddBookmarkToCategoriesResult = BaseError | Bookmark
-
+union UpdateBookmarkResult = BaseError | Bookmark
 type Mutation {
     "Returns null if bookmark wasn't created"
     createBookmark(data: CreateBookmarkInput!): CreateBookmarkResult!
+    updateBookmark(data: UpdateBookmarkInput!): UpdateBookmarkResult!
     addBookmarkToCategories(data: AddBookmarkToCategoriesInput!): AddBookmarkToCategoriesResult!
 }

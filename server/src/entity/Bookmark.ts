@@ -29,7 +29,7 @@ export class Bookmark extends BaseEntity {
     userId: number;
 
     @Column({ type: 'int', nullable: true })
-    categoryId: number;
+    categoryId: number | null;
 
     @ManyToOne(() => User, (user) => user.bookmarks)
     @JoinColumn({ name: 'userId' })

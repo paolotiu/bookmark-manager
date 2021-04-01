@@ -82,6 +82,7 @@ export type Mutation = {
   login?: Maybe<UserResult>;
   /** true => success | false => fail */
   register: Scalars['Boolean'];
+  updateBookmark: UpdateBookmarkResult;
 };
 
 
@@ -117,6 +118,11 @@ export type MutationRegisterArgs = {
   password: Scalars['String'];
 };
 
+
+export type MutationUpdateBookmarkArgs = {
+  data: UpdateBookmarkInput;
+};
+
 export type NoErrorCategoryDeletion = {
   __typename?: 'NoErrorCategoryDeletion';
   success: Scalars['Boolean'];
@@ -133,6 +139,16 @@ export type Query = {
 export type QueryBookmarkArgs = {
   id: Scalars['Int'];
 };
+
+export type UpdateBookmarkInput = {
+  id: Scalars['Int'];
+  title?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+  categoryId?: Maybe<Scalars['Int']>;
+};
+
+export type UpdateBookmarkResult = BaseError | Bookmark;
 
 /** User */
 export type User = {
@@ -244,6 +260,8 @@ export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   NoErrorCategoryDeletion: ResolverTypeWrapper<NoErrorCategoryDeletion>;
   Query: ResolverTypeWrapper<{}>;
+  UpdateBookmarkInput: UpdateBookmarkInput;
+  UpdateBookmarkResult: ResolversTypes['BaseError'] | ResolversTypes['Bookmark'];
   User: ResolverTypeWrapper<UserModel>;
   UserResult: ResolversTypes['BaseError'] | ResolversTypes['User'];
 }>;
@@ -269,6 +287,8 @@ export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean'];
   NoErrorCategoryDeletion: NoErrorCategoryDeletion;
   Query: {};
+  UpdateBookmarkInput: UpdateBookmarkInput;
+  UpdateBookmarkResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Bookmark'];
   User: UserModel;
   UserResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['User'];
 }>;
@@ -328,6 +348,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   invalidateTokens?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   login?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   register?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
+  updateBookmark?: Resolver<ResolversTypes['UpdateBookmarkResult'], ParentType, ContextType, RequireFields<MutationUpdateBookmarkArgs, 'data'>>;
 }>;
 
 export type NoErrorCategoryDeletionResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['NoErrorCategoryDeletion'] = ResolversParentTypes['NoErrorCategoryDeletion']> = ResolversObject<{
@@ -339,6 +360,10 @@ export type QueryResolvers<ContextType = MyContext, ParentType extends Resolvers
   bookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<QueryBookmarkArgs, 'id'>>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+}>;
+
+export type UpdateBookmarkResultResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['UpdateBookmarkResult'] = ResolversParentTypes['UpdateBookmarkResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'BaseError' | 'Bookmark', ParentType, ContextType>;
 }>;
 
 export type UserResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
@@ -367,6 +392,7 @@ export type Resolvers<ContextType = MyContext> = ResolversObject<{
   Mutation?: MutationResolvers<ContextType>;
   NoErrorCategoryDeletion?: NoErrorCategoryDeletionResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  UpdateBookmarkResult?: UpdateBookmarkResultResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserResult?: UserResultResolvers<ContextType>;
 }>;

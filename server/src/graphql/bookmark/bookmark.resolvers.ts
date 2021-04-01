@@ -3,6 +3,7 @@ import { Resolvers } from '@gql/types';
 import { unNullifyObj } from '@utils/unNullifyObj';
 import { unauthorizedError, isBaseError } from '@gql/shared/errorMessages';
 import { Category } from '@entity/Category';
+
 export const resolvers: Resolvers = {
     BookmarkResult: {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmark'),
@@ -11,6 +12,9 @@ export const resolvers: Resolvers = {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmark'),
     },
     CreateBookmarkResult: {
+        __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmark'),
+    },
+    UpdateBookmarkResult: {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmark'),
     },
     Query: {
@@ -55,6 +59,51 @@ export const resolvers: Resolvers = {
             bookmark.categoryId = categoryId;
 
             return bookmark.save();
+        },
+        updateBookmark: async (_, { data: { id, categoryId, description, title, url } }) => {
+            // if (!userId) return unauthorizedError('updateBookmark');
+            const userId = 1;
+            const updateObj: {
+                [key: string]: string | number | Date | null;
+            } = unNullifyObj({ description, title, url });
+            const bookmark = await Bookmark.findOne(id, { where: { userId }, relations: ['category'] });
+            if (!bookmark) {
+                return {
+                    path: 'updateBookmark',
+                    message: 'No bookmark with that id',
+                };
+            }
+
+            Object.assign(updateObj, bookmark);
+            await bookmark.save();
+
+            // TODO: Make logic less messy
+            if (typeof categoryId !== 'undefined') {
+                if (categoryId === null) {
+                    if (bookmark.categoryId !== null) {
+                        const category = await Category.findOne(bookmark.categoryId, {
+                            where: { userId },
+                            relations: ['bookmarks'],
+                        });
+                        if (category) {
+                            category.bookmarks = category.bookmarks.filter((val) => {
+                                console.log(bookmark.id !== val.id);
+                                return val.id !== bookmark.id;
+                            });
+                            await category.save();
+                        }
+                    }
+                } else {
+                    // Check if user owns the category
+                    const category = await Category.findOne({ where: { id: categoryId, userId } });
+                    if (category) {
+                        category.bookmarks ? category.bookmarks.push(bookmark) : (category.bookmarks = [bookmark]);
+                        await category.save();
+                    }
+                }
+            }
+
+            return Bookmark.findOne(id, { where: { userId }, relations: ['category'] });
         },
     },
 };
