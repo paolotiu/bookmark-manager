@@ -6,7 +6,7 @@
         "forceConsistentCasingInFileNames": true,
         "isolatedModules": true,
         "jsx": "preserve",
-        "lib": ["dom", "es2017"],
+        "lib": ["dom", "es2019"],
         "module": "esnext",
         "moduleResolution": "node",
         "noEmit": true,
@@ -19,7 +19,11 @@
         "target": "esnext",
         "strictNullChecks": true,
         "noImplicitAny": true,
-        "noImplicitReturns": false
+        "noImplicitReturns": false,
+        "baseUrl": ".",
+        "paths": {
+            "@graphql/*": ["graphql/*"]
+        }
     },
     "exclude": ["node_modules"],
     "include": ["**/*.ts", "**/*.tsx"]

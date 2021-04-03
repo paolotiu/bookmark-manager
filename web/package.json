@@ -1,32 +1,40 @@
 {
-  "name": "with-typescript",
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "next",
-    "build": "next build",
-    "start": "next start",
-    "type-check": "tsc"
-  },
-  "dependencies": {
-    "@apollo/client": "^3.3.13",
-    "deepmerge": "^4.2.2",
-    "graphql": "^15.5.0",
-    "lodash": "^4.17.21",
-    "next": "latest",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
-  },
-  "devDependencies": {
-    "@types/lodash": "^4.14.168",
-    "@types/node": "^12.12.21",
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.20.0",
-    "@typescript-eslint/parser": "^4.20.0",
-    "eslint": "^7.23.0",
-    "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-prettier": "^3.3.1",
-    "typescript": "4.0"
-  },
-  "license": "MIT"
+    "name": "with-typescript",
+    "version": "1.0.0",
+    "scripts": {
+        "dev": "next",
+        "build": "next build",
+        "start": "next start",
+        "type-check": "tsc",
+        "generate": "graphql-codegen --config codegen.yml"
+    },
+    "dependencies": {
+        "@apollo/client": "^3.3.13",
+        "cookie": "^0.4.1",
+        "deepmerge": "^4.2.2",
+        "graphql": "^15.5.0",
+        "lodash": "^4.17.21",
+        "next": "latest",
+        "react": "^17.0.1",
+        "react-dom": "^17.0.1"
+    },
+    "devDependencies": {
+        "@graphql-codegen/cli": "1.21.3",
+        "@types/cookie": "^0.4.0",
+        "@types/lodash": "^4.14.168",
+        "@types/node": "^12.12.21",
+        "@types/react": "^17.0.2",
+        "@types/react-dom": "^17.0.1",
+        "@typescript-eslint/eslint-plugin": "^4.20.0",
+        "@typescript-eslint/parser": "^4.20.0",
+        "eslint": "^7.23.0",
+        "eslint-config-prettier": "^8.1.0",
+        "eslint-plugin-prettier": "^3.3.1",
+        "typescript": "4.0",
+        "@graphql-codegen/typescript-operations": "1.17.15",
+        "@graphql-codegen/fragment-matcher": "2.0.1",
+        "@graphql-codegen/typescript": "1.21.1",
+        "@graphql-codegen/typescript-react-apollo": "2.2.3"
+    },
+    "license": "MIT"
 }
