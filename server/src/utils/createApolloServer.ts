@@ -13,7 +13,7 @@ export const createApolloServer = (app?: Express): ApolloServer => {
     });
 
     if (app) {
-        apolloServer.applyMiddleware({ app, path: '/graphql' });
+        apolloServer.applyMiddleware({ app, path: '/graphql', cors: false });
     }
 
     return apolloServer;
