@@ -9,6 +9,10 @@ module.exports = {
             colors: {
                 primary: '#5138ED',
             },
+            screens: {
+                '3xl': '1600px',
+                '4xl': '2000px',
+            },
         },
     },
     variants: {

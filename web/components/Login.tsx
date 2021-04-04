@@ -63,7 +63,7 @@ const Login = ({ className, ...p }: React.ComponentPropsWithoutRef<'div'>) => {
                     </div>
 
                     <ErrorMessage text={error} />
-                    <Link href=''>
+                    <Link href='/'>
                         <a className='text-sm font-medium justify-self-end hover:underline text-primary md:text-base hover:cursor-pointer'>
                             Forgot password?
                         </a>
