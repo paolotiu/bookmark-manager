@@ -4,7 +4,6 @@ dist/
 build/
 .env
 dea/
-.vscode/
 tmp/
 temp/
 ormconfig.json
