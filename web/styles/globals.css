@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+    .outline-default {
+        outline: 2px solid black;
+    }
+}
