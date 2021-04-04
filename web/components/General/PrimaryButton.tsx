@@ -6,7 +6,7 @@ interface Props extends React.ComponentPropsWithoutRef<'button'> {
 
 const PrimaryButton = ({ text, className, ...p }: Props) => {
     return (
-        <button className={` py-3 text-white rounded-full outline-none bg-primary ${className || ''}`} {...p}>
+        <button className={` py-3 text-white rounded-full no-outline bg-primary ${className || ''}`} {...p}>
             {text}
         </button>
     );
