@@ -7,20 +7,34 @@ import { useForm } from '@lib/useForm';
 import { useLoginMutation } from '@graphql/generated/graphql';
 import Link from 'next/link';
 import ErrorMessage from './General/ErrorMessage';
+import { checkObjEqual } from '@lib/checkObjEqual';
+
+// Inital form state
+const initialState = {
+    email: '',
+    password: '',
+};
 
 const Login = ({ className, ...p }: React.ComponentPropsWithoutRef<'div'>) => {
-    const { handleChange, inputs } = useForm({
-        email: 'sadsa',
-        password: 'asdsad',
-    });
+    const { handleChange, inputs } = useForm(initialState);
+    const [lastInputs, setLastInputs] = useState(initialState);
     const [error, setError] = useState('');
 
     const [loginMutation] = useLoginMutation();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        // To prevent multiple server calls
+        if (checkObjEqual(lastInputs, inputs)) return;
+
+        // Update cahced inputs
+        setLastInputs(inputs);
+
         const { data } = await loginMutation({ variables: inputs });
+
         if (data?.login?.__typename === 'BaseError') {
+            // Wrong email/password
             setError(data.login.message);
         } else {
             setError('');
@@ -29,7 +43,7 @@ const Login = ({ className, ...p }: React.ComponentPropsWithoutRef<'div'>) => {
     };
 
     return (
-        <div className={`p-8 ${className || ''}`}>
+        <div className={`p-8 ${className || ''}`} {...p}>
             <div className='py-4'>
                 <h1 className='py-4 text-4xl font-bold md:text-5xl'>Login</h1>
                 <p className='text-sm text-gray-500 md:text-lg'>Start organizing your bookmarks!</p>
@@ -68,7 +82,7 @@ const Login = ({ className, ...p }: React.ComponentPropsWithoutRef<'div'>) => {
                             Forgot password?
                         </a>
                     </Link>
-                    <PrimaryButton text='Login' className='transition-transform duration-200 transform ' />
+                    <PrimaryButton text='Login' className='transition-transform duration-200 transform' />
                     <span className='text-sm md:text-base'>
                         Already have an account?{' '}
                         <Link href='/register'>
