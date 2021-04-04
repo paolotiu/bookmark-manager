@@ -17,7 +17,7 @@ const Input = ({ label, type, name, placeholder = '', className, ...p }: InputPr
                 type={type}
                 placeholder={placeholder}
                 name={name}
-                className={`w-full px-5 py-2 border border-gray-300 rounded-full ${className}`}
+                className={`w-full px-5 py-2 border focus:ring-1 ring-primary  outline-none border-gray-300 rounded-full md:py-3 ${className}`}
                 {...p}
             />
         </div>

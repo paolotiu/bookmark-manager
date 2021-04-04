@@ -8,7 +8,7 @@ import { useLoginMutation } from '@graphql/generated/graphql';
 import Link from 'next/link';
 import ErrorMessage from './General/ErrorMessage';
 
-const Login = () => {
+const Login = ({ className, ...p }: React.ComponentPropsWithoutRef<'div'>) => {
     const { handleChange, inputs } = useForm({
         email: 'sadsa',
         password: 'asdsad',
@@ -29,13 +29,13 @@ const Login = () => {
     };
 
     return (
-        <div className='p-8'>
+        <div className={`p-8 ${className || ''}`}>
             <div className='py-4'>
-                <h1 className='py-4 text-4xl font-bold'>Login</h1>
-                <p className='text-sm text-gray-500'>Start organizing your bookmarks!</p>
+                <h1 className='py-4 text-4xl font-bold md:text-5xl'>Login</h1>
+                <p className='text-sm text-gray-500 md:text-lg'>Start organizing your bookmarks!</p>
             </div>
             <div className='pt-5'>
-                <button className='flex justify-center w-full px-4 py-2 border border-gray-300 rounded-full '>
+                <button className='flex justify-center w-full px-4 py-2 border border-gray-300 rounded-full md:py-3 '>
                     <Google className='h-5' />
                     <span className='px-4'>Sign in with Google</span>
                 </button>
@@ -63,14 +63,17 @@ const Login = () => {
                     </div>
 
                     <ErrorMessage text={error} />
-                    <Link href='/register'>
-                        <a className='text-sm font-medium justify-self-end hover:underline text-primary' href=''>
+                    <Link href=''>
+                        <a className='text-sm font-medium justify-self-end hover:underline text-primary md:text-base hover:cursor-pointer'>
                             Forgot password?
                         </a>
                     </Link>
-                    <PrimaryButton text='Login' />
-                    <span className='text-sm font-medium'>
-                        Already have an account? <span className='text-primary hover:underline'>Log In</span>
+                    <PrimaryButton text='Login' className='transition-transform duration-200 transform ' />
+                    <span className='text-sm md:text-base'>
+                        Already have an account?{' '}
+                        <Link href='/register'>
+                            <a className='font-medium text-primary hover:underline hover:cursor-pointer'>Log In</a>
+                        </Link>
                     </span>
                 </form>
             </div>
