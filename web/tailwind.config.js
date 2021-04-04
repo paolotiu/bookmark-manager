@@ -5,7 +5,11 @@ module.exports = {
         fontFamily: {
             sans: ['Heebo', 'Helvetica', 'Arial', 'sans-serif'],
         },
-        extend: {},
+        extend: {
+            colors: {
+                primary: '#5138ED',
+            },
+        },
     },
     variants: {
         extend: {},
