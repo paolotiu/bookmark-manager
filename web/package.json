@@ -20,6 +20,12 @@
     },
     "devDependencies": {
         "@graphql-codegen/cli": "1.21.3",
+        "@graphql-codegen/fragment-matcher": "2.0.1",
+        "@graphql-codegen/typescript": "1.21.1",
+        "@graphql-codegen/typescript-operations": "1.17.15",
+        "@graphql-codegen/typescript-react-apollo": "2.2.3",
+        "@svgr/webpack": "^5.5.0",
+        "@tailwindcss/jit": "^0.1.18",
         "@types/cookie": "^0.4.0",
         "@types/lodash": "^4.14.168",
         "@types/node": "^12.12.21",
@@ -27,14 +33,13 @@
         "@types/react-dom": "^17.0.1",
         "@typescript-eslint/eslint-plugin": "^4.20.0",
         "@typescript-eslint/parser": "^4.20.0",
+        "autoprefixer": "^10.2.5",
         "eslint": "^7.23.0",
         "eslint-config-prettier": "^8.1.0",
         "eslint-plugin-prettier": "^3.3.1",
-        "typescript": "4.0",
-        "@graphql-codegen/typescript-operations": "1.17.15",
-        "@graphql-codegen/fragment-matcher": "2.0.1",
-        "@graphql-codegen/typescript": "1.21.1",
-        "@graphql-codegen/typescript-react-apollo": "2.2.3"
+        "postcss": "^8.2.9",
+        "tailwindcss": "^2.0.4",
+        "typescript": "4.0"
     },
     "license": "MIT"
 }
