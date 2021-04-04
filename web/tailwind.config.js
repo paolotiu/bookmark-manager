@@ -5,9 +5,13 @@ module.exports = {
         fontFamily: {
             sans: ['Heebo', 'Helvetica', 'Arial', 'sans-serif'],
         },
+
         extend: {
             colors: {
-                primary: '#5138ED',
+                primary: {
+                    DEFAULT: '#5138ED',
+                    dark: '#4833D4',
+                },
             },
             screens: {
                 '3xl': '1600px',

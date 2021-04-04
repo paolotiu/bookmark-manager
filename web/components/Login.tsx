@@ -78,15 +78,20 @@ const Login = ({ className, ...p }: React.ComponentPropsWithoutRef<'div'>) => {
 
                     <ErrorMessage text={error} />
                     <Link href='/'>
-                        <a className='text-sm font-medium justify-self-end hover:underline text-primary md:text-base hover:cursor-pointer'>
+                        <a className='text-sm font-medium transition-colors duration-200 justify-self-end hover:underline text-primary hover:text-primary-dark md:text-base hover:cursor-pointer'>
                             Forgot password?
                         </a>
                     </Link>
-                    <PrimaryButton text='Login' className='transition-transform duration-200 transform' />
+                    <PrimaryButton
+                        text='Login'
+                        className='transition-all duration-200 transform hover:bg-primary-dark'
+                    />
                     <span className='text-sm md:text-base'>
                         Already have an account?{' '}
                         <Link href='/register'>
-                            <a className='font-medium text-primary hover:underline hover:cursor-pointer'>Log In</a>
+                            <a className='font-medium transition-colors duration-200 text-primary hover:underline hover:cursor-pointer hover:text-primary-dark'>
+                                Log In
+                            </a>
                         </Link>
                     </span>
                 </form>
