@@ -22,7 +22,10 @@
         "noImplicitReturns": false,
         "baseUrl": ".",
         "paths": {
-            "@graphql/*": ["graphql/*"]
+            "@graphql/*": ["graphql/*"],
+            "@assets/*": ["assets/*"],
+            "@components/*": ["components/*"],
+            "@lib/*": ["lib/*"]
         }
     },
     "exclude": ["node_modules"],
