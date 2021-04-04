@@ -49,7 +49,7 @@ const Login = ({ className, ...p }: React.ComponentPropsWithoutRef<'div'>) => {
                 <p className='text-sm text-gray-500 md:text-lg'>Start organizing your bookmarks!</p>
             </div>
             <div className='pt-5'>
-                <button className='flex justify-center w-full px-4 py-2 border border-gray-300 rounded-full md:py-3 '>
+                <button className='flex justify-center w-full px-4 py-2 border border-gray-300 rounded-full md:py-3 no-outline '>
                     <Google className='h-5' />
                     <span className='px-4'>Sign in with Google</span>
                 </button>

@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+    .no-outline {
+        @apply focus:outline-none focus-visible:outline-default;
+    }
+}
+
 @layer utilities {
     .outline-default {
         outline: 2px solid black;
