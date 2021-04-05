@@ -8,6 +8,7 @@ import { useLoginMutation } from '@graphql/generated/graphql';
 import Link from 'next/link';
 import ErrorMessage from './General/ErrorMessage';
 import { checkObjEqual } from '@lib/checkObjEqual';
+import * as yup from 'yup';
 
 // Inital form state
 const initialState = {
@@ -15,10 +16,16 @@ const initialState = {
     password: '',
 };
 
+const schema = yup.object().shape({
+    email: yup.string().email('Not a valid email').required('Email is required'),
+    password: yup.string().min(2),
+});
+
 const Login = ({ className, ...p }: React.ComponentPropsWithoutRef<'div'>) => {
-    const { handleChange, inputs } = useForm(initialState);
+    const { handleChange, inputs, isEmpty, isError, errors } = useForm(initialState, schema);
     const [lastInputs, setLastInputs] = useState(initialState);
     const [error, setError] = useState('');
+    const [isShowError, setIsShowError] = useState(false);
 
     const [loginMutation] = useLoginMutation();
 
@@ -56,16 +63,20 @@ const Login = ({ className, ...p }: React.ComponentPropsWithoutRef<'div'>) => {
                 <div className='text-xs font-medium py-7'>
                     <Divider text='or Sign in with Email' lineColor='rgba(0,0,0,.2)' textColor='rgba(0,0,0,.4)' />
                 </div>
-                <form onSubmit={handleSubmit} className='grid gap-5'>
+                <form onSubmit={handleSubmit} className='grid gap-6'>
                     <div className='grid gap-8'>
-                        <Input
-                            label='Email'
-                            type='email'
-                            name='email'
-                            placeholder='mail@example.com'
-                            onChange={handleChange}
-                            value={inputs.email}
-                        />
+                        <div className='grid gap-3'>
+                            <Input
+                                label='Email'
+                                type='email'
+                                name='email'
+                                placeholder='mail@example.com'
+                                onChange={handleChange}
+                                value={inputs.email}
+                            />
+
+                            <ErrorMessage text={errors.email.message || ''} hidden={!isShowError} />
+                        </div>
                         <Input
                             label='Password'
                             type='password'
@@ -82,15 +93,22 @@ const Login = ({ className, ...p }: React.ComponentPropsWithoutRef<'div'>) => {
                             Forgot password?
                         </a>
                     </Link>
-                    <PrimaryButton
-                        text='Login'
-                        className='transition-all duration-200 transform hover:bg-primary-dark'
-                    />
+                    <div className='relative'>
+                        <div
+                            className={`absolute z-10 w-full h-full ${isShowError ? 'hidden' : ''}`}
+                            onClick={() => setIsShowError(true)}
+                        ></div>
+                        <PrimaryButton
+                            disabled={isEmpty || isError}
+                            text='Login'
+                            className='w-full transition-all duration-200 transform hover:bg-primary-dark disabled:opacity-50 '
+                        />
+                    </div>
                     <span className='text-sm md:text-base'>
-                        Already have an account?{' '}
+                        Don&apos;t have an account?{' '}
                         <Link href='/register'>
                             <a className='font-medium transition-colors duration-200 text-primary hover:underline hover:cursor-pointer hover:text-primary-dark'>
-                                Log In
+                                Register
                             </a>
                         </Link>
                     </span>
