@@ -1,4 +1,10 @@
-<svg viewBox="0 0 960 1080" fill="none" preserveAspectRatio="xMaxYMid meet">
+<svg
+    viewBox="0 0 960 1080"
+    fill="none"
+    preserveAspectRatio="xMaxYMid meet"
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.2"
+>
     <path d="M249 80H164V162H83V242H0V0H249V80Z" fill="#3521B5" />
     <path d="M611 80V147L539 80H611Z" fill="#3521B5" />
     <path d="M683 80V147L611 80H683Z" fill="#3521B5" />

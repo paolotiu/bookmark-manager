@@ -1,7 +1,8 @@
 import Login from '@components/Login';
 import React from 'react';
+import dynamic from 'next/dynamic';
 
-import Test from '@assets/loginAssets/hero.svg';
+const Test: any = dynamic(() => import('@assets/loginAssets/hero.svg'));
 
 const login = () => {
     return (
