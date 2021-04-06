@@ -54,6 +54,7 @@ export type CreateBookmarkInput = {
   title: Scalars['String'];
   url: Scalars['String'];
   description?: Maybe<Scalars['String']>;
+  folderId?: Maybe<Scalars['Int']>;
 };
 
 export type CreateCategoryInput = {

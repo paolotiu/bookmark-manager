@@ -10,6 +10,7 @@ input CreateBookmarkInput {
     title: String!
     url: String!
     description: String
+    folderId: Int
 }
 
 input AddBookmarkToCategoriesInput {

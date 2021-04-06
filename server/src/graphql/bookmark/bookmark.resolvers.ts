@@ -3,6 +3,7 @@ import { Resolvers } from '@gql/types';
 import { unNullifyObj } from '@utils/unNullifyObj';
 import { unauthorizedError, isBaseError } from '@gql/shared/errorMessages';
 import { Category } from '@entity/Category';
+import { Folder } from '@entity/Folder';
 
 export const resolvers: Resolvers = {
     BookmarkResult: {
@@ -21,9 +22,14 @@ export const resolvers: Resolvers = {
         },
     },
     Mutation: {
-        createBookmark: async (_, { data: { title, description, url } }, { userId }) => {
+        createBookmark: async (_, { data: { title, description, url, folderId } }, { userId }) => {
             if (!userId) return unauthorizedError('createBookmark');
             const cleaned = unNullifyObj({ title, description, url });
+            if (folderId) {
+                const folder = await Folder.findOne(folderId, { where: { userId } });
+                if (!folder) return { path: 'createBookmark', message: 'No folder with that id' };
+                cleaned.folderId = folder.id;
+            }
 
             const bookmark = Bookmark.create({
                 ...cleaned,
