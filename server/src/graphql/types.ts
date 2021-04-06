@@ -25,8 +25,6 @@ export type AddBookmarkToCategoriesInput = {
   categoryId: Scalars['Int'];
 };
 
-export type AddBookmarkToCategoriesResult = BaseError | Bookmark;
-
 export type BaseError = {
   __typename?: 'BaseError';
   message: Scalars['String'];
@@ -58,8 +56,6 @@ export type CreateBookmarkInput = {
   description?: Maybe<Scalars['String']>;
 };
 
-export type CreateBookmarkResult = BaseError | Bookmark;
-
 export type CreateCategoryInput = {
   name: Scalars['String'];
   bookmarks?: Maybe<Array<Scalars['Int']>>;
@@ -89,9 +85,9 @@ export type FolderResult = BaseError | Folder;
 
 export type Mutation = {
   __typename?: 'Mutation';
-  addBookmarkToCategories: AddBookmarkToCategoriesResult;
+  addBookmarkToCategories: BookmarkResult;
   /** Returns null if bookmark wasn't created */
-  createBookmark: CreateBookmarkResult;
+  createBookmark: BookmarkResult;
   createCategory: CreateCategoryResult;
   createFolder: FolderResult;
   /** Pass in category id */
@@ -102,7 +98,7 @@ export type Mutation = {
   /** true => success | false => fail */
   register: Scalars['Boolean'];
   softDeleteFolder: FolderResult;
-  updateBookmark: UpdateBookmarkResult;
+  updateBookmark: BookmarkResult;
   updateFolderName: FolderResult;
 };
 
@@ -190,8 +186,6 @@ export type UpdateBookmarkInput = {
   url?: Maybe<Scalars['String']>;
   categoryId?: Maybe<Scalars['Int']>;
 };
-
-export type UpdateBookmarkResult = BaseError | Bookmark;
 
 /** User */
 export type User = {
@@ -287,7 +281,6 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = ResolversObject<{
   AddBookmarkToCategoriesInput: AddBookmarkToCategoriesInput;
   Int: ResolverTypeWrapper<Scalars['Int']>;
-  AddBookmarkToCategoriesResult: ResolversTypes['BaseError'] | ResolversTypes['Bookmark'];
   BaseError: ResolverTypeWrapper<BaseError>;
   String: ResolverTypeWrapper<Scalars['String']>;
   Bookmark: ResolverTypeWrapper<BookmarkModel>;
@@ -295,7 +288,6 @@ export type ResolversTypes = ResolversObject<{
   BookmarkResult: ResolversTypes['BaseError'] | ResolversTypes['Bookmark'];
   Category: ResolverTypeWrapper<CategoryModel>;
   CreateBookmarkInput: CreateBookmarkInput;
-  CreateBookmarkResult: ResolversTypes['BaseError'] | ResolversTypes['Bookmark'];
   CreateCategoryInput: CreateCategoryInput;
   CreateCategoryResult: ResolversTypes['BaseError'] | ResolversTypes['Category'];
   CreateFolderInput: CreateFolderInput;
@@ -308,7 +300,6 @@ export type ResolversTypes = ResolversObject<{
   NoErrorCategoryDeletion: ResolverTypeWrapper<NoErrorCategoryDeletion>;
   Query: ResolverTypeWrapper<{}>;
   UpdateBookmarkInput: UpdateBookmarkInput;
-  UpdateBookmarkResult: ResolversTypes['BaseError'] | ResolversTypes['Bookmark'];
   User: ResolverTypeWrapper<UserModel>;
   UserResult: ResolversTypes['BaseError'] | ResolversTypes['User'];
 }>;
@@ -317,7 +308,6 @@ export type ResolversTypes = ResolversObject<{
 export type ResolversParentTypes = ResolversObject<{
   AddBookmarkToCategoriesInput: AddBookmarkToCategoriesInput;
   Int: Scalars['Int'];
-  AddBookmarkToCategoriesResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Bookmark'];
   BaseError: BaseError;
   String: Scalars['String'];
   Bookmark: BookmarkModel;
@@ -325,7 +315,6 @@ export type ResolversParentTypes = ResolversObject<{
   BookmarkResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Bookmark'];
   Category: CategoryModel;
   CreateBookmarkInput: CreateBookmarkInput;
-  CreateBookmarkResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Bookmark'];
   CreateCategoryInput: CreateCategoryInput;
   CreateCategoryResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Category'];
   CreateFolderInput: CreateFolderInput;
@@ -338,13 +327,8 @@ export type ResolversParentTypes = ResolversObject<{
   NoErrorCategoryDeletion: NoErrorCategoryDeletion;
   Query: {};
   UpdateBookmarkInput: UpdateBookmarkInput;
-  UpdateBookmarkResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Bookmark'];
   User: UserModel;
   UserResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['User'];
-}>;
-
-export type AddBookmarkToCategoriesResultResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['AddBookmarkToCategoriesResult'] = ResolversParentTypes['AddBookmarkToCategoriesResult']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'BaseError' | 'Bookmark', ParentType, ContextType>;
 }>;
 
 export type BaseErrorResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['BaseError'] = ResolversParentTypes['BaseError']> = ResolversObject<{
@@ -374,10 +358,6 @@ export type CategoryResolvers<ContextType = MyContext, ParentType extends Resolv
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type CreateBookmarkResultResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['CreateBookmarkResult'] = ResolversParentTypes['CreateBookmarkResult']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'BaseError' | 'Bookmark', ParentType, ContextType>;
-}>;
-
 export type CreateCategoryResultResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['CreateCategoryResult'] = ResolversParentTypes['CreateCategoryResult']> = ResolversObject<{
   __resolveType: TypeResolveFn<'BaseError' | 'Category', ParentType, ContextType>;
 }>;
@@ -405,8 +385,8 @@ export type FolderResultResolvers<ContextType = MyContext, ParentType extends Re
 }>;
 
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  addBookmarkToCategories?: Resolver<ResolversTypes['AddBookmarkToCategoriesResult'], ParentType, ContextType, RequireFields<MutationAddBookmarkToCategoriesArgs, 'data'>>;
-  createBookmark?: Resolver<ResolversTypes['CreateBookmarkResult'], ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
+  addBookmarkToCategories?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationAddBookmarkToCategoriesArgs, 'data'>>;
+  createBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
   createCategory?: Resolver<ResolversTypes['CreateCategoryResult'], ParentType, ContextType, RequireFields<MutationCreateCategoryArgs, 'data'>>;
   createFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationCreateFolderArgs, 'data'>>;
   deleteCategory?: Resolver<ResolversTypes['DeleteCategoryResult'], ParentType, ContextType, RequireFields<MutationDeleteCategoryArgs, 'id'>>;
@@ -414,7 +394,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   login?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   register?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
   softDeleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationSoftDeleteFolderArgs, 'id'>>;
-  updateBookmark?: Resolver<ResolversTypes['UpdateBookmarkResult'], ParentType, ContextType, RequireFields<MutationUpdateBookmarkArgs, 'data'>>;
+  updateBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationUpdateBookmarkArgs, 'data'>>;
   updateFolderName?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationUpdateFolderNameArgs, 'id' | 'name'>>;
 }>;
 
@@ -428,10 +408,6 @@ export type QueryResolvers<ContextType = MyContext, ParentType extends Resolvers
   folder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<QueryFolderArgs, 'id'>>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-}>;
-
-export type UpdateBookmarkResultResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['UpdateBookmarkResult'] = ResolversParentTypes['UpdateBookmarkResult']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'BaseError' | 'Bookmark', ParentType, ContextType>;
 }>;
 
 export type UserResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
@@ -449,12 +425,10 @@ export type UserResultResolvers<ContextType = MyContext, ParentType extends Reso
 }>;
 
 export type Resolvers<ContextType = MyContext> = ResolversObject<{
-  AddBookmarkToCategoriesResult?: AddBookmarkToCategoriesResultResolvers<ContextType>;
   BaseError?: BaseErrorResolvers<ContextType>;
   Bookmark?: BookmarkResolvers<ContextType>;
   BookmarkResult?: BookmarkResultResolvers<ContextType>;
   Category?: CategoryResolvers<ContextType>;
-  CreateBookmarkResult?: CreateBookmarkResultResolvers<ContextType>;
   CreateCategoryResult?: CreateCategoryResultResolvers<ContextType>;
   Date?: GraphQLScalarType;
   DeleteCategoryResult?: DeleteCategoryResultResolvers<ContextType>;
@@ -463,7 +437,6 @@ export type Resolvers<ContextType = MyContext> = ResolversObject<{
   Mutation?: MutationResolvers<ContextType>;
   NoErrorCategoryDeletion?: NoErrorCategoryDeletionResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  UpdateBookmarkResult?: UpdateBookmarkResultResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserResult?: UserResultResolvers<ContextType>;
 }>;

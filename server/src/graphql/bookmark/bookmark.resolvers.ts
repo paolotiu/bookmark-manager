@@ -8,15 +8,7 @@ export const resolvers: Resolvers = {
     BookmarkResult: {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmark'),
     },
-    AddBookmarkToCategoriesResult: {
-        __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmark'),
-    },
-    CreateBookmarkResult: {
-        __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmark'),
-    },
-    UpdateBookmarkResult: {
-        __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmark'),
-    },
+
     Query: {
         bookmark: async (_, { id }, { userId }) => {
             const bookmark = await Bookmark.findOne({ id, userId }, { relations: ['category'] });

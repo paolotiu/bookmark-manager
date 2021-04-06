@@ -62,27 +62,6 @@
         "possibleTypes": null
       },
       {
-        "kind": "UNION",
-        "name": "AddBookmarkToCategoriesResult",
-        "description": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": [
-          {
-            "kind": "OBJECT",
-            "name": "BaseError",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "Bookmark",
-            "ofType": null
-          }
-        ]
-      },
-      {
         "kind": "OBJECT",
         "name": "BaseError",
         "description": null,
@@ -382,27 +361,6 @@
         "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
-      },
-      {
-        "kind": "UNION",
-        "name": "CreateBookmarkResult",
-        "description": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": [
-          {
-            "kind": "OBJECT",
-            "name": "BaseError",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "Bookmark",
-            "ofType": null
-          }
-        ]
       },
       {
         "kind": "INPUT_OBJECT",
@@ -705,7 +663,7 @@
               "name": null,
               "ofType": {
                 "kind": "UNION",
-                "name": "AddBookmarkToCategoriesResult",
+                "name": "BookmarkResult",
                 "ofType": null
               }
             },
@@ -738,7 +696,7 @@
               "name": null,
               "ofType": {
                 "kind": "UNION",
-                "name": "CreateBookmarkResult",
+                "name": "BookmarkResult",
                 "ofType": null
               }
             },
@@ -1029,7 +987,7 @@
               "name": null,
               "ofType": {
                 "kind": "UNION",
-                "name": "UpdateBookmarkResult",
+                "name": "BookmarkResult",
                 "ofType": null
               }
             },
@@ -1307,27 +1265,6 @@
         "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
-      },
-      {
-        "kind": "UNION",
-        "name": "UpdateBookmarkResult",
-        "description": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": [
-          {
-            "kind": "OBJECT",
-            "name": "BaseError",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "Bookmark",
-            "ofType": null
-          }
-        ]
       },
       {
         "kind": "OBJECT",
