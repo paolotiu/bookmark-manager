@@ -35,6 +35,9 @@ export class Folder extends BaseEntity {
     @JoinColumn({ name: 'parentId' })
     parent: Folder;
 
+    @OneToMany(() => Folder, (folder) => folder.parent)
+    children: Folder[];
+
     @ManyToOne(() => User, (user) => user.folders)
     @JoinColumn({ name: 'userId' })
     user: User;

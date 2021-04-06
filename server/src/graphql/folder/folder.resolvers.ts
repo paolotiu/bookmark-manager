@@ -1,5 +1,5 @@
 import { Folder } from '@entity/Folder';
-import { isBaseError } from '@gql/shared/errorMessages';
+import { isBaseError, unauthorizedError } from '@gql/shared/errorMessages';
 import { Resolvers } from '@gql/types';
 
 export const resolvers: Resolvers = {
@@ -7,10 +7,11 @@ export const resolvers: Resolvers = {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Folder'),
     },
     Query: {
-        folder: async (_, { id }) => {
+        folder: async (_, { id }, { userId }) => {
+            if (!userId) return unauthorizedError('folder');
             //TODO: ADD USER CHECK
             return (
-                (await Folder.findOne(id, { relations: ['parent'] })) || {
+                (await Folder.findOne(id, { relations: ['parent', 'children'] })) || {
                     path: 'folder',
                     message: 'No folder with that id',
                 }
