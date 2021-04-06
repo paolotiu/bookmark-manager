@@ -20,4 +20,6 @@ type Query {
 
 type Mutation {
     createFolder(data: CreateFolderInput!): FolderResult!
+    updateFolderName(id: Int!, name: String!): FolderResult!
+    softDeleteFolder(id: Int!): FolderResult!
 }

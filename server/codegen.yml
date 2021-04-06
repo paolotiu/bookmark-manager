@@ -12,6 +12,7 @@ generates:
                 User: ../entity/User#UserModel
                 Bookmark: ../entity/Bookmark#BookmarkModel
                 Category: ../entity/Category#CategoryModel
+                Folder: ../entity/Folder#Folder
         plugins:
             - 'typescript'
             - 'typescript-resolvers'

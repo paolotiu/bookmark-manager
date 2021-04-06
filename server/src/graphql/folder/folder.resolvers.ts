@@ -1,8 +1,24 @@
+import { Bookmark } from '@entity/Bookmark';
 import { Folder } from '@entity/Folder';
 import { isBaseError, unauthorizedError } from '@gql/shared/errorMessages';
 import { Resolvers } from '@gql/types';
 
 export const resolvers: Resolvers = {
+    Folder: {
+        bookmarks: (parent) => {
+            if (parent.bookmarks) return parent.bookmarks;
+            return Bookmark.find({ where: { folderId: parent.id } });
+        },
+        children: (parent) => {
+            if (parent.children) return parent.children;
+            return Folder.find({ where: { parentId: parent.id } });
+        },
+        parent: async (parent) => {
+            if (parent.parent) return parent.parent;
+            // Return null if folder has no parent
+            return (await Folder.findOne(parent.parentId)) || null;
+        },
+    },
     FolderResult: {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Folder'),
     },
@@ -11,7 +27,7 @@ export const resolvers: Resolvers = {
             if (!userId) return unauthorizedError('folder');
             //TODO: ADD USER CHECK
             return (
-                (await Folder.findOne(id, { relations: ['parent', 'children'] })) || {
+                (await Folder.findOne(id)) || {
                     path: 'folder',
                     message: 'No folder with that id',
                 }
@@ -36,6 +52,43 @@ export const resolvers: Resolvers = {
             }
             folder.depth = depth;
             return folder.save();
+        },
+        updateFolderName: async (_, { name, id }, { userId }) => {
+            if (!userId) return unauthorizedError('updateFolderName');
+
+            const folder = await Folder.findOne(id, { where: { userId: userId } });
+
+            // No folder found
+            if (!folder)
+                return {
+                    path: 'updateFolderName',
+                    message: 'No folder with that id',
+                };
+
+            // Folder found => Change folder name
+            folder.name = name;
+
+            return folder.save();
+        },
+        softDeleteFolder: async (_, { id }, { userId }) => {
+            if (!userId) return unauthorizedError('deleteFolder');
+
+            // Soft delete folder
+            const folder = await Folder.createQueryBuilder()
+                .softDelete()
+                .where('id = :id', { id })
+                .andWhere('userId = :userId', { userId })
+                .returning(['id', 'name', 'depth'])
+                .execute();
+
+            // No folders found
+            if (!folder)
+                return {
+                    path: 'deleteFolder',
+                    message: 'No folder with that id',
+                };
+
+            return folder.raw[0];
         },
     },
 };
