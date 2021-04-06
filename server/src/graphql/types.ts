@@ -79,6 +79,7 @@ export type Folder = {
   __typename?: 'Folder';
   id: Scalars['Int'];
   parent?: Maybe<Folder>;
+  children: Array<Maybe<Folder>>;
   bookmarks: Array<Maybe<Bookmark>>;
   depth: Scalars['Int'];
   name: Scalars['String'];
@@ -187,6 +188,7 @@ export type User = {
   name: Scalars['String'];
   bookmarks: Array<Maybe<Bookmark>>;
   categories: Array<Maybe<Category>>;
+  folders: Array<Maybe<Folder>>;
 };
 
 export type UserResult = BaseError | User;
@@ -286,7 +288,7 @@ export type ResolversTypes = ResolversObject<{
   CreateFolderInput: CreateFolderInput;
   Date: ResolverTypeWrapper<Scalars['Date']>;
   DeleteCategoryResult: ResolversTypes['BaseError'] | ResolversTypes['NoErrorCategoryDeletion'];
-  Folder: ResolverTypeWrapper<Omit<Folder, 'parent' | 'bookmarks'> & { parent?: Maybe<ResolversTypes['Folder']>, bookmarks: Array<Maybe<ResolversTypes['Bookmark']>> }>;
+  Folder: ResolverTypeWrapper<Omit<Folder, 'parent' | 'children' | 'bookmarks'> & { parent?: Maybe<ResolversTypes['Folder']>, children: Array<Maybe<ResolversTypes['Folder']>>, bookmarks: Array<Maybe<ResolversTypes['Bookmark']>> }>;
   FolderResult: ResolversTypes['BaseError'] | ResolversTypes['Folder'];
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
@@ -316,7 +318,7 @@ export type ResolversParentTypes = ResolversObject<{
   CreateFolderInput: CreateFolderInput;
   Date: Scalars['Date'];
   DeleteCategoryResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['NoErrorCategoryDeletion'];
-  Folder: Omit<Folder, 'parent' | 'bookmarks'> & { parent?: Maybe<ResolversParentTypes['Folder']>, bookmarks: Array<Maybe<ResolversParentTypes['Bookmark']>> };
+  Folder: Omit<Folder, 'parent' | 'children' | 'bookmarks'> & { parent?: Maybe<ResolversParentTypes['Folder']>, children: Array<Maybe<ResolversParentTypes['Folder']>>, bookmarks: Array<Maybe<ResolversParentTypes['Bookmark']>> };
   FolderResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Folder'];
   Mutation: {};
   Boolean: Scalars['Boolean'];
@@ -378,6 +380,7 @@ export type DeleteCategoryResultResolvers<ContextType = MyContext, ParentType ex
 export type FolderResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Folder'] = ResolversParentTypes['Folder']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   parent?: Resolver<Maybe<ResolversTypes['Folder']>, ParentType, ContextType>;
+  children?: Resolver<Array<Maybe<ResolversTypes['Folder']>>, ParentType, ContextType>;
   bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
   depth?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -422,6 +425,7 @@ export type UserResolvers<ContextType = MyContext, ParentType extends ResolversP
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
   categories?: Resolver<Array<Maybe<ResolversTypes['Category']>>, ParentType, ContextType>;
+  folders?: Resolver<Array<Maybe<ResolversTypes['Folder']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

@@ -5,6 +5,7 @@ type User {
     name: String!
     bookmarks: [Bookmark]!
     categories: [Category]!
+    folders: [Folder]!
 }
 
 type Query {
