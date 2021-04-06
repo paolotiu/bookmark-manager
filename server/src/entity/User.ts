@@ -1,7 +1,7 @@
 import { Bookmark } from './Bookmark';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BaseEntity } from 'typeorm';
 import { Category } from './Category';
-
+import { Folder } from './Folder';
 @Entity()
 export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
@@ -24,5 +24,8 @@ export class User extends BaseEntity {
 
     @OneToMany(() => Category, (category) => category.user)
     categories: Category[];
+
+    @OneToMany(() => Folder, (folder) => folder.user)
+    folders: Folder[];
 }
 export type UserModel = User;

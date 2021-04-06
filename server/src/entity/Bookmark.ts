@@ -10,6 +10,7 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './User';
+import { Folder } from './Folder';
 
 @Entity()
 export class Bookmark extends BaseEntity {
@@ -31,6 +32,9 @@ export class Bookmark extends BaseEntity {
     @Column({ type: 'int', nullable: true })
     categoryId: number | null;
 
+    @Column({ type: 'int', nullable: true })
+    folderId: number | null;
+
     @ManyToOne(() => User, (user) => user.bookmarks)
     @JoinColumn({ name: 'userId' })
     user: User;
@@ -38,6 +42,10 @@ export class Bookmark extends BaseEntity {
     @ManyToOne(() => Category, (category) => category.bookmarks)
     @JoinColumn({ name: 'categoryId' })
     category: Category;
+
+    @ManyToOne(() => Folder, (folder) => folder.bookmarks)
+    @JoinColumn({ name: 'folderId' })
+    folder: Folder;
 
     @CreateDateColumn()
     createdDate: Date;
