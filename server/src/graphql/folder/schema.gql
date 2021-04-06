@@ -1,0 +1,22 @@
+type Folder {
+    id: Int!
+    parent: Folder
+    bookmarks: [Bookmark]!
+    depth: Int!
+    name: String!
+}
+
+union FolderResult = BaseError | Folder
+
+input CreateFolderInput {
+    name: String!
+    parentId: Int
+}
+
+type Query {
+    folder(id: Int!): FolderResult!
+}
+
+type Mutation {
+    createFolder(data: CreateFolderInput!): FolderResult!
+}

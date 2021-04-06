@@ -7,6 +7,7 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -66,8 +67,24 @@ export type CreateCategoryInput = {
 
 export type CreateCategoryResult = BaseError | Category;
 
+export type CreateFolderInput = {
+  name: Scalars['String'];
+  parentId?: Maybe<Scalars['Int']>;
+};
+
 
 export type DeleteCategoryResult = BaseError | NoErrorCategoryDeletion;
+
+export type Folder = {
+  __typename?: 'Folder';
+  id: Scalars['Int'];
+  parent?: Maybe<Folder>;
+  bookmarks: Array<Maybe<Bookmark>>;
+  depth: Scalars['Int'];
+  name: Scalars['String'];
+};
+
+export type FolderResult = BaseError | Folder;
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -75,6 +92,7 @@ export type Mutation = {
   /** Returns null if bookmark wasn't created */
   createBookmark: CreateBookmarkResult;
   createCategory: CreateCategoryResult;
+  createFolder: FolderResult;
   /** Pass in category id */
   deleteCategory: DeleteCategoryResult;
   invalidateTokens: Scalars['Boolean'];
@@ -98,6 +116,11 @@ export type MutationCreateBookmarkArgs = {
 
 export type MutationCreateCategoryArgs = {
   data: CreateCategoryInput;
+};
+
+
+export type MutationCreateFolderArgs = {
+  data: CreateFolderInput;
 };
 
 
@@ -131,12 +154,18 @@ export type NoErrorCategoryDeletion = {
 export type Query = {
   __typename?: 'Query';
   bookmark: BookmarkResult;
+  folder: FolderResult;
   me?: Maybe<User>;
   ping: Scalars['String'];
 };
 
 
 export type QueryBookmarkArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type QueryFolderArgs = {
   id: Scalars['Int'];
 };
 
@@ -254,8 +283,11 @@ export type ResolversTypes = ResolversObject<{
   CreateBookmarkResult: ResolversTypes['BaseError'] | ResolversTypes['Bookmark'];
   CreateCategoryInput: CreateCategoryInput;
   CreateCategoryResult: ResolversTypes['BaseError'] | ResolversTypes['Category'];
+  CreateFolderInput: CreateFolderInput;
   Date: ResolverTypeWrapper<Scalars['Date']>;
   DeleteCategoryResult: ResolversTypes['BaseError'] | ResolversTypes['NoErrorCategoryDeletion'];
+  Folder: ResolverTypeWrapper<Omit<Folder, 'parent' | 'bookmarks'> & { parent?: Maybe<ResolversTypes['Folder']>, bookmarks: Array<Maybe<ResolversTypes['Bookmark']>> }>;
+  FolderResult: ResolversTypes['BaseError'] | ResolversTypes['Folder'];
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   NoErrorCategoryDeletion: ResolverTypeWrapper<NoErrorCategoryDeletion>;
@@ -281,8 +313,11 @@ export type ResolversParentTypes = ResolversObject<{
   CreateBookmarkResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Bookmark'];
   CreateCategoryInput: CreateCategoryInput;
   CreateCategoryResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Category'];
+  CreateFolderInput: CreateFolderInput;
   Date: Scalars['Date'];
   DeleteCategoryResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['NoErrorCategoryDeletion'];
+  Folder: Omit<Folder, 'parent' | 'bookmarks'> & { parent?: Maybe<ResolversParentTypes['Folder']>, bookmarks: Array<Maybe<ResolversParentTypes['Bookmark']>> };
+  FolderResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Folder'];
   Mutation: {};
   Boolean: Scalars['Boolean'];
   NoErrorCategoryDeletion: NoErrorCategoryDeletion;
@@ -340,10 +375,24 @@ export type DeleteCategoryResultResolvers<ContextType = MyContext, ParentType ex
   __resolveType: TypeResolveFn<'BaseError' | 'NoErrorCategoryDeletion', ParentType, ContextType>;
 }>;
 
+export type FolderResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Folder'] = ResolversParentTypes['Folder']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  parent?: Resolver<Maybe<ResolversTypes['Folder']>, ParentType, ContextType>;
+  bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
+  depth?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type FolderResultResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['FolderResult'] = ResolversParentTypes['FolderResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'BaseError' | 'Folder', ParentType, ContextType>;
+}>;
+
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   addBookmarkToCategories?: Resolver<ResolversTypes['AddBookmarkToCategoriesResult'], ParentType, ContextType, RequireFields<MutationAddBookmarkToCategoriesArgs, 'data'>>;
   createBookmark?: Resolver<ResolversTypes['CreateBookmarkResult'], ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
   createCategory?: Resolver<ResolversTypes['CreateCategoryResult'], ParentType, ContextType, RequireFields<MutationCreateCategoryArgs, 'data'>>;
+  createFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationCreateFolderArgs, 'data'>>;
   deleteCategory?: Resolver<ResolversTypes['DeleteCategoryResult'], ParentType, ContextType, RequireFields<MutationDeleteCategoryArgs, 'id'>>;
   invalidateTokens?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   login?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
@@ -358,6 +407,7 @@ export type NoErrorCategoryDeletionResolvers<ContextType = MyContext, ParentType
 
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   bookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<QueryBookmarkArgs, 'id'>>;
+  folder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<QueryFolderArgs, 'id'>>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 }>;
@@ -389,6 +439,8 @@ export type Resolvers<ContextType = MyContext> = ResolversObject<{
   CreateCategoryResult?: CreateCategoryResultResolvers<ContextType>;
   Date?: GraphQLScalarType;
   DeleteCategoryResult?: DeleteCategoryResultResolvers<ContextType>;
+  Folder?: FolderResolvers<ContextType>;
+  FolderResult?: FolderResultResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   NoErrorCategoryDeletion?: NoErrorCategoryDeletionResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

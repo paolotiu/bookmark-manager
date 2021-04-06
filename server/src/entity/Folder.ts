@@ -25,14 +25,15 @@ export class Folder extends BaseEntity {
     @Column({ type: 'int', default: 0 })
     depth: number;
 
-    @Column('int')
+    @Column({ type: 'int', nullable: true })
     parentId: number;
 
     @Column('int')
     userId: number;
 
     @ManyToOne(() => Folder, (folder) => folder.parentId)
-    parentFolder: Folder;
+    @JoinColumn({ name: 'parentId' })
+    parent: Folder;
 
     @ManyToOne(() => User, (user) => user.folders)
     @JoinColumn({ name: 'userId' })
