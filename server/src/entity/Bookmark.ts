@@ -1,4 +1,3 @@
-import { Category } from './Category';
 import {
     BaseEntity,
     Column,
@@ -38,10 +37,6 @@ export class Bookmark extends BaseEntity {
     @ManyToOne(() => User, (user) => user.bookmarks)
     @JoinColumn({ name: 'userId' })
     user: User;
-
-    @ManyToOne(() => Category, (category) => category.bookmarks)
-    @JoinColumn({ name: 'categoryId' })
-    category: Category;
 
     @ManyToOne(() => Folder, (folder) => folder.bookmarks)
     @JoinColumn({ name: 'folderId' })

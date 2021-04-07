@@ -1,6 +1,5 @@
 import { Bookmark } from './Bookmark';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BaseEntity } from 'typeorm';
-import { Category } from './Category';
 import { Folder } from './Folder';
 @Entity()
 export class User extends BaseEntity {
@@ -21,9 +20,6 @@ export class User extends BaseEntity {
 
     @OneToMany(() => Bookmark, (bookmark) => bookmark.user)
     bookmarks: Bookmark[];
-
-    @OneToMany(() => Category, (category) => category.user)
-    categories: Category[];
 
     @OneToMany(() => Folder, (folder) => folder.user)
     folders: Folder[];

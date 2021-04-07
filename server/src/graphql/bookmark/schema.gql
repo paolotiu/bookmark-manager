@@ -3,7 +3,6 @@ type Bookmark {
     title: String!
     url: String!
     description: String
-    category: Category
     createdDate: Date!
 }
 input CreateBookmarkInput {
@@ -13,20 +12,11 @@ input CreateBookmarkInput {
     folderId: Int
 }
 
-input AddBookmarkToCategoriesInput {
-    bookmarkId: Int!
-    """
-    Category id
-    """
-    categoryId: Int!
-}
-
 input UpdateBookmarkInput {
     id: Int!
     title: String
     description: String
     url: String
-    categoryId: Int
 }
 
 union BookmarkResult = BaseError | Bookmark
@@ -36,8 +26,6 @@ type Query {
 }
 
 type Mutation {
-    "Returns null if bookmark wasn't created"
     createBookmark(data: CreateBookmarkInput!): BookmarkResult!
     updateBookmark(data: UpdateBookmarkInput!): BookmarkResult!
-    addBookmarkToCategories(data: AddBookmarkToCategoriesInput!): BookmarkResult!
 }

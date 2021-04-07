@@ -2,7 +2,6 @@ import { Bookmark } from '@entity/Bookmark';
 import { Resolvers } from '@gql/types';
 import { unNullifyObj } from '@utils/unNullifyObj';
 import { unauthorizedError, isBaseError } from '@gql/shared/errorMessages';
-import { Category } from '@entity/Category';
 import { Folder } from '@entity/Folder';
 
 export const resolvers: Resolvers = {
@@ -38,27 +37,8 @@ export const resolvers: Resolvers = {
 
             return bookmark.save();
         },
-        addBookmarkToCategories: async (_, { data: { bookmarkId, categoryId } }, { userId }) => {
-            if (!userId) return unauthorizedError('addBookmarkToCategories');
-            const bookmark = await Bookmark.findOne({ where: { id: bookmarkId, userId } });
-            const category = await Category.findOne({ where: { id: categoryId, userId } });
-            if (!bookmark)
-                return {
-                    path: 'add',
-                    message: 'No bookmark with that ID',
-                };
 
-            if (!category)
-                return {
-                    path: 'add',
-                    message: 'No category with that ID',
-                };
-
-            bookmark.categoryId = categoryId;
-
-            return bookmark.save();
-        },
-        updateBookmark: async (_, { data: { id, categoryId, description, title, url } }, { userId }) => {
+        updateBookmark: async (_, { data: { id, description, title, url } }, { userId }) => {
             if (!userId) return unauthorizedError('updateBookmark');
             const updateObj: {
                 [key: string]: string | number | Date | null;
@@ -75,14 +55,6 @@ export const resolvers: Resolvers = {
             Object.assign(bookmark, updateObj);
             await bookmark.save();
 
-            // No category changes made
-            if (typeof categoryId === 'undefined' || categoryId === bookmark.categoryId) return bookmark;
-
-            if (categoryId === null) {
-                removeFromCategory(bookmark);
-            } else {
-                addToCategory(bookmark, categoryId);
-            }
             const newBookmark = await Bookmark.findOne(id, { where: { userId }, relations: ['category'] });
 
             return (
@@ -91,49 +63,6 @@ export const resolvers: Resolvers = {
                     message: "Somehting wrong happened. You shouldn't be recieving this error",
                 }
             );
-
-            async function addToCategory(bookmark: Bookmark, categoryId: number) {
-                // Check if user owns the category
-                const category = await Category.findOne(categoryId, {
-                    where: { userId },
-                    relations: ['bookmarks'],
-                });
-
-                if (category) {
-                    category.bookmarks ? category.bookmarks.push(bookmark) : (category.bookmarks = [bookmark]);
-                    await category.save();
-                }
-            }
-
-            async function removeFromCategory(bookmark: Bookmark) {
-                // null check to please typescript
-                if (bookmark.categoryId !== null) {
-                    const category = await Category.findOne(bookmark.categoryId, {
-                        where: { userId },
-                        relations: ['bookmarks'],
-                    });
-
-                    if (category) {
-                        // Category found
-                        // Remove bookmark
-                        category.bookmarks = category.bookmarks.filter((val) => {
-                            return val.id !== bookmark.id;
-                        });
-                        await category.save();
-                    }
-                }
-            }
         },
     },
 };
-
-// async function checkIfUserOwnsCategories(ids: number[], userId: number) {
-//     // Check if use rincluded a category that's not their's
-//     const cats = await Category.createQueryBuilder('c')
-//         .select()
-//         .where('c.userId != :userId', { userId })
-//         .andWhereInIds(ids)
-//         .execute();
-//     if (cats.length) return false;
-//     return true;
-// }

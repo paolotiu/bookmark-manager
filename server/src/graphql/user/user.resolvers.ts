@@ -1,5 +1,4 @@
 import { Bookmark } from '@entity/Bookmark';
-import { Category } from '@entity/Category';
 import { Folder } from '@entity/Folder';
 import { User } from '@entity/User';
 import { isBaseError } from '@gql/shared/errorMessages';
@@ -11,7 +10,6 @@ export const resolvers: Resolvers = {
     },
     User: {
         bookmarks: (parent) => Bookmark.find({ where: { userId: parent.id }, relations: ['category'] }),
-        categories: (parent) => Category.find({ where: { userId: parent.id }, relations: ['bookmarks'] }),
         folders: (parent) =>
             Folder.find({ where: { userId: parent.id }, relations: ['parent', 'bookmarks', 'children'] }),
     },

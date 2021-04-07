@@ -4,7 +4,6 @@ type User {
     email: String!
     name: String!
     bookmarks: [Bookmark]!
-    categories: [Category]!
     folders: [Folder]!
 }
 
