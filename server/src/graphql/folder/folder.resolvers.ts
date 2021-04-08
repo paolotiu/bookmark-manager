@@ -9,14 +9,11 @@ export const resolvers: Resolvers = {
             if (parent.bookmarks) return parent.bookmarks;
             return Bookmark.find({ where: { folderId: parent.id } });
         },
-        children: (parent) => {
+        children: async (parent) => {
+            console.log(parent.id);
             if (parent.children) return parent.children;
-            return Folder.find({ where: { parentId: parent.id } });
-        },
-        parent: async (parent) => {
-            if (parent.parent) return parent.parent;
-            // Return null if folder has no parent
-            return (await Folder.findOne(parent.parentId)) || null;
+            const tree = await parent.getDescendantsTree();
+            return tree.children;
         },
     },
     FolderResult: {
@@ -33,6 +30,11 @@ export const resolvers: Resolvers = {
                 }
             );
         },
+        q: async () => {
+            const parent = await Folder.findOne(2);
+            if (!parent) return null;
+            return parent.getDescendantsTree();
+        },
     },
     Mutation: {
         createFolder: async (_, { data: { name, parentId } }) => {
@@ -42,16 +44,25 @@ export const resolvers: Resolvers = {
 
             // default depth is 0 meaning no parent folder
             let depth = 0;
+            let path = '';
             if (parentId) {
                 // Check if parent id exists
                 const parent = await Folder.findOne(parentId);
                 if (parent) {
                     depth = parent.depth + 1;
-                    folder.parentId = parent.id;
+                    path = parent.path + '.';
                 }
             }
             folder.depth = depth;
-            return folder.save();
+            const prePathFolder = await folder.save();
+            prePathFolder.path = path + prePathFolder.id;
+            return prePathFolder.save();
+        },
+        moveFolder: async (_, { folderId, targetFolderId }) => {
+            const folders = await Folder.findByIds([folderId, targetFolderId]);
+            console.log(folders);
+
+            return folders[0];
         },
         updateFolderName: async (_, { name, id }, { userId }) => {
             if (!userId) return unauthorizedError('updateFolderName');
@@ -73,22 +84,35 @@ export const resolvers: Resolvers = {
         softDeleteFolder: async (_, { id }, { userId }) => {
             if (!userId) return unauthorizedError('deleteFolder');
 
-            // Soft delete folder
-            const folder = await Folder.createQueryBuilder()
-                .softDelete()
-                .where('id = :id', { id })
-                .andWhere('userId = :userId', { userId })
-                .returning(['id', 'name', 'depth'])
-                .execute();
-
-            // No folders found
+            // TODO: FIGURE OUT DELETION!!!!!
+            const folder = await Folder.findOne(id, { where: { userId } });
+            // No folder found
             if (!folder)
                 return {
                     path: 'deleteFolder',
                     message: 'No folder with that id',
                 };
 
-            return folder.raw[0];
+            await Folder.createQueryBuilder()
+                .update()
+                .set({
+                    deleted: true,
+                })
+                .where('path <@ :path', { path: folder.path })
+                .execute();
+
+            return folder;
+        },
+        recoverFolder: async (_, { id }, { userId }) => {
+            if (!userId) return unauthorizedError('recoverFolder');
+            const folder = await Folder.findOne(id, { where: { userId }, withDeleted: true, relations: ['parent'] });
+
+            if (!folder)
+                return {
+                    path: 'recoverFolder',
+                    message: 'No folder with that id',
+                };
+            return folder;
         },
     },
 };
