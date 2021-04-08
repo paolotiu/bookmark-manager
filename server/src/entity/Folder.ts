@@ -23,20 +23,11 @@ export class Folder extends BaseEntity {
     @Column()
     name: string;
 
-    // @Column({ type: 'int', nullable: true })
-    // parentId: number;
-
     @Column('int')
     userId: number;
 
     @Column('ltree', { nullable: true })
     path: string;
-
-    // @TreeParent()
-    // parent: Folder;
-
-    // @TreeChildren({ cascade: true })
-    // children: Folder[];
 
     @Column('int', { default: 0 })
     depth: number;
