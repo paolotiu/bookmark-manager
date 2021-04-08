@@ -16,10 +16,13 @@ input CreateFolderInput {
 
 type Query {
     folder(id: Int!): FolderResult!
+    q: Folder
 }
 
 type Mutation {
     createFolder(data: CreateFolderInput!): FolderResult!
     updateFolderName(id: Int!, name: String!): FolderResult!
     softDeleteFolder(id: Int!): FolderResult!
+    recoverFolder(id: Int!): FolderResult!
+    moveFolder(folderId: Int!, targetFolderId: Int!): FolderResult!
 }

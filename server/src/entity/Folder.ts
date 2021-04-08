@@ -84,4 +84,18 @@ export class Folder extends BaseEntity {
         const childrenArr = await this.getDescendants();
         return this.arrayToTree(childrenArr);
     }
+
+    // Returns A tuple
+    // 1st element is an array of updated Folders
+    // 2nd element is th enumber of affected entities
+    move(targetFolderPath: string): Promise<[Folder[], number]> {
+        // $1: Target path
+        // $2: Source path
+        // Concatenates target path with the source's id
+        // We use the id as path markers
+        return Folder.query(
+            'update folder set path = $1 || subpath(path, nlevel($2) - 1) where path <@ $2 returning *',
+            [targetFolderPath, this.path],
+        );
+    }
 }

@@ -67,6 +67,7 @@ export type Mutation = {
   invalidateTokens: Scalars['Boolean'];
   /** Returns null if login failed */
   login?: Maybe<UserResult>;
+  moveFolder: FolderResult;
   recoverFolder: FolderResult;
   /** true => success | false => fail */
   register: Scalars['Boolean'];
@@ -89,6 +90,12 @@ export type MutationCreateFolderArgs = {
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationMoveFolderArgs = {
+  folderId: Scalars['Int'];
+  targetFolderId: Scalars['Int'];
 };
 
 
@@ -125,6 +132,7 @@ export type Query = {
   folder: FolderResult;
   me?: Maybe<User>;
   ping: Scalars['String'];
+  q?: Maybe<Folder>;
 };
 
 
@@ -317,6 +325,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   createFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationCreateFolderArgs, 'data'>>;
   invalidateTokens?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   login?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
+  moveFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationMoveFolderArgs, 'folderId' | 'targetFolderId'>>;
   recoverFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationRecoverFolderArgs, 'id'>>;
   register?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
   softDeleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationSoftDeleteFolderArgs, 'id'>>;
@@ -329,6 +338,7 @@ export type QueryResolvers<ContextType = MyContext, ParentType extends Resolvers
   folder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<QueryFolderArgs, 'id'>>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  q?: Resolver<Maybe<ResolversTypes['Folder']>, ParentType, ContextType>;
 }>;
 
 export type UserResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{

@@ -10,7 +10,6 @@ export const resolvers: Resolvers = {
             return Bookmark.find({ where: { folderId: parent.id } });
         },
         children: async (parent) => {
-            console.log(parent.id);
             if (parent.children) return parent.children;
             const tree = await parent.getDescendantsTree();
             return tree.children;
@@ -58,11 +57,33 @@ export const resolvers: Resolvers = {
             prePathFolder.path = path + prePathFolder.id;
             return prePathFolder.save();
         },
-        moveFolder: async (_, { folderId, targetFolderId }) => {
-            const folders = await Folder.findByIds([folderId, targetFolderId]);
-            console.log(folders);
+        moveFolder: async (_, { folderId, targetFolderId }, { userId }) => {
+            if (!userId) return unauthorizedError('moveFolder');
+            const foldersArr = await Folder.findByIds([folderId, targetFolderId], { where: { userId } });
+            if (foldersArr.length < 2) {
+                return {
+                    path: 'moveFolder',
+                    message: 'No folder with that id',
+                };
+            }
+            const folders = foldersArr.reduce<{ [key: string]: Folder }>(
+                (prev, curr) => ({ ...prev, [curr.id]: curr }),
+                {},
+            );
+            const res = await folders[folderId].move(folders[targetFolderId].path);
+            const updatedFolder = res[0].find((f) => f.id === folderId);
 
-            return folders[0];
+            if (!updatedFolder)
+                return {
+                    path: 'moveFolder',
+                    message: 'An error has occured',
+                };
+
+            // Update folder path
+            folders[folderId].path = updatedFolder.path;
+
+            // Return updated folder
+            return folders[folderId];
         },
         updateFolderName: async (_, { name, id }, { userId }) => {
             if (!userId) return unauthorizedError('updateFolderName');
