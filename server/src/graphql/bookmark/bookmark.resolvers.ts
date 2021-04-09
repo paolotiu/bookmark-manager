@@ -1,7 +1,7 @@
 import { Bookmark } from '@entity/Bookmark';
 import { Resolvers } from '@gql/types';
 import { unNullifyObj } from '@utils/unNullifyObj';
-import { unauthorizedError, isBaseError } from '@gql/shared/errorMessages';
+import { isBaseError } from '@gql/shared/errorMessages';
 import { Folder } from '@entity/Folder';
 
 export const resolvers: Resolvers = {
