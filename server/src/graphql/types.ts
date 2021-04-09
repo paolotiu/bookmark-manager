@@ -18,6 +18,7 @@ export type Scalars = {
   Date: Date;
 };
 
+
 export type BaseError = {
   __typename?: 'BaseError';
   message: Scalars['String'];
@@ -130,7 +131,7 @@ export type Query = {
   __typename?: 'Query';
   bookmark: BookmarkResult;
   folder: FolderResult;
-  me?: Maybe<User>;
+  me?: Maybe<UserResult>;
   ping: Scalars['String'];
   q?: Maybe<Folder>;
 };
@@ -283,6 +284,10 @@ export type ResolversParentTypes = ResolversObject<{
   UserResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['User'];
 }>;
 
+export type AuthDirectiveArgs = {  };
+
+export type AuthDirectiveResolver<Result, Parent, ContextType = MyContext, Args = AuthDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
 export type BaseErrorResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['BaseError'] = ResolversParentTypes['BaseError']> = ResolversObject<{
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   path?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -336,7 +341,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   bookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<QueryBookmarkArgs, 'id'>>;
   folder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<QueryFolderArgs, 'id'>>;
-  me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  me?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType>;
   ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   q?: Resolver<Maybe<ResolversTypes['Folder']>, ParentType, ContextType>;
 }>;
@@ -373,3 +378,13 @@ export type Resolvers<ContextType = MyContext> = ResolversObject<{
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
  */
 export type IResolvers<ContextType = MyContext> = Resolvers<ContextType>;
+export type DirectiveResolvers<ContextType = MyContext> = ResolversObject<{
+  auth?: AuthDirectiveResolver<any, any, ContextType>;
+}>;
+
+
+/**
+ * @deprecated
+ * Use "DirectiveResolvers" root object instead. If you wish to get "IDirectiveResolvers", add "typesPrefix: I" to your config.
+ */
+export type IDirectiveResolvers<ContextType = MyContext> = DirectiveResolvers<ContextType>;

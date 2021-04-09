@@ -8,6 +8,6 @@ type User {
 }
 
 type Query {
-    me: User
+    me: UserResult @auth
     ping: String!
 }

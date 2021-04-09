@@ -4,6 +4,7 @@ import { mergeTypeDefs } from '@graphql-tools/merge';
 import { makeExecutableSchema } from 'apollo-server-express';
 import { GraphQLSchema } from 'graphql';
 import path from 'path';
+import { AuthDirective } from './shared/authDirective';
 
 export const genSchema = (): GraphQLSchema => {
     const typesArray = loadFilesSync(path.join(__dirname, '.'), { recursive: true, extensions: ['gql'] });
@@ -15,5 +16,8 @@ export const genSchema = (): GraphQLSchema => {
     return makeExecutableSchema({
         typeDefs,
         resolvers,
+        schemaDirectives: {
+            auth: AuthDirective,
+        },
     });
 };
