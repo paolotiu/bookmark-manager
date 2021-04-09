@@ -1,22 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createApolloServer } from '@utils/createApolloServer';
-import { createTypeormConn } from '@utils/createTypeormConn';
 import { gql } from 'apollo-server-express';
 import { createTestClient } from 'apollo-server-integration-testing';
-import { Connection } from 'typeorm';
-const { mutate } = createTestClient({
-    apolloServer: createApolloServer() as any,
-});
 
-let conn: Connection;
+const testClient = createTestClient({ apolloServer: createApolloServer() as any });
 
-beforeAll(async () => {
-    conn = await createTypeormConn();
-});
-
-afterAll(() => {
-    conn.close();
-});
+const { mutate } = testClient;
 
 const REGISTER_MUTATION = gql`
     mutation REGISTER_MUTATION($name: String!, $email: String!, $password: String!) {
