@@ -2,9 +2,9 @@ union UserResult = BaseError | User
 
 type Mutation {
     "true => success | false => fail"
-    register(email: String!, name: String!, password: String!): Boolean!
+    register(email: String!, name: String!, password: String!): UserResult!
     "Returns null if login failed"
-    login(email: String!, password: String!): UserResult
+    login(email: String!, password: String!): UserResult!
 
     invalidateTokens: Boolean!
 }

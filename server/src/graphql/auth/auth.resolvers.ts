@@ -4,21 +4,34 @@ import bcrypt from 'bcryptjs';
 import { createTokens } from '@utils/createTokens';
 import { User } from '@entity/User';
 import { CookieOptions, Response } from 'express';
+import { createBaseError, createUnexpectedError } from '@gql/shared/errorMessages';
+import { registerSchema } from './yupSchemas';
 
 const loginError: BaseError = {
     path: 'login',
     message: 'Email or password is incorrect',
 };
+
 export const resolvers: Resolvers = {
     Mutation: {
         register: async (_, { email, password, name }) => {
+            // Hash the password
             const hashedPassword = await bcrypt.hash(password, 10);
+
+            // Check if a user with that email exists
+            const user = await User.findOne({ email });
+            if (user) return createBaseError('register', 'A user with that email already exists');
+
+            // Input validation
+            const x = await registerSchema.validate({ email, password, name }).catch((e) => e);
+            if (x.errors) return createBaseError('register', x.errors[0]);
+
             try {
-                await User.create({ email, name, password: hashedPassword }).save();
-            } catch {
-                return false;
+                const user = User.create({ email, name, password: hashedPassword }).save();
+                return user;
+            } catch (error) {
+                return createUnexpectedError('register');
             }
-            return true;
         },
         login: async (_, { email, password }, { res }) => {
             const user = await User.findOne({ where: { email } });
