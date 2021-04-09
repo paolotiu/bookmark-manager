@@ -50,7 +50,7 @@
         "start": "ts-node src/index.ts",
         "dev": "NODE_ENV=dev concurrently \"nodemon --exec ts-node-transpile-only -r tsconfig-paths/register src/index.ts\" \"yarn generate --watch\"",
         "generate": "graphql-codegen --config codegen.yml",
-        "test": "NODE_ENV=test jest",
+        "test": "NODE_ENV=test jest --runInBand",
         "migrate": "ts-node-transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -c dev"
     }
 }
