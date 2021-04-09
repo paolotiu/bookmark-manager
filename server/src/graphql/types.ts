@@ -66,11 +66,11 @@ export type Mutation = {
   createFolder: FolderResult;
   invalidateTokens: Scalars['Boolean'];
   /** Returns null if login failed */
-  login?: Maybe<UserResult>;
+  login: UserResult;
   moveFolder: FolderResult;
   recoverFolder: FolderResult;
   /** true => success | false => fail */
-  register: Scalars['Boolean'];
+  register: UserResult;
   softDeleteFolder: FolderResult;
   updateBookmark: BookmarkResult;
   updateFolderName: FolderResult;
@@ -324,10 +324,10 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   createBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
   createFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationCreateFolderArgs, 'data'>>;
   invalidateTokens?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  login?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
+  login?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   moveFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationMoveFolderArgs, 'folderId' | 'targetFolderId'>>;
   recoverFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationRecoverFolderArgs, 'id'>>;
-  register?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
+  register?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
   softDeleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationSoftDeleteFolderArgs, 'id'>>;
   updateBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationUpdateBookmarkArgs, 'data'>>;
   updateFolderName?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationUpdateFolderNameArgs, 'id' | 'name'>>;
