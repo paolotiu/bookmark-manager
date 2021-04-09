@@ -5,5 +5,5 @@ export class depth1617783725353 implements MigrationInterface {
         queryRunner.query('ALTER TABLE folder DROP COLUMN depth;');
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(): Promise<void> {}
 }
