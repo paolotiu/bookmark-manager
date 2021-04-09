@@ -68,7 +68,11 @@ export class Folder extends BaseEntity {
     }
 
     getDescendants(): Promise<Folder[]> {
-        return Folder.createQueryBuilder().select('*').where('path <@ :path', { path: this.path }).execute();
+        return Folder.createQueryBuilder()
+            .select('*')
+            .where('path <@ :path', { path: this.path })
+            .orderBy('nlevel(path)', 'ASC')
+            .execute();
     }
 
     async getDescendantsTree(): Promise<Folder> {
