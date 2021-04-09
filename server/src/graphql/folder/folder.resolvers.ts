@@ -1,11 +1,6 @@
 import { Bookmark } from '@entity/Bookmark';
 import { Folder } from '@entity/Folder';
-import {
-    createEntityIdNotFoundError,
-    createUnexpectedError,
-    isBaseError,
-    unauthorizedError,
-} from '@gql/shared/errorMessages';
+import { createEntityIdNotFoundError, createUnexpectedError, isBaseError } from '@gql/shared/errorMessages';
 import { Resolvers } from '@gql/types';
 
 export const resolvers: Resolvers = {
@@ -24,8 +19,7 @@ export const resolvers: Resolvers = {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Folder'),
     },
     Query: {
-        folder: async (_, { id }, { userId }) => {
-            if (!userId) return unauthorizedError('folder');
+        folder: async (_, { id }) => {
             return (await Folder.findOne(id)) || createEntityIdNotFoundError('folder', 'folder');
         },
         q: async () => {
@@ -36,8 +30,6 @@ export const resolvers: Resolvers = {
     },
     Mutation: {
         createFolder: async (_, { data: { name, parentId } }, { userId }) => {
-            if (!userId) return unauthorizedError('createFolder');
-
             const folder = Folder.create({ name, userId });
 
             // default depth is 0 meaning no parent folder
@@ -64,8 +56,6 @@ export const resolvers: Resolvers = {
             return prePathFolder.save();
         },
         moveFolder: async (_, { folderId, targetFolderId }, { userId }) => {
-            if (!userId) return unauthorizedError('moveFolder');
-
             // Get both target and source folder
             const foldersArr = await Folder.findByIds([folderId, targetFolderId], { where: { userId } });
 
@@ -94,8 +84,6 @@ export const resolvers: Resolvers = {
             return folders[folderId];
         },
         updateFolderName: async (_, { name, id }, { userId }) => {
-            if (!userId) return unauthorizedError('updateFolderName');
-
             // Get folder
             const folder = await Folder.findOne(id, { where: { userId: userId } });
 
@@ -109,8 +97,6 @@ export const resolvers: Resolvers = {
             return folder.save();
         },
         softDeleteFolder: async (_, { id }, { userId }) => {
-            if (!userId) return unauthorizedError('deleteFolder');
-
             // Get folder
             const folder = await Folder.findOne(id, { where: { userId } });
 
@@ -129,7 +115,6 @@ export const resolvers: Resolvers = {
             return folder;
         },
         recoverFolder: async (_, { id }, { userId }) => {
-            if (!userId) return unauthorizedError('recoverFolder');
             const folder = await Folder.update({ id, userId }, { deleted: false });
 
             if (folder.raw.length < 1) return createEntityIdNotFoundError('recoverFolder', 'folder');

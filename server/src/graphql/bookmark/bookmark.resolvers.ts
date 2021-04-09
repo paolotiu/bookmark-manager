@@ -22,7 +22,6 @@ export const resolvers: Resolvers = {
     },
     Mutation: {
         createBookmark: async (_, { data: { title, description, url, folderId } }, { userId }) => {
-            if (!userId) return unauthorizedError('createBookmark');
             const cleaned = unNullifyObj({ title, description, url });
             if (folderId) {
                 const folder = await Folder.findOne(folderId, { where: { userId } });
@@ -39,7 +38,6 @@ export const resolvers: Resolvers = {
         },
 
         updateBookmark: async (_, { data: { id, description, title, url } }, { userId }) => {
-            if (!userId) return unauthorizedError('updateBookmark');
             const updateObj: {
                 [key: string]: string | number | Date | null;
             } = unNullifyObj({ description, title, url });

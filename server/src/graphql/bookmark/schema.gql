@@ -22,10 +22,10 @@ input UpdateBookmarkInput {
 union BookmarkResult = BaseError | Bookmark
 
 type Query {
-    bookmark(id: Int!): BookmarkResult!
+    bookmark(id: Int!): BookmarkResult! @auth
 }
 
 type Mutation {
-    createBookmark(data: CreateBookmarkInput!): BookmarkResult!
-    updateBookmark(data: UpdateBookmarkInput!): BookmarkResult!
+    createBookmark(data: CreateBookmarkInput!): BookmarkResult! @auth
+    updateBookmark(data: UpdateBookmarkInput!): BookmarkResult! @auth
 }
