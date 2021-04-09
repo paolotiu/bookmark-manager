@@ -22,7 +22,7 @@ interface RefreshTokenPayload extends AccessTokenPayload {
 export const startServer = async (): Promise<void> => {
     const app = express();
 
-    app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+    app.use(cors({ origin: ['http://localhost:3000', 'https://studio.apollographql.com'], credentials: true }));
     app.use(cookieParser());
     app.use(async (req, res, next) => {
         const accessToken = req.cookies['access-token'];
