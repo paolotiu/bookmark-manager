@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createApolloServer } from '@utils/createApolloServer';
+import { createApolloTestClient } from '@utils/createApolloTestClient';
 import { gql } from 'apollo-server-express';
-import { createTestClient } from 'apollo-server-integration-testing';
 
-const testClient = createTestClient({ apolloServer: createApolloServer() as any });
-
+// Get test client
+const testClient = createApolloTestClient();
 const { mutate } = testClient;
 
 const REGISTER_MUTATION = gql`
