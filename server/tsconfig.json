@@ -29,6 +29,6 @@
             "@utils/*": ["utils/*"]
         }
     },
-    "exclude": ["node_modules"],
+    "exclude": ["node_modules", "./src/migration/*.ts"],
     "include": ["./src/**/*.tsx", "./src/**/*.ts"]
 }
