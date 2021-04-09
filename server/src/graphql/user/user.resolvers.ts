@@ -10,8 +10,7 @@ export const resolvers: Resolvers = {
     },
     User: {
         bookmarks: (parent) => Bookmark.find({ where: { userId: parent.id }, relations: ['category'] }),
-        folders: (parent) =>
-            Folder.find({ where: { userId: parent.id }, relations: ['parent', 'bookmarks', 'children'] }),
+        folders: (parent) => Folder.find({ where: { userId: parent.id } }),
     },
     Query: {
         me: async (_, _a, { userId }) => {
