@@ -47,24 +47,26 @@ export class Folder extends BaseEntity {
 
     private arrayToTree(arr: Folder[]): Folder {
         const map: Record<string, Folder> = {};
-        for (let i = 0; i < arr.length; i++) {
-            map[arr[i].id] = arr[i];
-            arr[i].children = [];
-        }
+        arr.forEach((folder) => {
+            map[folder.id] = folder; // initialize the map
+            folder.children = []; // initialize the children
+        });
+
         arr.forEach((folder, i) => {
             const regex = /\w+\./g;
             const regexMatches = [...folder.path.matchAll(regex)];
+            const id = regexMatches.length ? regexMatches[regexMatches.length - 1][0].slice(0, -1) : null;
 
             // Skip root node
-            if (i) {
-                // Gets the parent id form the path
+            if (i && id) {
+                // Gets the parent id from the path
                 // 1.2.3 => 2
-                const parentId = regexMatches[regexMatches.length - 1][0].slice(0, -1);
+                const parentId = id;
                 map[parentId].children.push(folder);
             }
         });
 
-        return arr[0];
+        return map[this.id];
     }
 
     getDescendants(): Promise<Folder[]> {
