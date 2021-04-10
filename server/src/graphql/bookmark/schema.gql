@@ -4,6 +4,7 @@ type Bookmark {
     url: String!
     description: String
     createdDate: Date!
+    folderId: Int
 }
 input CreateBookmarkInput {
     title: String!
@@ -17,6 +18,7 @@ input UpdateBookmarkInput {
     title: String
     description: String
     url: String
+    folderId: Int
 }
 
 union BookmarkResult = BaseError | Bookmark

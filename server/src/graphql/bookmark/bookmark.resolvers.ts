@@ -1,7 +1,7 @@
 import { Bookmark } from '@entity/Bookmark';
 import { Resolvers } from '@gql/types';
 import { unNullifyObj } from '@utils/unNullifyObj';
-import { isBaseError } from '@gql/shared/errorMessages';
+import { createEntityIdNotFoundError, createUnexpectedError, isBaseError } from '@gql/shared/errorMessages';
 import { Folder } from '@entity/Folder';
 
 export const resolvers: Resolvers = {
@@ -11,7 +11,7 @@ export const resolvers: Resolvers = {
 
     Query: {
         bookmark: async (_, { id }, { userId }) => {
-            const bookmark = await Bookmark.findOne({ id, userId }, { relations: ['category'] });
+            const bookmark = await Bookmark.findOne({ id, userId });
             if (!bookmark)
                 return {
                     path: 'bookmark',
@@ -37,30 +37,26 @@ export const resolvers: Resolvers = {
             return bookmark.save();
         },
 
-        updateBookmark: async (_, { data: { id, description, title, url } }, { userId }) => {
+        updateBookmark: async (_, { data: { id, description, title, url, folderId } }, { userId }) => {
+            // Get unullified object
             const updateObj: {
                 [key: string]: string | number | Date | null;
             } = unNullifyObj({ description, title, url });
 
-            const bookmark = await Bookmark.findOne(id, { where: { userId }, relations: ['category'] });
-            if (!bookmark) {
-                return {
-                    path: 'updateBookmark',
-                    message: 'No bookmark with that id',
-                };
+            const bookmark = await Bookmark.findOne(id, { where: { userId } });
+            if (!bookmark) return createEntityIdNotFoundError('updateBookmark', 'bookmark');
+
+            // Client requested to change folders
+            if (folderId) {
+                // Check if folder exists then save
+                const folder = await Folder.findOne(folderId, { where: { userId } });
+                folder ? (bookmark.folderId = folderId) : '';
             }
 
             Object.assign(bookmark, updateObj);
-            await bookmark.save();
+            const newBookmark = await bookmark.save();
 
-            const newBookmark = await Bookmark.findOne(id, { where: { userId }, relations: ['category'] });
-
-            return (
-                newBookmark || {
-                    path: 'updateBookmark',
-                    message: "Somehting wrong happened. You shouldn't be recieving this error",
-                }
-            );
+            return newBookmark || createUnexpectedError('updateBookmark');
         },
     },
 };

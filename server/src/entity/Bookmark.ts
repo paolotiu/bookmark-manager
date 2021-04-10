@@ -29,9 +29,6 @@ export class Bookmark extends BaseEntity {
     userId: number;
 
     @Column({ type: 'int', nullable: true })
-    categoryId: number | null;
-
-    @Column({ type: 'int', nullable: true })
     folderId: number | null;
 
     @ManyToOne(() => User, (user) => user.bookmarks)
