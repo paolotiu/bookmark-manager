@@ -12,23 +12,25 @@ export const resolvers: Resolvers = {
     Query: {
         bookmark: async (_, { id }, { userId }) => {
             const bookmark = await Bookmark.findOne({ id, userId });
-            if (!bookmark)
-                return {
-                    path: 'bookmark',
-                    message: 'No bookmark with that id',
-                };
+            if (!bookmark) return createEntityIdNotFoundError('bookmark', 'bookmark');
             return bookmark;
         },
     },
     Mutation: {
         createBookmark: async (_, { data: { title, description, url, folderId } }, { userId }) => {
+            // Get unNullified object
             const cleaned = unNullifyObj({ title, description, url });
+
+            // Put bookmark in a folder
             if (folderId) {
                 const folder = await Folder.findOne(folderId, { where: { userId } });
-                if (!folder) return { path: 'createBookmark', message: 'No folder with that id' };
+                // TODO: Decide if it should error out if a folder isn't found
+                // or just dont add the folder id to the bookmark
+                if (!folder) return createEntityIdNotFoundError('createBookmark', 'folder');
                 cleaned.folderId = folder.id;
             }
 
+            // Create bookmark
             const bookmark = Bookmark.create({
                 ...cleaned,
                 userId,
@@ -43,7 +45,10 @@ export const resolvers: Resolvers = {
                 [key: string]: string | number | Date | null;
             } = unNullifyObj({ description, title, url });
 
+            // Find bookmark
             const bookmark = await Bookmark.findOne(id, { where: { userId } });
+
+            // No bookmark found
             if (!bookmark) return createEntityIdNotFoundError('updateBookmark', 'bookmark');
 
             // Client requested to change folders
@@ -53,6 +58,7 @@ export const resolvers: Resolvers = {
                 folder ? (bookmark.folderId = folderId) : '';
             }
 
+            // Update bookmark obj properties
             Object.assign(bookmark, updateObj);
             const newBookmark = await bookmark.save();
 
