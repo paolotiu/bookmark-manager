@@ -9,7 +9,7 @@ export const resolvers: Resolvers = {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'User'),
     },
     User: {
-        bookmarks: (parent) => Bookmark.find({ where: { userId: parent.id }, relations: ['category'] }),
+        bookmarks: (parent) => Bookmark.find({ where: { userId: parent.id } }),
         folders: (parent) => Folder.find({ where: { userId: parent.id } }),
     },
     Query: {
