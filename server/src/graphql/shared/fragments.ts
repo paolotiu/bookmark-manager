@@ -15,6 +15,42 @@ export const FolderFragment = gql`
         name
     }
 `;
+export const FolderFragments = {
+    withChildren: gql`
+        fragment FolderWithChildren on Folder {
+            id
+            parentId
+            depth
+            name
+            children {
+                id
+                name
+            }
+        }
+    `,
+    withBookmarks: gql`
+        fragment FolderWithBookmarks on Folder {
+            id
+            parentId
+            depth
+            name
+            bookmarks {
+                id
+                title
+                url
+                description
+            }
+        }
+    `,
+    base: gql`
+        fragment Folder on Folder {
+            id
+            parentId
+            depth
+            name
+        }
+    `,
+};
 
 const Fragments = {
     BaseErrorFragment,

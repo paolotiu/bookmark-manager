@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Bookmark } from '@entity/Bookmark';
 import { Folder } from '@entity/Folder';
 import { User } from '@entity/User';
-import { BaseErrorFragment, FolderFragment } from '@gql/shared/fragments';
+import { BaseErrorFragment, FolderFragments } from '@gql/shared/fragments';
 import { createApolloTestClient } from '@utils/createApolloTestClient';
 import { gql } from 'apollo-server-express';
 
@@ -19,30 +20,42 @@ beforeAll(async () => {
 });
 
 const testClient = createApolloTestClient();
-const { mutate } = testClient;
+const { mutate, query } = testClient;
 
-const CREATE_FOLDER_MUTATION = gql`
-    mutation CREATE_FOLDER_MUTATION($name: String!, $parentId: Int) {
-        createFolder(data: { name: $name, parentId: $parentId }) {
+const WITH_BOOKMARKS_QUERY = gql`
+    query WITH_BOOKMARKS_QUERY($id: Int!) {
+        folder(id: $id) {
+            ...FolderWithBookmarks
             ...BaseError
-            ...Folder
         }
     }
 
     ${BaseErrorFragment}
-    ${FolderFragment}
+    ${FolderFragments.withBookmarks}
+`;
+
+const CREATE_FOLDER_MUTATION = gql`
+    mutation CREATE_FOLDER_MUTATION($name: String!, $parentId: Int) {
+        createFolder(data: { name: $name, parentId: $parentId }) {
+            ...Folder
+            ...BaseError
+        }
+    }
+
+    ${BaseErrorFragment}
+    ${FolderFragments.base}
 `;
 
 const UPDATE_FOLDER_NAME_MUTATION = gql`
     mutation UPDATE_FOLDER_NAME_MUTATION($id: Int!, $name: String!) {
         updateFolderName(id: $id, name: $name) {
-            ...BaseError
             ...Folder
+            ...BaseError
         }
     }
 
     ${BaseErrorFragment}
-    ${FolderFragment}
+    ${FolderFragments.base}
 `;
 
 const MOVE_FOLDER_MUTATION = gql`
@@ -54,7 +67,7 @@ const MOVE_FOLDER_MUTATION = gql`
     }
 
     ${BaseErrorFragment}
-    ${FolderFragment}
+    ${FolderFragments.base}
 `;
 
 type FolderRes<T extends string> = {
@@ -69,6 +82,8 @@ const updateFolderMutation = (variables: any) =>
     mutate<FolderRes<'updateFolderName'>>(UPDATE_FOLDER_NAME_MUTATION, { variables });
 
 const moveFolderMutation = (variables: any) => mutate<FolderRes<'moveFolder'>>(MOVE_FOLDER_MUTATION, { variables });
+
+const withBookmarksQuery = (variables: any) => query<FolderRes<'folder'>>(WITH_BOOKMARKS_QUERY, { variables });
 
 describe('Happy Path :)', () => {
     const testFolder: Partial<Folder> = { name: 'TestFolder' };
@@ -129,5 +144,26 @@ describe('Happy Path :)', () => {
             data: { moveFolder },
         } = await moveFolderMutation({ folderId: testChildFolder.id, targetFolderId: testFolder.id });
         expect(moveFolder).toEqual(expect.objectContaining(testChildFolder));
+    });
+
+    test('bookmark works', async () => {
+        const bookmark = await Bookmark.create({
+            title: 'HI!',
+            description: 'A test bookmark!',
+            url: 'http://SOMEURL.com',
+            folderId: testChildFolder.id,
+            userId: testUser.id,
+        }).save();
+
+        const {
+            data: { folder },
+        } = await withBookmarksQuery(testChildFolder);
+        expect(folder.bookmarks.length).toBe(1);
+        expect(folder.bookmarks[0]).toEqual({
+            description: bookmark.description,
+            id: bookmark.id,
+            title: bookmark.title,
+            url: bookmark.url,
+        });
     });
 });

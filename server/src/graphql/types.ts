@@ -27,7 +27,7 @@ export type BaseError = {
 
 export type Bookmark = {
   __typename?: 'Bookmark';
-  id: Scalars['ID'];
+  id: Scalars['Int'];
   title: Scalars['String'];
   url: Scalars['String'];
   description?: Maybe<Scalars['String']>;
@@ -255,7 +255,6 @@ export type ResolversTypes = ResolversObject<{
   BaseError: ResolverTypeWrapper<BaseError>;
   String: ResolverTypeWrapper<Scalars['String']>;
   Bookmark: ResolverTypeWrapper<BookmarkModel>;
-  ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   BookmarkResult: ResolversTypes['BaseError'] | ResolversTypes['Bookmark'];
   CreateBookmarkInput: CreateBookmarkInput;
@@ -268,6 +267,7 @@ export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>;
   UpdateBookmarkInput: UpdateBookmarkInput;
   User: ResolverTypeWrapper<UserModel>;
+  ID: ResolverTypeWrapper<Scalars['ID']>;
   UserResult: ResolversTypes['BaseError'] | ResolversTypes['User'];
 }>;
 
@@ -276,7 +276,6 @@ export type ResolversParentTypes = ResolversObject<{
   BaseError: BaseError;
   String: Scalars['String'];
   Bookmark: BookmarkModel;
-  ID: Scalars['ID'];
   Int: Scalars['Int'];
   BookmarkResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Bookmark'];
   CreateBookmarkInput: CreateBookmarkInput;
@@ -289,6 +288,7 @@ export type ResolversParentTypes = ResolversObject<{
   Query: {};
   UpdateBookmarkInput: UpdateBookmarkInput;
   User: UserModel;
+  ID: Scalars['ID'];
   UserResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['User'];
 }>;
 
@@ -303,7 +303,7 @@ export type BaseErrorResolvers<ContextType = MyContext, ParentType extends Resol
 }>;
 
 export type BookmarkResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Bookmark'] = ResolversParentTypes['Bookmark']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
