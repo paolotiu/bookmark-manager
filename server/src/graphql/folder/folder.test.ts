@@ -70,6 +70,18 @@ const MOVE_FOLDER_MUTATION = gql`
     ${FolderFragments.base}
 `;
 
+const DELETE_BOOKMARK_MUTATION = gql`
+    mutation DELETE_BOOKMARK_MUTATION($id: Int!) {
+        deleteFolder(id: $id) {
+            ...Folder
+            ...BaseError
+        }
+    }
+
+    ${BaseErrorFragment}
+    ${FolderFragments.base}
+`;
+
 type FolderRes<T extends string> = {
     data: {
         [key in T]: any;
@@ -84,6 +96,8 @@ const updateFolderMutation = (variables: any) =>
 const moveFolderMutation = (variables: any) => mutate<FolderRes<'moveFolder'>>(MOVE_FOLDER_MUTATION, { variables });
 
 const withBookmarksQuery = (variables: any) => query<FolderRes<'folder'>>(WITH_BOOKMARKS_QUERY, { variables });
+const deleteFolderMutation = (variables: any) =>
+    mutate<FolderRes<'deleteFolder'>>(DELETE_BOOKMARK_MUTATION, { variables });
 
 describe('Happy Path :)', () => {
     const testFolder: Partial<Folder> = { name: 'TestFolder' };
@@ -146,7 +160,9 @@ describe('Happy Path :)', () => {
         expect(moveFolder).toEqual(expect.objectContaining(testChildFolder));
     });
 
+    let bookmarkId: number;
     test('bookmark works', async () => {
+        // Create bookmark
         const bookmark = await Bookmark.create({
             title: 'HI!',
             description: 'A test bookmark!',
@@ -154,6 +170,9 @@ describe('Happy Path :)', () => {
             folderId: testChildFolder.id,
             userId: testUser.id,
         }).save();
+
+        // initialize bookmarkId
+        bookmarkId = bookmark.id;
 
         const {
             data: { folder },
@@ -165,5 +184,21 @@ describe('Happy Path :)', () => {
             title: bookmark.title,
             url: bookmark.url,
         });
+    });
+
+    test('Folder deletion ', async () => {
+        const {
+            data: { deleteFolder },
+        } = await deleteFolderMutation(testChildFolder);
+        expect(deleteFolder).toEqual(expect.objectContaining(testChildFolder));
+
+        // Check if folder not in db
+        const folder = await Folder.findOne(testChildFolder.id);
+        expect(folder).toBeUndefined();
+    });
+
+    test('Bookmarks of deleted folder gets soft deleted', async () => {
+        const bookmark = await Bookmark.findOne(bookmarkId);
+        expect(bookmark).toBeUndefined();
     });
 });

@@ -133,6 +133,13 @@ export const resolvers: Resolvers = {
 
             if (!folder) return createEntityIdNotFoundError('deleteFolder', 'folder');
 
+            // Soft delete
+            await Bookmark.createQueryBuilder()
+                .softDelete()
+                .where('folderId = :fid', { fid: id })
+                .andWhere('userId = :uid', { uid: userId })
+                .execute();
+
             // Remove folder id
             await Bookmark.createQueryBuilder()
                 .update()
@@ -143,15 +150,8 @@ export const resolvers: Resolvers = {
                 .andWhere('userId = :uid', { uid: userId })
                 .execute();
 
-            // Soft delete
-            await Bookmark.createQueryBuilder()
-                .softDelete()
-                .where('folderId = :fid', { fid: id })
-                .andWhere('userId = :uid', { uid: userId })
-                .execute();
-
             // Delete folder
-            await Folder.delete(folder);
+            await Folder.delete({ id, userId });
 
             return folder;
         },
