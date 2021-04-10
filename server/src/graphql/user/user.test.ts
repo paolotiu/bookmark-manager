@@ -3,6 +3,19 @@ import { User } from '@entity/User';
 import { createApolloTestClient } from '@utils/createApolloTestClient';
 import { gql } from 'apollo-server-express';
 
+const testUser = { email: 'bob@2bob.com', password: 'password', name: 'bob', id: 0 };
+
+beforeAll(async () => {
+    // Setup user
+    const user = await User.create(testUser).save();
+    testUser.id = user.id;
+    testClient.setOptions({
+        request: {
+            userId: user.id,
+        },
+    });
+});
+
 const testClient = createApolloTestClient();
 const { query } = testClient;
 
@@ -24,17 +37,6 @@ const ME_QUERY = gql`
 `;
 
 const meQuery = () => query<{ data: { me: any } }>(ME_QUERY);
-
-const testUser = { email: 'bob@2bob.com', password: 'password', name: 'bob', id: 0 };
-beforeAll(async () => {
-    const user = await User.create(testUser).save();
-    testUser.id = user.id;
-    testClient.setOptions({
-        request: {
-            userId: user.id,
-        },
-    });
-});
 
 test('test', async () => {
     const res = await meQuery();
