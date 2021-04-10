@@ -1,5 +1,5 @@
 type Bookmark {
-    id: ID!
+    id: Int!
     title: String!
     url: String!
     description: String
