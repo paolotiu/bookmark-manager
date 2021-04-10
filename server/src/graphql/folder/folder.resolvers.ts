@@ -44,6 +44,9 @@ export const resolvers: Resolvers = {
                     // Parent path + '.'
                     // We'll insert the folder id later
                     path = parent.path + '.';
+
+                    // Add parent id
+                    folder.parentId = parentId;
                 }
             }
             folder.depth = depth;
@@ -79,6 +82,9 @@ export const resolvers: Resolvers = {
 
             // Update folder path
             folders[folderId].path = updatedFolder.path;
+
+            // Update parent id
+            folders[folderId].parentId = targetFolderId;
 
             // Return updated folder
             return folders[folderId];

@@ -26,6 +26,9 @@ export class Folder extends BaseEntity {
     @Column('int')
     userId: number;
 
+    @Column('int', { nullable: true })
+    parentId?: number;
+
     @Column('ltree', { nullable: true })
     path: string;
 
