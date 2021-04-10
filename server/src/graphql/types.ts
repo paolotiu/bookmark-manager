@@ -53,7 +53,7 @@ export type CreateFolderInput = {
 export type Folder = {
   __typename?: 'Folder';
   id: Scalars['Int'];
-  parent?: Maybe<Folder>;
+  parentId?: Maybe<Scalars['Int']>;
   children: Array<Maybe<Folder>>;
   bookmarks: Array<Maybe<Bookmark>>;
   depth: Scalars['Int'];
@@ -103,7 +103,7 @@ export type MutationLoginArgs = {
 
 export type MutationMoveFolderArgs = {
   folderId: Scalars['Int'];
-  targetFolderId: Scalars['Int'];
+  targetFolderId?: Maybe<Scalars['Int']>;
 };
 
 
@@ -131,7 +131,7 @@ export type MutationUpdateBookmarkArgs = {
 
 export type MutationUpdateFolderNameArgs = {
   id: Scalars['Int'];
-  name: Scalars['ID'];
+  name: Scalars['String'];
 };
 
 export type Query = {
@@ -322,7 +322,7 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 
 export type FolderResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Folder'] = ResolversParentTypes['Folder']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  parent?: Resolver<Maybe<ResolversTypes['Folder']>, ParentType, ContextType>;
+  parentId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   children?: Resolver<Array<Maybe<ResolversTypes['Folder']>>, ParentType, ContextType>;
   bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
   depth?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -340,7 +340,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   deleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationDeleteFolderArgs, 'id'>>;
   invalidateTokens?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   login?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
-  moveFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationMoveFolderArgs, 'folderId' | 'targetFolderId'>>;
+  moveFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationMoveFolderArgs, 'folderId'>>;
   recoverFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationRecoverFolderArgs, 'id'>>;
   register?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
   softDeleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationSoftDeleteFolderArgs, 'id'>>;

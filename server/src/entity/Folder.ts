@@ -27,7 +27,7 @@ export class Folder extends BaseEntity {
     userId: number;
 
     @Column('int', { nullable: true })
-    parentId?: number;
+    parentId?: number | null;
 
     @Column('ltree', { nullable: true })
     path: string;
@@ -94,8 +94,17 @@ export class Folder extends BaseEntity {
         // Concatenates target path with the source's id
         // We use the id as path markers
         return Folder.query(
-            'update folder set path = $1 || subpath(path, nlevel($2) - 1) where path <@ $2 returning *',
+            'update folder set path = $1 || subpath(path, nlevel($2) - 1), depth = nlevel($1), "parentId" = ltree2text(subpath($1, -1, 1))::int where path <@ $2 returning *',
             [targetFolderPath, this.path],
+        );
+    }
+
+    // Returns the values as move
+    // moves the folder to the top level (root)
+    moveToRoot(): Promise<[Folder[], number]> {
+        return Folder.query(
+            'update folder set path = subpath(path, nlevel($1) - 1), depth = 0, "parentId" = null where path <@ $1 returning *',
+            [this.path],
         );
     }
 }

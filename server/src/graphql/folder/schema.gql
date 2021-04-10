@@ -24,6 +24,6 @@ type Mutation {
     updateFolderName(id: Int!, name: String!): FolderResult! @auth
     softDeleteFolder(id: Int!): FolderResult! @auth
     recoverFolder(id: Int!): FolderResult! @auth
-    moveFolder(folderId: Int!, targetFolderId: Int!): FolderResult! @auth
+    moveFolder(folderId: Int!, targetFolderId: Int): FolderResult! @auth
     deleteFolder(id: Int!): FolderResult! @auth
 }

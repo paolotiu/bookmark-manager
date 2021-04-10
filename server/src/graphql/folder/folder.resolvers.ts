@@ -59,6 +59,14 @@ export const resolvers: Resolvers = {
             return prePathFolder.save();
         },
         moveFolder: async (_, { folderId, targetFolderId }, { userId }) => {
+            // Move folder to root
+            if (!targetFolderId) {
+                const folder = await Folder.findOne(folderId, { where: { userId } });
+                const res = await folder?.moveToRoot();
+                if (!res) return createEntityIdNotFoundError('moveFolder', 'folder');
+                return res[0][0];
+            }
+
             // Get both target and source folder
             const foldersArr = await Folder.findByIds([folderId, targetFolderId], { where: { userId } });
 
@@ -80,14 +88,8 @@ export const resolvers: Resolvers = {
             // This should not happen!!!
             if (!updatedFolder) return createUnexpectedError('moveFolder');
 
-            // Update folder path
-            folders[folderId].path = updatedFolder.path;
-
-            // Update parent id
-            folders[folderId].parentId = targetFolderId;
-
             // Return updated folder
-            return folders[folderId];
+            return updatedFolder;
         },
         updateFolderName: async (_, { name, id }, { userId }) => {
             // Get folder
