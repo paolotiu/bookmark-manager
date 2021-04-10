@@ -32,6 +32,7 @@ export type Bookmark = {
   url: Scalars['String'];
   description?: Maybe<Scalars['String']>;
   createdDate: Scalars['Date'];
+  folderId?: Maybe<Scalars['Int']>;
 };
 
 export type BookmarkResult = BaseError | Bookmark;
@@ -65,6 +66,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createBookmark: BookmarkResult;
   createFolder: FolderResult;
+  deleteFolder: FolderResult;
   invalidateTokens: Scalars['Boolean'];
   /** Returns null if login failed */
   login: UserResult;
@@ -85,6 +87,11 @@ export type MutationCreateBookmarkArgs = {
 
 export type MutationCreateFolderArgs = {
   data: CreateFolderInput;
+};
+
+
+export type MutationDeleteFolderArgs = {
+  id: Scalars['Int'];
 };
 
 
@@ -124,7 +131,7 @@ export type MutationUpdateBookmarkArgs = {
 
 export type MutationUpdateFolderNameArgs = {
   id: Scalars['Int'];
-  name: Scalars['String'];
+  name: Scalars['ID'];
 };
 
 export type Query = {
@@ -151,6 +158,7 @@ export type UpdateBookmarkInput = {
   title?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['String']>;
+  folderId?: Maybe<Scalars['Int']>;
 };
 
 /** User */
@@ -248,9 +256,9 @@ export type ResolversTypes = ResolversObject<{
   String: ResolverTypeWrapper<Scalars['String']>;
   Bookmark: ResolverTypeWrapper<BookmarkModel>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
   BookmarkResult: ResolversTypes['BaseError'] | ResolversTypes['Bookmark'];
   CreateBookmarkInput: CreateBookmarkInput;
-  Int: ResolverTypeWrapper<Scalars['Int']>;
   CreateFolderInput: CreateFolderInput;
   Date: ResolverTypeWrapper<Scalars['Date']>;
   Folder: ResolverTypeWrapper<Folder>;
@@ -269,9 +277,9 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String'];
   Bookmark: BookmarkModel;
   ID: Scalars['ID'];
+  Int: Scalars['Int'];
   BookmarkResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Bookmark'];
   CreateBookmarkInput: CreateBookmarkInput;
-  Int: Scalars['Int'];
   CreateFolderInput: CreateFolderInput;
   Date: Scalars['Date'];
   Folder: Folder;
@@ -300,6 +308,7 @@ export type BookmarkResolvers<ContextType = MyContext, ParentType extends Resolv
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdDate?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  folderId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -328,6 +337,7 @@ export type FolderResultResolvers<ContextType = MyContext, ParentType extends Re
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
   createFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationCreateFolderArgs, 'data'>>;
+  deleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationDeleteFolderArgs, 'id'>>;
   invalidateTokens?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   login?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   moveFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationMoveFolderArgs, 'folderId' | 'targetFolderId'>>;

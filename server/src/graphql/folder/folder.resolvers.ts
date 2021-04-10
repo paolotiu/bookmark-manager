@@ -120,5 +120,32 @@ export const resolvers: Resolvers = {
             if (folder.raw.length < 1) return createEntityIdNotFoundError('recoverFolder', 'folder');
             return folder.raw[0];
         },
+        deleteFolder: async (_, { id }, { userId }) => {
+            const folder = await Folder.findOne(id, { where: { userId } });
+
+            if (!folder) return createEntityIdNotFoundError('deleteFolder', 'folder');
+
+            // Remove folder id
+            await Bookmark.createQueryBuilder()
+                .update()
+                .set({
+                    folderId: () => 'null',
+                })
+                .where('folderId = :fid', { fid: id })
+                .andWhere('userId = :uid', { uid: userId })
+                .execute();
+
+            // Soft delete
+            await Bookmark.createQueryBuilder()
+                .softDelete()
+                .where('folderId = :fid', { fid: id })
+                .andWhere('userId = :uid', { uid: userId })
+                .execute();
+
+            // Delete folder
+            await Folder.delete(folder);
+
+            return folder;
+        },
     },
 };
