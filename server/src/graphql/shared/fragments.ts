@@ -13,10 +13,12 @@ export const FolderFragments = {
             id
             parentId
             depth
-            nae
+            name
             children {
                 id
+                depth
                 name
+                parentId
             }
         }
     `,

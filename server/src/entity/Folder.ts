@@ -27,7 +27,7 @@ export class Folder extends BaseEntity {
     userId: number;
 
     @Column('int', { nullable: true })
-    parentId?: number | null;
+    parentId: number | null;
 
     @Column('ltree', { nullable: true })
     path: string;
@@ -55,17 +55,16 @@ export class Folder extends BaseEntity {
             folder.children = []; // initialize the children
         });
 
-        arr.forEach((folder, i) => {
-            const regex = /\w+\./g;
-            const regexMatches = [...folder.path.matchAll(regex)];
-            const id = regexMatches.length ? regexMatches[regexMatches.length - 1][0].slice(0, -1) : null;
+        arr.forEach((folder) => {
+            // const regex = /\w+\./g;
+            // const regexMatches = [...folder.path.matchAll(regex)];
+            // const id = regexMatches.length ? regexMatches[regexMatches.length - 1][0].slice(0, -1) : null;
 
             // Skip root node
-            if (i && id) {
+            if (folder.parentId !== this.parentId && folder.parentId !== null) {
                 // Gets the parent id from the path
                 // 1.2.3 => 2
-                const parentId = id;
-                map[parentId].children.push(folder);
+                map[folder.parentId].children.push(folder);
             }
         });
 

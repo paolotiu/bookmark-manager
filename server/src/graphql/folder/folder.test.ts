@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Bookmark } from '@entity/Bookmark';
 import { Folder } from '@entity/Folder';
 import { User } from '@entity/User';
 import { BaseErrorFragment, FolderFragments } from '@gql/shared/fragments';
+import { FolderResult } from '@gql/types';
 import { createApolloTestClient } from '@utils/createApolloTestClient';
 import { gql } from 'apollo-server-express';
 
@@ -30,6 +32,18 @@ const WITH_BOOKMARKS_QUERY = gql`
 
     ${BaseErrorFragment}
     ${FolderFragments.withBookmarks}
+`;
+
+const WITH_CHILDREN_QUERY = gql`
+    query WITH_CHILDREN_QUERY($id: Int!) {
+        folder(id: $id) {
+            ...FolderWithChildren
+            ...BaseError
+        }
+    }
+
+    ${BaseErrorFragment}
+    ${FolderFragments.withChildren}
 `;
 
 const CREATE_FOLDER_MUTATION = gql`
@@ -80,9 +94,14 @@ const DELETE_BOOKMARK_MUTATION = gql`
     ${FolderFragments.base}
 `;
 
+type DataWithFolder = {
+    data: {
+        [key: string]: Folder;
+    };
+};
 type FolderRes<T extends string> = {
     data: {
-        [key in T]: any;
+        [key in T]: FolderResult;
     };
 };
 const createFolderMutation = (variables: any) =>
@@ -92,6 +111,9 @@ const updateFolderMutation = (variables: any) =>
     mutate<FolderRes<'updateFolderName'>>(UPDATE_FOLDER_NAME_MUTATION, { variables });
 
 const moveFolderMutation = (variables: any) => mutate<FolderRes<'moveFolder'>>(MOVE_FOLDER_MUTATION, { variables });
+
+const withChildrenQuery = (variables: { id: number }) =>
+    mutate<FolderRes<'folder'>>(WITH_CHILDREN_QUERY, { variables });
 
 const withBookmarksQuery = (variables: any) => query<FolderRes<'folder'>>(WITH_BOOKMARKS_QUERY, { variables });
 const deleteFolderMutation = (variables: any) =>
@@ -174,7 +196,8 @@ describe('Happy Path :)', () => {
 
         const {
             data: { folder },
-        } = await withBookmarksQuery(testChildFolder);
+        } = (await withBookmarksQuery(testChildFolder)) as DataWithFolder;
+
         expect(folder.bookmarks.length).toBe(1);
         expect(folder.bookmarks[0]).toEqual({
             description: bookmark.description,
@@ -182,6 +205,13 @@ describe('Happy Path :)', () => {
             title: bookmark.title,
             url: bookmark.url,
         });
+    });
+
+    test('Gives back folder children', async () => {
+        const {
+            data: { folder },
+        } = (await withChildrenQuery({ id: testFolder.id! })) as DataWithFolder;
+        expect(folder.children).toEqual(expect.arrayContaining([expect.objectContaining(testChildFolder)]));
     });
 
     test('Folder deletion ', async () => {
