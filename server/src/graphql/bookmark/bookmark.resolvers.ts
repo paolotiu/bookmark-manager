@@ -52,10 +52,16 @@ export const resolvers: Resolvers = {
             if (!bookmark) return createEntityIdNotFoundError('updateBookmark', 'bookmark');
 
             // Client requested to change folders
-            if (folderId) {
-                // Check if folder exists then save
-                const folder = await Folder.findOne(folderId, { where: { userId } });
-                folder ? (bookmark.folderId = folderId) : '';
+            if (typeof folderId !== 'undefined') {
+                if (folderId) {
+                    // Check if folder exists then save
+                    const folder = await Folder.findOne(folderId, { where: { userId } });
+
+                    folder ? (bookmark.folderId = folderId) : '';
+                } else {
+                    // Bookmark to root
+                    bookmark.folderId = null;
+                }
             }
 
             // Update bookmark obj properties

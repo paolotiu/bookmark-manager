@@ -7,21 +7,13 @@ export const BaseErrorFragment = gql`
     }
 `;
 
-export const FolderFragment = gql`
-    fragment Folder on Folder {
-        id
-        parentId
-        depth
-        name
-    }
-`;
 export const FolderFragments = {
     withChildren: gql`
         fragment FolderWithChildren on Folder {
             id
             parentId
             depth
-            name
+            nae
             children {
                 id
                 name
@@ -52,8 +44,20 @@ export const FolderFragments = {
     `,
 };
 
+export const BookmarkFragments = {
+    base: gql`
+        fragment Bookmark on Bookmark {
+            id
+            title
+            url
+            description
+            createdDate
+            folderId
+        }
+    `,
+};
+
 const Fragments = {
     BaseErrorFragment,
-    FolderFragment,
 };
 export default Fragments;
