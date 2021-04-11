@@ -78,5 +78,13 @@ export const resolvers: Resolvers = {
 
             return bookmark;
         },
+        hardDeleteBookmark: async (_, { id }, { userId }) => {
+            const bookmark = await Bookmark.findOne(id, { where: { userId }, withDeleted: true });
+            if (!bookmark) return createEntityIdNotFoundError('softDelete', 'bookmark');
+
+            await Bookmark.delete({ id: bookmark.id, userId });
+
+            return bookmark;
+        },
     },
 };

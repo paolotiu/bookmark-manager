@@ -67,6 +67,7 @@ export type Mutation = {
   createBookmark: BookmarkResult;
   createFolder: FolderResult;
   deleteFolder: FolderResult;
+  hardDeleteBookmark: BookmarkResult;
   invalidateTokens: Scalars['Boolean'];
   /** Returns null if login failed */
   login: UserResult;
@@ -92,6 +93,11 @@ export type MutationCreateFolderArgs = {
 
 
 export type MutationDeleteFolderArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationHardDeleteBookmarkArgs = {
   id: Scalars['Int'];
 };
 
@@ -344,6 +350,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   createBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
   createFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationCreateFolderArgs, 'data'>>;
   deleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationDeleteFolderArgs, 'id'>>;
+  hardDeleteBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationHardDeleteBookmarkArgs, 'id'>>;
   invalidateTokens?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   login?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   moveFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationMoveFolderArgs, 'folderId'>>;

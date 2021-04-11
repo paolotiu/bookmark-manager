@@ -69,6 +69,17 @@ const SOFT_DELETE_BOOKMARK_MUTATION = gql`
     ${BookmarkFragments.base}
     ${BaseErrorFragment}
 `;
+const HARD_DELETE_BOOKMARK_MUTATION = gql`
+    mutation HARD_DELETE_BOOKMARK_MUTATION($id: Int!) {
+        hardDeleteBookmark(id: $id) {
+            ...Bookmark
+            ...BaseError
+        }
+    }
+
+    ${BookmarkFragments.base}
+    ${BaseErrorFragment}
+`;
 
 type BookmarkRes<T extends string> = {
     data: {
@@ -83,6 +94,8 @@ const updateBookmarkMutation = (variables: UpdateBookmarkInput) =>
     mutate<BookmarkRes<'updateBookmark'>>(UPDATE_BOOKMARK_MUTATION, { variables: { updateBookmarkData: variables } });
 const softDeleteBookmarkMuatation = (variables: { id: number }) =>
     mutate<BookmarkRes<'softDeleteBookmark'>>(SOFT_DELETE_BOOKMARK_MUTATION, { variables });
+const hardDeleteBookmarkMuatation = (variables: { id: number }) =>
+    mutate<BookmarkRes<'hardDeleteBookmark'>>(HARD_DELETE_BOOKMARK_MUTATION, { variables });
 
 interface TestBookmark extends Partial<Bookmark> {
     title: string;
@@ -162,6 +175,17 @@ describe('Happy Path :)', () => {
         expect(softDeleteBookmark).toEqual(expect.objectContaining(testBookmark2));
 
         const bookmark = await Bookmark.findOne(testBookmark2.id);
+        expect(bookmark).toBeUndefined();
+    });
+
+    test('Hard deletes bookmark', async () => {
+        const {
+            data: { hardDeleteBookmark },
+        } = await hardDeleteBookmarkMuatation({ id: testBookmark2.id! });
+
+        expect(hardDeleteBookmark).toEqual(expect.objectContaining(testBookmark2));
+
+        const bookmark = await Bookmark.findOne(testBookmark2.id, { withDeleted: true });
         expect(bookmark).toBeUndefined();
     });
 });
