@@ -7,7 +7,8 @@ import { createApolloTestClient } from '@utils/createApolloTestClient';
 import { gql } from 'apollo-server-express';
 
 const testUser = { email: 'tommy@2bob.com', password: 'password', name: 'bob', id: 0 };
-
+const testClient = createApolloTestClient();
+const { mutate, query } = testClient;
 beforeAll(async () => {
     // Setup user
     const user = await User.create(testUser).save();
@@ -18,9 +19,6 @@ beforeAll(async () => {
         },
     });
 });
-
-const testClient = createApolloTestClient();
-const { mutate, query } = testClient;
 
 const WITH_BOOKMARKS_QUERY = gql`
     query WITH_BOOKMARKS_QUERY($id: Int!) {
