@@ -70,5 +70,13 @@ export const resolvers: Resolvers = {
 
             return newBookmark || createUnexpectedError('updateBookmark');
         },
+        softDeleteBookmark: async (_, { id }, { userId }) => {
+            const bookmark = await Bookmark.findOne(id, { where: { userId } });
+            if (!bookmark) return createEntityIdNotFoundError('softDelete', 'bookmark');
+
+            await bookmark.softRemove();
+
+            return bookmark;
+        },
     },
 };

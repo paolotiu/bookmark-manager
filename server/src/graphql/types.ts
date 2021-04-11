@@ -74,6 +74,7 @@ export type Mutation = {
   recoverFolder: FolderResult;
   /** true => success | false => fail */
   register: UserResult;
+  softDeleteBookmark: BookmarkResult;
   softDeleteFolder: FolderResult;
   updateBookmark: BookmarkResult;
   updateFolderName: FolderResult;
@@ -116,6 +117,11 @@ export type MutationRegisterArgs = {
   email: Scalars['String'];
   name: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationSoftDeleteBookmarkArgs = {
+  id: Scalars['Int'];
 };
 
 
@@ -343,6 +349,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   moveFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationMoveFolderArgs, 'folderId'>>;
   recoverFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationRecoverFolderArgs, 'id'>>;
   register?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
+  softDeleteBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationSoftDeleteBookmarkArgs, 'id'>>;
   softDeleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationSoftDeleteFolderArgs, 'id'>>;
   updateBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationUpdateBookmarkArgs, 'data'>>;
   updateFolderName?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationUpdateFolderNameArgs, 'id' | 'name'>>;

@@ -30,4 +30,5 @@ type Query {
 type Mutation {
     createBookmark(data: CreateBookmarkInput!): BookmarkResult! @auth
     updateBookmark(data: UpdateBookmarkInput!): BookmarkResult! @auth
+    softDeleteBookmark(id: Int!): BookmarkResult! @auth
 }
