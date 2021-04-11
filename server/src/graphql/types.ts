@@ -150,6 +150,7 @@ export type Query = {
   __typename?: 'Query';
   bookmark: BookmarkResult;
   folder: FolderResult;
+  getTree: TreeResult;
   me?: Maybe<UserResult>;
   ping: Scalars['String'];
   q?: Maybe<Folder>;
@@ -164,6 +165,13 @@ export type QueryBookmarkArgs = {
 export type QueryFolderArgs = {
   id: Scalars['Int'];
 };
+
+export type Tree = {
+  __typename?: 'Tree';
+  tree?: Maybe<Scalars['String']>;
+};
+
+export type TreeResult = BaseError | Tree;
 
 export type UpdateBookmarkInput = {
   id: Scalars['Int'];
@@ -277,6 +285,8 @@ export type ResolversTypes = ResolversObject<{
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Query: ResolverTypeWrapper<{}>;
+  Tree: ResolverTypeWrapper<Tree>;
+  TreeResult: ResolversTypes['BaseError'] | ResolversTypes['Tree'];
   UpdateBookmarkInput: UpdateBookmarkInput;
   User: ResolverTypeWrapper<UserModel>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
@@ -298,6 +308,8 @@ export type ResolversParentTypes = ResolversObject<{
   Mutation: {};
   Boolean: Scalars['Boolean'];
   Query: {};
+  Tree: Tree;
+  TreeResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Tree'];
   UpdateBookmarkInput: UpdateBookmarkInput;
   User: UserModel;
   ID: Scalars['ID'];
@@ -365,9 +377,19 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   bookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<QueryBookmarkArgs, 'id'>>;
   folder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<QueryFolderArgs, 'id'>>;
+  getTree?: Resolver<ResolversTypes['TreeResult'], ParentType, ContextType>;
   me?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType>;
   ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   q?: Resolver<Maybe<ResolversTypes['Folder']>, ParentType, ContextType>;
+}>;
+
+export type TreeResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Tree'] = ResolversParentTypes['Tree']> = ResolversObject<{
+  tree?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type TreeResultResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['TreeResult'] = ResolversParentTypes['TreeResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'BaseError' | 'Tree', ParentType, ContextType>;
 }>;
 
 export type UserResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
@@ -392,6 +414,8 @@ export type Resolvers<ContextType = MyContext> = ResolversObject<{
   FolderResult?: FolderResultResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Tree?: TreeResolvers<ContextType>;
+  TreeResult?: TreeResultResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserResult?: UserResultResolvers<ContextType>;
 }>;

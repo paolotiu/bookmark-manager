@@ -7,7 +7,12 @@ type Folder {
     name: String!
 }
 
+type Tree {
+    tree: String
+}
+
 union FolderResult = BaseError | Folder
+union TreeResult = BaseError | Tree
 
 input CreateFolderInput {
     name: String!
@@ -16,6 +21,7 @@ input CreateFolderInput {
 
 type Query {
     folder(id: Int!): FolderResult!
+    getTree: TreeResult! @auth
     q: Folder
 }
 

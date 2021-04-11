@@ -44,6 +44,11 @@ export const FolderFragments = {
             name
         }
     `,
+    tree: gql`
+        fragment Tree on Tree {
+            tree
+        }
+    `,
 };
 
 export const BookmarkFragments = {

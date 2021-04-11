@@ -1,6 +1,11 @@
 import { Bookmark } from '@entity/Bookmark';
-import { Folder } from '@entity/Folder';
-import { createEntityIdNotFoundError, createUnexpectedError, isBaseError } from '@gql/shared/errorMessages';
+import { Folder, getFolderStructure } from '@entity/Folder';
+import {
+    createEntityIdNotFoundError,
+    createUnexpectedError,
+    isBaseError,
+    unauthorizedError,
+} from '@gql/shared/errorMessages';
 import { Resolvers } from '@gql/types';
 
 export const resolvers: Resolvers = {
@@ -15,6 +20,9 @@ export const resolvers: Resolvers = {
             return tree.children;
         },
     },
+    TreeResult: {
+        __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Tree'),
+    },
     FolderResult: {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Folder'),
     },
@@ -26,6 +34,12 @@ export const resolvers: Resolvers = {
             const parent = await Folder.findOne(2);
             if (!parent) return null;
             return parent.getDescendantsTree();
+        },
+        getTree: async (_, __, { userId }) => {
+            if (!userId) return unauthorizedError('getTree');
+            const res = await getFolderStructure(userId);
+
+            return { tree: JSON.stringify(res) };
         },
     },
     Mutation: {

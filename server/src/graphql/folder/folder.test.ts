@@ -4,7 +4,7 @@ import { Bookmark } from '@entity/Bookmark';
 import { Folder } from '@entity/Folder';
 import { User } from '@entity/User';
 import { BaseErrorFragment, FolderFragments } from '@gql/shared/fragments';
-import { FolderResult } from '@gql/types';
+import { CreateFolderInput, FolderResult } from '@gql/types';
 import { createApolloTestClient } from '@utils/createApolloTestClient';
 import { gql } from 'apollo-server-express';
 
@@ -21,6 +21,18 @@ beforeAll(async () => {
         },
     });
 });
+
+const TREE_QUERY = gql`
+    query TREE_QUERY {
+        getTree {
+            ...Tree
+            ...BaseError
+        }
+    }
+
+    ${BaseErrorFragment}
+    ${FolderFragments.tree}
+`;
 
 const WITH_BOOKMARKS_QUERY = gql`
     query WITH_BOOKMARKS_QUERY($id: Int!) {
@@ -47,8 +59,8 @@ const WITH_CHILDREN_QUERY = gql`
 `;
 
 const CREATE_FOLDER_MUTATION = gql`
-    mutation CREATE_FOLDER_MUTATION($name: String!, $parentId: Int) {
-        createFolder(data: { name: $name, parentId: $parentId }) {
+    mutation CREATE_FOLDER_MUTATION($createFolderData: CreateFolderInput!) {
+        createFolder(data: $createFolderData) {
             ...Folder
             ...BaseError
         }
@@ -104,8 +116,8 @@ type FolderRes<T extends string> = {
         [key in T]: FolderResult;
     };
 };
-const createFolderMutation = (variables: any) =>
-    mutate<FolderRes<'createFolder'>>(CREATE_FOLDER_MUTATION, { variables });
+const createFolderMutation = (variables: CreateFolderInput) =>
+    mutate<FolderRes<'createFolder'>>(CREATE_FOLDER_MUTATION, { variables: { createFolderData: variables } });
 
 const updateFolderMutation = (variables: any) =>
     mutate<FolderRes<'updateFolderName'>>(UPDATE_FOLDER_NAME_MUTATION, { variables });
@@ -119,9 +131,15 @@ const withBookmarksQuery = (variables: any) => query<FolderRes<'folder'>>(WITH_B
 const deleteFolderMutation = (variables: any) =>
     mutate<FolderRes<'deleteFolder'>>(DELETE_BOOKMARK_MUTATION, { variables });
 
+const treeQuery = () => query<{ data: any }>(TREE_QUERY);
+
+interface TestFolder extends Partial<Folder> {
+    name: string;
+}
+
 describe('Happy Path :)', () => {
-    const testFolder: Partial<Folder> = { name: 'TestFolder' };
-    const testChildFolder: Partial<Folder> = { name: 'Child' };
+    const testFolder: TestFolder = { name: 'TestFolder' };
+    const testChildFolder: TestFolder = { name: 'Child' };
     test('Creates folder', async () => {
         const {
             data: { createFolder },
@@ -214,6 +232,11 @@ describe('Happy Path :)', () => {
         expect(folder.children).toEqual(expect.arrayContaining([expect.objectContaining(testChildFolder)]));
     });
 
+    // test('test', async () => {
+    //     const res = await getFolderStructure(testUser.id);
+    //     console.log(res);
+    // });
+
     test('Folder deletion ', async () => {
         const {
             data: { deleteFolder },
@@ -228,5 +251,70 @@ describe('Happy Path :)', () => {
     test('Bookmarks of deleted folder gets soft deleted', async () => {
         const bookmark = await Bookmark.findOne(bookmarkId);
         expect(bookmark).toBeUndefined();
+    });
+});
+
+describe('Tree ', () => {
+    const parentFolder1: TestFolder = {
+        name: 'parent1',
+    };
+
+    const parentFolder2: TestFolder = {
+        name: 'parent2',
+    };
+
+    const child1: TestFolder = {
+        name: 'child1',
+    };
+
+    const child2: TestFolder = {
+        name: 'child2',
+    };
+
+    const grandChild1: TestFolder = {
+        name: 'grandChild1',
+    };
+    const folders = [parentFolder1, parentFolder2, child1, child2, grandChild1];
+
+    test('Creating', async () => {
+        // Reset folders
+        await Folder.delete({ userId: testUser.id });
+
+        const {
+            data: { createFolder: res1 },
+        } = (await createFolderMutation(parentFolder1)) as DataWithFolder;
+        Object.assign(parentFolder1, res1);
+        const {
+            data: { createFolder: res2 },
+        } = await createFolderMutation(parentFolder2);
+        Object.assign(parentFolder2, res2);
+        const {
+            data: { createFolder: res3 },
+        } = await createFolderMutation({ ...child1, parentId: res1.id });
+        Object.assign(child1, res3);
+
+        const {
+            data: { createFolder: res4 },
+        } = await createFolderMutation({ ...child2, parentId: res1.id });
+        Object.assign(child2, res4);
+
+        const {
+            data: { createFolder: res5 },
+        } = await createFolderMutation({ ...grandChild1, parentId: child1.id });
+        Object.assign(grandChild1, res5);
+
+        const {
+            data: {
+                getTree: { tree: tree },
+            },
+        } = await treeQuery();
+
+        // delte;
+        parentFolder1.children = [child1 as Folder];
+        parentFolder1.children?.push(child2 as Folder);
+        child1.children = [grandChild1 as Folder];
+        folders.forEach((folder) => (folder.children = folder.children || []));
+        const sampleTree = [parentFolder1, parentFolder2];
+        expect(JSON.parse(tree)).toEqual(sampleTree);
     });
 });

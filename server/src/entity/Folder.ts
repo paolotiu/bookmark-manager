@@ -48,28 +48,28 @@ export class Folder extends BaseEntity {
     @Column('boolean', { default: false })
     deleted: boolean;
 
-    private arrayToTree(arr: Folder[]): Folder {
-        const map: Record<string, Folder> = {};
-        arr.forEach((folder) => {
-            map[folder.id] = folder; // initialize the map
-            folder.children = []; // initialize the children
-        });
+    // private arrayToTree(arr: Folder[]): Folder {
+    //     const map: Record<string, Folder> = {};
+    //     arr.forEach((folder) => {
+    //         map[folder.id] = folder; // initialize the map
+    //         folder.children = []; // initialize the children
+    //     });
 
-        arr.forEach((folder) => {
-            // const regex = /\w+\./g;
-            // const regexMatches = [...folder.path.matchAll(regex)];
-            // const id = regexMatches.length ? regexMatches[regexMatches.length - 1][0].slice(0, -1) : null;
+    //     arr.forEach((folder) => {
+    //         // const regex = /\w+\./g;
+    //         // const regexMatches = [...folder.path.matchAll(regex)];
+    //         // const id = regexMatches.length ? regexMatches[regexMatches.length - 1][0].slice(0, -1) : null;
 
-            // Skip root node
-            if (folder.parentId !== this.parentId && folder.parentId !== null) {
-                // Gets the parent id from the path
-                // 1.2.3 => 2
-                map[folder.parentId].children.push(folder);
-            }
-        });
+    //         // Skip root node
+    //         if (folder.parentId !== this.parentId && folder.parentId !== null) {
+    //             // Gets the parent id from the path
+    //             // 1.2.3 => 2
+    //             map[folder.parentId].children.push(folder);
+    //         }
+    //     });
 
-        return map[this.id];
-    }
+    //     return map[this.id];
+    // }
 
     getDescendants(): Promise<Folder[]> {
         return Folder.createQueryBuilder()
@@ -81,7 +81,10 @@ export class Folder extends BaseEntity {
 
     async getDescendantsTree(): Promise<Folder> {
         const childrenArr = await this.getDescendants();
-        return this.arrayToTree(childrenArr);
+        return arrayToTree({
+            foldersArr: childrenArr,
+            parentId: this.id,
+        });
     }
 
     // Returns A tuple
@@ -106,4 +109,65 @@ export class Folder extends BaseEntity {
             [this.path],
         );
     }
+}
+
+export const getFolderStructure = async (userId: number): Promise<Folder[]> => {
+    const foldersArr = await Folder.find({ where: { userId }, order: { path: 'ASC' } });
+
+    // Delte unnecesarry field
+    foldersArr.forEach((folder: Partial<Folder>) => {
+        delete folder.createdDate;
+        delete folder.deleted;
+        delete folder.path;
+        delete folder.userId;
+    });
+    return arrayToTreeWithRoot({ foldersArr });
+};
+
+interface ArrayToTreeWithRoot {
+    foldersArr: Folder[];
+}
+
+interface ArrayToTreeWithParent {
+    foldersArr: Folder[];
+    parentId: number;
+}
+
+function arrayToTree({ parentId, foldersArr }: ArrayToTreeWithParent) {
+    const map: Record<string, Folder> = {};
+
+    foldersArr.forEach((folder) => {
+        map[folder.id] = folder; // initialize the map
+        folder.children = []; // initialize the children
+    });
+
+    foldersArr.forEach((folder) => {
+        // Skip root node
+        if (folder.id !== parentId && folder.parentId !== null) {
+            map[folder.parentId].children.push(folder);
+        }
+    });
+    return map[parentId];
+}
+
+function arrayToTreeWithRoot({ foldersArr }: ArrayToTreeWithRoot) {
+    const map: Record<string, Folder> = {};
+    const roots: Folder[] = [];
+
+    foldersArr.forEach((folder) => {
+        map[folder.id] = folder; // initialize the map
+        folder.children = []; // initialize the children
+    });
+
+    foldersArr.forEach((folder) => {
+        // Skip root node
+        if (folder.parentId !== null) {
+            // Gets the parent id from the path
+            // 1.2.3 => 2
+            map[folder.parentId].children.push(folder);
+        } else {
+            roots.push(folder);
+        }
+    });
+    return roots;
 }
