@@ -16,13 +16,6 @@ export type Scalars = {
   Date: any;
 };
 
-export type AddBookmarkToCategoriesInput = {
-  bookmarkId: Scalars['Int'];
-  /** Category id */
-  categoryId: Scalars['Int'];
-};
-
-export type AddBookmarkToCategoriesResult = BaseError | Bookmark;
 
 export type BaseError = {
   __typename?: 'BaseError';
@@ -32,55 +25,58 @@ export type BaseError = {
 
 export type Bookmark = {
   __typename?: 'Bookmark';
-  id: Scalars['ID'];
+  id: Scalars['Int'];
   title: Scalars['String'];
   url: Scalars['String'];
   description?: Maybe<Scalars['String']>;
-  category?: Maybe<Category>;
   createdDate: Scalars['Date'];
+  folderId?: Maybe<Scalars['Int']>;
 };
 
 export type BookmarkResult = BaseError | Bookmark;
-
-export type Category = {
-  __typename?: 'Category';
-  id: Scalars['ID'];
-  name: Scalars['String'];
-  bookmarks: Array<Maybe<Bookmark>>;
-};
 
 export type CreateBookmarkInput = {
   title: Scalars['String'];
   url: Scalars['String'];
   description?: Maybe<Scalars['String']>;
+  folderId?: Maybe<Scalars['Int']>;
 };
 
-export type CreateBookmarkResult = BaseError | Bookmark;
-
-export type CreateCategoryInput = {
+export type CreateFolderInput = {
   name: Scalars['String'];
-  bookmarks?: Maybe<Array<Scalars['Int']>>;
+  parentId?: Maybe<Scalars['Int']>;
 };
 
-export type CreateCategoryResult = BaseError | Category;
 
+export type Folder = {
+  __typename?: 'Folder';
+  id: Scalars['Int'];
+  parentId?: Maybe<Scalars['Int']>;
+  children: Array<Maybe<Folder>>;
+  bookmarks: Array<Maybe<Bookmark>>;
+  depth: Scalars['Int'];
+  name: Scalars['String'];
+};
 
-export type DeleteCategoryResult = BaseError | NoErrorCategoryDeletion;
+export type FolderResult = BaseError | Folder;
 
 export type Mutation = {
   __typename?: 'Mutation';
   /** true => success | false => fail */
-  register: Scalars['Boolean'];
+  register: UserResult;
   /** Returns null if login failed */
-  login?: Maybe<UserResult>;
+  login: UserResult;
   invalidateTokens: Scalars['Boolean'];
-  /** Returns null if bookmark wasn't created */
-  createBookmark: CreateBookmarkResult;
-  updateBookmark: UpdateBookmarkResult;
-  addBookmarkToCategories: AddBookmarkToCategoriesResult;
-  createCategory: CreateCategoryResult;
-  /** Pass in category id */
-  deleteCategory: DeleteCategoryResult;
+  createBookmark: BookmarkResult;
+  updateBookmark: BookmarkResult;
+  softDeleteBookmark: BookmarkResult;
+  hardDeleteBookmark: BookmarkResult;
+  createFolder: FolderResult;
+  updateFolderName: FolderResult;
+  softDeleteFolder: FolderResult;
+  recoverFolder: FolderResult;
+  moveFolder: FolderResult;
+  deleteFolder: FolderResult;
 };
 
 
@@ -107,29 +103,54 @@ export type MutationUpdateBookmarkArgs = {
 };
 
 
-export type MutationAddBookmarkToCategoriesArgs = {
-  data: AddBookmarkToCategoriesInput;
-};
-
-
-export type MutationCreateCategoryArgs = {
-  data: CreateCategoryInput;
-};
-
-
-export type MutationDeleteCategoryArgs = {
+export type MutationSoftDeleteBookmarkArgs = {
   id: Scalars['Int'];
 };
 
-export type NoErrorCategoryDeletion = {
-  __typename?: 'NoErrorCategoryDeletion';
-  success: Scalars['Boolean'];
+
+export type MutationHardDeleteBookmarkArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationCreateFolderArgs = {
+  data: CreateFolderInput;
+};
+
+
+export type MutationUpdateFolderNameArgs = {
+  id: Scalars['Int'];
+  name: Scalars['String'];
+};
+
+
+export type MutationSoftDeleteFolderArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationRecoverFolderArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationMoveFolderArgs = {
+  folderId: Scalars['Int'];
+  targetFolderId?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationDeleteFolderArgs = {
+  id: Scalars['Int'];
 };
 
 export type Query = {
   __typename?: 'Query';
   bookmark: BookmarkResult;
-  me?: Maybe<User>;
+  folder: FolderResult;
+  getTree: TreeResult;
+  q?: Maybe<Folder>;
+  me?: Maybe<UserResult>;
   ping: Scalars['String'];
 };
 
@@ -138,15 +159,25 @@ export type QueryBookmarkArgs = {
   id: Scalars['Int'];
 };
 
+
+export type QueryFolderArgs = {
+  id: Scalars['Int'];
+};
+
+export type Tree = {
+  __typename?: 'Tree';
+  tree?: Maybe<Scalars['String']>;
+};
+
+export type TreeResult = BaseError | Tree;
+
 export type UpdateBookmarkInput = {
   id: Scalars['Int'];
   title?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['String']>;
-  categoryId?: Maybe<Scalars['Int']>;
+  folderId?: Maybe<Scalars['Int']>;
 };
-
-export type UpdateBookmarkResult = BaseError | Bookmark;
 
 /** User */
 export type User = {
@@ -155,7 +186,7 @@ export type User = {
   email: Scalars['String'];
   name: Scalars['String'];
   bookmarks: Array<Maybe<Bookmark>>;
-  categories: Array<Maybe<Category>>;
+  folders: Array<Maybe<Folder>>;
 };
 
 export type UserResult = BaseError | User;
@@ -168,29 +199,61 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = (
   { __typename?: 'Mutation' }
-  & { login?: Maybe<(
+  & { login: (
     { __typename?: 'BaseError' }
-    & Pick<BaseError, 'path' | 'message'>
+    & BaseErrorFragment
   ) | (
-    { __typename?: 'User' }
+    { __typename: 'User' }
     & Pick<User, 'id'>
-  )> }
+  ) }
 );
 
+export type Tree_QueryQueryVariables = Exact<{ [key: string]: never; }>;
 
+
+export type Tree_QueryQuery = (
+  { __typename?: 'Query' }
+  & { getTree: (
+    { __typename?: 'BaseError' }
+    & BaseErrorFragment
+  ) | (
+    { __typename?: 'Tree' }
+    & TreeFragment
+  ) }
+);
+
+export type TreeFragment = (
+  { __typename?: 'Tree' }
+  & Pick<Tree, 'tree'>
+);
+
+export type BaseErrorFragment = (
+  { __typename?: 'BaseError' }
+  & Pick<BaseError, 'path' | 'message'>
+);
+
+export const TreeFragmentDoc = gql`
+    fragment Tree on Tree {
+  tree
+}
+    `;
+export const BaseErrorFragmentDoc = gql`
+    fragment BaseError on BaseError {
+  path
+  message
+}
+    `;
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
     ... on User {
+      __typename
       id
     }
-    ... on BaseError {
-      path
-      message
-    }
+    ...BaseError
   }
 }
-    `;
+    ${BaseErrorFragmentDoc}`;
 export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
 /**
@@ -218,6 +281,42 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const Tree_QueryDocument = gql`
+    query TREE_QUERY {
+  getTree {
+    ...Tree
+    ...BaseError
+  }
+}
+    ${TreeFragmentDoc}
+${BaseErrorFragmentDoc}`;
+
+/**
+ * __useTree_QueryQuery__
+ *
+ * To run a query within a React component, call `useTree_QueryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTree_QueryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTree_QueryQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useTree_QueryQuery(baseOptions?: Apollo.QueryHookOptions<Tree_QueryQuery, Tree_QueryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<Tree_QueryQuery, Tree_QueryQueryVariables>(Tree_QueryDocument, options);
+      }
+export function useTree_QueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Tree_QueryQuery, Tree_QueryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<Tree_QueryQuery, Tree_QueryQueryVariables>(Tree_QueryDocument, options);
+        }
+export type Tree_QueryQueryHookResult = ReturnType<typeof useTree_QueryQuery>;
+export type Tree_QueryLazyQueryHookResult = ReturnType<typeof useTree_QueryLazyQuery>;
+export type Tree_QueryQueryResult = Apollo.QueryResult<Tree_QueryQuery, Tree_QueryQueryVariables>;
 
       export interface PossibleTypesResultData {
         possibleTypes: {
@@ -226,29 +325,17 @@ export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, Log
       }
       const result: PossibleTypesResultData = {
   "possibleTypes": {
-    "AddBookmarkToCategoriesResult": [
-      "BaseError",
-      "Bookmark"
-    ],
     "BookmarkResult": [
       "BaseError",
       "Bookmark"
     ],
-    "CreateBookmarkResult": [
+    "FolderResult": [
       "BaseError",
-      "Bookmark"
+      "Folder"
     ],
-    "CreateCategoryResult": [
+    "TreeResult": [
       "BaseError",
-      "Category"
-    ],
-    "DeleteCategoryResult": [
-      "BaseError",
-      "NoErrorCategoryDeletion"
-    ],
-    "UpdateBookmarkResult": [
-      "BaseError",
-      "Bookmark"
+      "Tree"
     ],
     "UserResult": [
       "BaseError",
