@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client';
+import { ErrorFragments } from '@graphql/fragments';
 
 export const LOGIN_MUTATION = gql`
     mutation Login($email: String!, $password: String!) {
@@ -7,12 +8,9 @@ export const LOGIN_MUTATION = gql`
                 __typename
                 id
             }
-
-            ... on BaseError {
-                __typename
-                path
-                message
-            }
+            ...BaseError
         }
     }
+
+    ${ErrorFragments.base}
 `;
