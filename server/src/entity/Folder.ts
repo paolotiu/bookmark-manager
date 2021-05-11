@@ -35,6 +35,9 @@ export class Folder extends BaseEntity {
     @Column('int', { default: 0 })
     depth: number;
 
+    @Column({ default: 'folder' })
+    type: 'folder';
+
     @ManyToOne(() => User, (user) => user.folders)
     @JoinColumn({ name: 'userId' })
     user: User;
@@ -47,29 +50,6 @@ export class Folder extends BaseEntity {
 
     @Column('boolean', { default: false })
     deleted: boolean;
-
-    // private arrayToTree(arr: Folder[]): Folder {
-    //     const map: Record<string, Folder> = {};
-    //     arr.forEach((folder) => {
-    //         map[folder.id] = folder; // initialize the map
-    //         folder.children = []; // initialize the children
-    //     });
-
-    //     arr.forEach((folder) => {
-    //         // const regex = /\w+\./g;
-    //         // const regexMatches = [...folder.path.matchAll(regex)];
-    //         // const id = regexMatches.length ? regexMatches[regexMatches.length - 1][0].slice(0, -1) : null;
-
-    //         // Skip root node
-    //         if (folder.parentId !== this.parentId && folder.parentId !== null) {
-    //             // Gets the parent id from the path
-    //             // 1.2.3 => 2
-    //             map[folder.parentId].children.push(folder);
-    //         }
-    //     });
-
-    //     return map[this.id];
-    // }
 
     getDescendants(): Promise<Folder[]> {
         return Folder.createQueryBuilder()

@@ -6,6 +6,14 @@ export const FolderFragments = {
             tree
         }
     `,
+
+    folders: gql`
+        fragment FoldersArray on Folders {
+            folders {
+                id
+            }
+        }
+    `,
 };
 
 export const ErrorFragments = {

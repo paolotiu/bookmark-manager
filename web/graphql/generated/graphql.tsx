@@ -56,9 +56,17 @@ export type Folder = {
   bookmarks: Array<Maybe<Bookmark>>;
   depth: Scalars['Int'];
   name: Scalars['String'];
+  type: Scalars['String'];
 };
 
+export type FolderArrayResult = BaseError | Folders;
+
 export type FolderResult = BaseError | Folder;
+
+export type Folders = {
+  __typename?: 'Folders';
+  folders: Array<Maybe<Folder>>;
+};
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -148,6 +156,7 @@ export type Query = {
   __typename?: 'Query';
   bookmark: BookmarkResult;
   folder: FolderResult;
+  foldersByDepth: FolderArrayResult;
   getTree: TreeResult;
   q?: Maybe<Folder>;
   me?: Maybe<UserResult>;
@@ -162,6 +171,11 @@ export type QueryBookmarkArgs = {
 
 export type QueryFolderArgs = {
   id: Scalars['Int'];
+};
+
+
+export type QueryFoldersByDepthArgs = {
+  depth: Scalars['Int'];
 };
 
 export type Tree = {
@@ -208,6 +222,20 @@ export type LoginMutation = (
   ) }
 );
 
+export type RootFoldersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RootFoldersQuery = (
+  { __typename?: 'Query' }
+  & { foldersByDepth: (
+    { __typename?: 'BaseError' }
+    & BaseErrorFragment
+  ) | (
+    { __typename?: 'Folders' }
+    & FoldersArrayFragment
+  ) }
+);
+
 export type Tree_QueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -227,6 +255,14 @@ export type TreeFragment = (
   & Pick<Tree, 'tree'>
 );
 
+export type FoldersArrayFragment = (
+  { __typename?: 'Folders' }
+  & { folders: Array<Maybe<(
+    { __typename?: 'Folder' }
+    & Pick<Folder, 'id'>
+  )>> }
+);
+
 export type BaseErrorFragment = (
   { __typename?: 'BaseError' }
   & Pick<BaseError, 'path' | 'message'>
@@ -235,6 +271,13 @@ export type BaseErrorFragment = (
 export const TreeFragmentDoc = gql`
     fragment Tree on Tree {
   tree
+}
+    `;
+export const FoldersArrayFragmentDoc = gql`
+    fragment FoldersArray on Folders {
+  folders {
+    id
+  }
 }
     `;
 export const BaseErrorFragmentDoc = gql`
@@ -281,6 +324,42 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const RootFoldersDocument = gql`
+    query rootFolders {
+  foldersByDepth(depth: 0) {
+    ...FoldersArray
+    ...BaseError
+  }
+}
+    ${FoldersArrayFragmentDoc}
+${BaseErrorFragmentDoc}`;
+
+/**
+ * __useRootFoldersQuery__
+ *
+ * To run a query within a React component, call `useRootFoldersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRootFoldersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRootFoldersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRootFoldersQuery(baseOptions?: Apollo.QueryHookOptions<RootFoldersQuery, RootFoldersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<RootFoldersQuery, RootFoldersQueryVariables>(RootFoldersDocument, options);
+      }
+export function useRootFoldersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<RootFoldersQuery, RootFoldersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<RootFoldersQuery, RootFoldersQueryVariables>(RootFoldersDocument, options);
+        }
+export type RootFoldersQueryHookResult = ReturnType<typeof useRootFoldersQuery>;
+export type RootFoldersLazyQueryHookResult = ReturnType<typeof useRootFoldersLazyQuery>;
+export type RootFoldersQueryResult = Apollo.QueryResult<RootFoldersQuery, RootFoldersQueryVariables>;
 export const Tree_QueryDocument = gql`
     query TREE_QUERY {
   getTree {
@@ -328,6 +407,10 @@ export type Tree_QueryQueryResult = Apollo.QueryResult<Tree_QueryQuery, Tree_Que
     "BookmarkResult": [
       "BaseError",
       "Bookmark"
+    ],
+    "FolderArrayResult": [
+      "BaseError",
+      "Folders"
     ],
     "FolderResult": [
       "BaseError",

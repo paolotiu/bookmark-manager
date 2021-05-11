@@ -7,6 +7,7 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -58,9 +59,17 @@ export type Folder = {
   bookmarks: Array<Maybe<Bookmark>>;
   depth: Scalars['Int'];
   name: Scalars['String'];
+  type: Scalars['String'];
 };
 
+export type FolderArrayResult = BaseError | Folders;
+
 export type FolderResult = BaseError | Folder;
+
+export type Folders = {
+  __typename?: 'Folders';
+  folders: Array<Maybe<Folder>>;
+};
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -150,6 +159,7 @@ export type Query = {
   __typename?: 'Query';
   bookmark: BookmarkResult;
   folder: FolderResult;
+  foldersByDepth: FolderArrayResult;
   getTree: TreeResult;
   me?: Maybe<UserResult>;
   ping: Scalars['String'];
@@ -164,6 +174,11 @@ export type QueryBookmarkArgs = {
 
 export type QueryFolderArgs = {
   id: Scalars['Int'];
+};
+
+
+export type QueryFoldersByDepthArgs = {
+  depth: Scalars['Int'];
 };
 
 export type Tree = {
@@ -281,7 +296,9 @@ export type ResolversTypes = ResolversObject<{
   CreateFolderInput: CreateFolderInput;
   Date: ResolverTypeWrapper<Scalars['Date']>;
   Folder: ResolverTypeWrapper<Folder>;
+  FolderArrayResult: ResolversTypes['BaseError'] | ResolversTypes['Folders'];
   FolderResult: ResolversTypes['BaseError'] | ResolversTypes['Folder'];
+  Folders: ResolverTypeWrapper<Omit<Folders, 'folders'> & { folders: Array<Maybe<ResolversTypes['Folder']>> }>;
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Query: ResolverTypeWrapper<{}>;
@@ -304,7 +321,9 @@ export type ResolversParentTypes = ResolversObject<{
   CreateFolderInput: CreateFolderInput;
   Date: Scalars['Date'];
   Folder: Folder;
+  FolderArrayResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Folders'];
   FolderResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Folder'];
+  Folders: Omit<Folders, 'folders'> & { folders: Array<Maybe<ResolversParentTypes['Folder']>> };
   Mutation: {};
   Boolean: Scalars['Boolean'];
   Query: {};
@@ -351,11 +370,21 @@ export type FolderResolvers<ContextType = MyContext, ParentType extends Resolver
   bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
   depth?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type FolderArrayResultResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['FolderArrayResult'] = ResolversParentTypes['FolderArrayResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'BaseError' | 'Folders', ParentType, ContextType>;
 }>;
 
 export type FolderResultResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['FolderResult'] = ResolversParentTypes['FolderResult']> = ResolversObject<{
   __resolveType: TypeResolveFn<'BaseError' | 'Folder', ParentType, ContextType>;
+}>;
+
+export type FoldersResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Folders'] = ResolversParentTypes['Folders']> = ResolversObject<{
+  folders?: Resolver<Array<Maybe<ResolversTypes['Folder']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
@@ -377,6 +406,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   bookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<QueryBookmarkArgs, 'id'>>;
   folder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<QueryFolderArgs, 'id'>>;
+  foldersByDepth?: Resolver<ResolversTypes['FolderArrayResult'], ParentType, ContextType, RequireFields<QueryFoldersByDepthArgs, 'depth'>>;
   getTree?: Resolver<ResolversTypes['TreeResult'], ParentType, ContextType>;
   me?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType>;
   ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -411,7 +441,9 @@ export type Resolvers<ContextType = MyContext> = ResolversObject<{
   BookmarkResult?: BookmarkResultResolvers<ContextType>;
   Date?: GraphQLScalarType;
   Folder?: FolderResolvers<ContextType>;
+  FolderArrayResult?: FolderArrayResultResolvers<ContextType>;
   FolderResult?: FolderResultResolvers<ContextType>;
+  Folders?: FoldersResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Tree?: TreeResolvers<ContextType>;

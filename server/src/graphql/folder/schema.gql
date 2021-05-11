@@ -5,13 +5,19 @@ type Folder {
     bookmarks: [Bookmark]!
     depth: Int!
     name: String!
+    type: String!
 }
 
 type Tree {
     tree: String
 }
 
+type Folders {
+    folders: [Folder]!
+}
+
 union FolderResult = BaseError | Folder
+union FolderArrayResult = BaseError | Folders
 union TreeResult = BaseError | Tree
 
 input CreateFolderInput {
@@ -21,6 +27,7 @@ input CreateFolderInput {
 
 type Query {
     folder(id: Int!): FolderResult!
+    foldersByDepth(depth: Int!): FolderArrayResult! @auth
     getTree: TreeResult! @auth
     q: Folder
 }

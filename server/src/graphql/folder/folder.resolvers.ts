@@ -26,11 +26,24 @@ export const resolvers: Resolvers = {
     FolderResult: {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Folder'),
     },
+    FolderArrayResult: {
+        __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Folders'),
+    },
     Query: {
         folder: async (_, { id }) => {
             return (await Folder.findOne(id)) || createEntityIdNotFoundError('folder', 'folder');
         },
-        q: async () => {
+        foldersByDepth: async (_, { depth }) => {
+            const folders = await Folder.find({ where: { depth } });
+            return folders ? { folders } : createEntityIdNotFoundError('folder', 'folderByDepth');
+        },
+
+        q: async (_, __, { dataSources: { iconsApi } }) => {
+            const x = await iconsApi.getIconSets();
+            const setId = x.iconsets[0].iconset_id;
+            console.log(setId);
+            const icons = await iconsApi.getIconSetIcons({ id: setId });
+            console.log(icons.icons[0].raster_sizes);
             const parent = await Folder.findOne(2);
             if (!parent) return null;
             return parent.getDescendantsTree();
