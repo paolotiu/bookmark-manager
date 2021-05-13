@@ -2,7 +2,6 @@ import { Bookmark } from '@entity/Bookmark';
 import { Resolvers } from '@gql/types';
 import { unNullifyObj } from '@utils/unNullifyObj';
 import {
-    createBaseError,
     createEntityIdNotFoundError,
     createUnexpectedError,
     createValidationError,
@@ -41,7 +40,6 @@ export const resolvers: Resolvers = {
                 url,
                 folderId,
             };
-
 
             // Put bookmark in a folder
             if (folderId) {
