@@ -1,12 +1,21 @@
 import { Bookmark } from '@entity/Bookmark';
 import { Resolvers } from '@gql/types';
 import { unNullifyObj } from '@utils/unNullifyObj';
-import { createEntityIdNotFoundError, createUnexpectedError, isBaseError } from '@gql/shared/errorMessages';
+import {
+    createBaseError,
+    createEntityIdNotFoundError,
+    createUnexpectedError,
+    createValidationError,
+    isBaseError,
+    isValidationError,
+} from '@gql/shared/errorMessages';
 import { Folder } from '@entity/Folder';
+import { bookmarkSchema } from './yupSchema';
 
 export const resolvers: Resolvers = {
     BookmarkResult: {
-        __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmark'),
+        __resolveType: (parent) =>
+            isBaseError(parent) ? 'BaseError' : isValidationError(parent) ? 'InputValidationError' : 'Bookmark',
     },
 
     Query: {
@@ -18,6 +27,10 @@ export const resolvers: Resolvers = {
     },
     Mutation: {
         createBookmark: async (_, { data: { title, description, url, folderId } }, { userId }) => {
+            const x = await bookmarkSchema.validate({ title, description, url }, { abortEarly: false }).catch((e) => e);
+            if (x.errors) {
+                return createValidationError('createBookmark', x);
+            }
             // Get unNullified object
             const cleaned = unNullifyObj({ title, description, url });
 

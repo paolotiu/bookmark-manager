@@ -21,7 +21,7 @@ input UpdateBookmarkInput {
     folderId: Int
 }
 
-union BookmarkResult = BaseError | Bookmark
+union BookmarkResult = BaseError | Bookmark | InputValidationError
 
 type Query {
     bookmark(id: Int!): BookmarkResult! @auth
