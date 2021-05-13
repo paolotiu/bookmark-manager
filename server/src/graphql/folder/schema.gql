@@ -26,8 +26,7 @@ input CreateFolderInput {
 }
 
 type Query {
-    folder(id: Int!): FolderResult!
-    foldersByDepth(depth: Int!): FolderArrayResult! @auth
+    folder(id: Int!): FolderResult! @auth
     getTree: TreeResult! @auth
     q: Folder
 }

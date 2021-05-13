@@ -33,10 +33,6 @@ export const resolvers: Resolvers = {
         folder: async (_, { id }) => {
             return (await Folder.findOne(id)) || createEntityIdNotFoundError('folder', 'folder');
         },
-        foldersByDepth: async (_, { depth }) => {
-            const folders = await Folder.find({ where: { depth } });
-            return folders ? { folders } : createEntityIdNotFoundError('folder', 'folderByDepth');
-        },
 
         q: async (_, __, { dataSources: { iconsApi } }) => {
             const x = await iconsApi.getIconSets();
