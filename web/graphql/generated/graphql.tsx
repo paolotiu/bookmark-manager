@@ -33,10 +33,10 @@ export type Bookmark = {
   folderId?: Maybe<Scalars['Int']>;
 };
 
-export type BookmarkResult = BaseError | Bookmark;
+export type BookmarkResult = BaseError | Bookmark | InputValidationError;
 
 export type CreateBookmarkInput = {
-  title: Scalars['String'];
+  title?: Maybe<Scalars['String']>;
   url: Scalars['String'];
   description?: Maybe<Scalars['String']>;
   folderId?: Maybe<Scalars['Int']>;
@@ -66,6 +66,12 @@ export type FolderResult = BaseError | Folder;
 export type Folders = {
   __typename?: 'Folders';
   folders: Array<Maybe<Folder>>;
+};
+
+export type InputValidationError = {
+  __typename?: 'InputValidationError';
+  path: Scalars['String'];
+  errors: Array<Maybe<BaseError>>;
 };
 
 export type Mutation = {
@@ -156,7 +162,6 @@ export type Query = {
   __typename?: 'Query';
   bookmark: BookmarkResult;
   folder: FolderResult;
-  foldersByDepth: FolderArrayResult;
   getTree: TreeResult;
   q?: Maybe<Folder>;
   me?: Maybe<UserResult>;
@@ -171,11 +176,6 @@ export type QueryBookmarkArgs = {
 
 export type QueryFolderArgs = {
   id: Scalars['Int'];
-};
-
-
-export type QueryFoldersByDepthArgs = {
-  depth: Scalars['Int'];
 };
 
 export type Tree = {
@@ -222,17 +222,55 @@ export type LoginMutation = (
   ) }
 );
 
-export type RootFoldersQueryVariables = Exact<{ [key: string]: never; }>;
+export type CreateBookmarkMutationVariables = Exact<{
+  url: Scalars['String'];
+  folderId?: Maybe<Scalars['Int']>;
+}>;
 
 
-export type RootFoldersQuery = (
-  { __typename?: 'Query' }
-  & { foldersByDepth: (
+export type CreateBookmarkMutation = (
+  { __typename?: 'Mutation' }
+  & { createBookmark: (
     { __typename?: 'BaseError' }
     & BaseErrorFragment
   ) | (
-    { __typename?: 'Folders' }
-    & FoldersArrayFragment
+    { __typename?: 'Bookmark' }
+    & BookmarkFragment
+  ) | (
+    { __typename?: 'InputValidationError' }
+    & ValidationErrorFragment
+  ) }
+);
+
+export type FolderBookmarksQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type FolderBookmarksQuery = (
+  { __typename?: 'Query' }
+  & { folder: (
+    { __typename?: 'BaseError' }
+    & BaseErrorFragment
+  ) | (
+    { __typename?: 'Folder' }
+    & FolderBookmarksFragment
+  ) }
+);
+
+export type FolderQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type FolderQuery = (
+  { __typename?: 'Query' }
+  & { folder: (
+    { __typename?: 'BaseError' }
+    & BaseErrorFragment
+  ) | (
+    { __typename?: 'Folder' }
+    & FolderFragment
   ) }
 );
 
@@ -250,6 +288,11 @@ export type Tree_QueryQuery = (
   ) }
 );
 
+export type BookmarkFragment = (
+  { __typename?: 'Bookmark' }
+  & Pick<Bookmark, 'id' | 'title' | 'url' | 'description' | 'createdDate' | 'folderId'>
+);
+
 export type TreeFragment = (
   { __typename?: 'Tree' }
   & Pick<Tree, 'tree'>
@@ -263,9 +306,38 @@ export type FoldersArrayFragment = (
   )>> }
 );
 
+export type FolderFragment = (
+  { __typename?: 'Folder' }
+  & Pick<Folder, 'id' | 'name'>
+  & { children: Array<Maybe<(
+    { __typename?: 'Folder' }
+    & Pick<Folder, 'id' | 'name'>
+  )>>, bookmarks: Array<Maybe<(
+    { __typename?: 'Bookmark' }
+    & BookmarkFragment
+  )>> }
+);
+
+export type FolderBookmarksFragment = (
+  { __typename?: 'Folder' }
+  & { bookmarks: Array<Maybe<(
+    { __typename?: 'Bookmark' }
+    & BookmarkFragment
+  )>> }
+);
+
 export type BaseErrorFragment = (
   { __typename?: 'BaseError' }
   & Pick<BaseError, 'path' | 'message'>
+);
+
+export type ValidationErrorFragment = (
+  { __typename?: 'InputValidationError' }
+  & Pick<InputValidationError, 'path'>
+  & { errors: Array<Maybe<(
+    { __typename?: 'BaseError' }
+    & Pick<BaseError, 'message' | 'path'>
+  )>> }
 );
 
 export const TreeFragmentDoc = gql`
@@ -280,10 +352,49 @@ export const FoldersArrayFragmentDoc = gql`
   }
 }
     `;
+export const BookmarkFragmentDoc = gql`
+    fragment Bookmark on Bookmark {
+  id
+  title
+  url
+  description
+  createdDate
+  folderId
+}
+    `;
+export const FolderFragmentDoc = gql`
+    fragment Folder on Folder {
+  id
+  name
+  children {
+    id
+    name
+  }
+  bookmarks {
+    ...Bookmark
+  }
+}
+    ${BookmarkFragmentDoc}`;
+export const FolderBookmarksFragmentDoc = gql`
+    fragment FolderBookmarks on Folder {
+  bookmarks {
+    ...Bookmark
+  }
+}
+    ${BookmarkFragmentDoc}`;
 export const BaseErrorFragmentDoc = gql`
     fragment BaseError on BaseError {
   path
   message
+}
+    `;
+export const ValidationErrorFragmentDoc = gql`
+    fragment ValidationError on InputValidationError {
+  path
+  errors {
+    message
+    path
+  }
 }
     `;
 export const LoginDocument = gql`
@@ -324,42 +435,118 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
-export const RootFoldersDocument = gql`
-    query rootFolders {
-  foldersByDepth(depth: 0) {
-    ...FoldersArray
+export const CreateBookmarkDocument = gql`
+    mutation createBookmark($url: String!, $folderId: Int) {
+  createBookmark(data: {url: $url, folderId: $folderId}) {
+    ...Bookmark
+    ...BaseError
+    ...ValidationError
+  }
+}
+    ${BookmarkFragmentDoc}
+${BaseErrorFragmentDoc}
+${ValidationErrorFragmentDoc}`;
+export type CreateBookmarkMutationFn = Apollo.MutationFunction<CreateBookmarkMutation, CreateBookmarkMutationVariables>;
+
+/**
+ * __useCreateBookmarkMutation__
+ *
+ * To run a mutation, you first call `useCreateBookmarkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateBookmarkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createBookmarkMutation, { data, loading, error }] = useCreateBookmarkMutation({
+ *   variables: {
+ *      url: // value for 'url'
+ *      folderId: // value for 'folderId'
+ *   },
+ * });
+ */
+export function useCreateBookmarkMutation(baseOptions?: Apollo.MutationHookOptions<CreateBookmarkMutation, CreateBookmarkMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateBookmarkMutation, CreateBookmarkMutationVariables>(CreateBookmarkDocument, options);
+      }
+export type CreateBookmarkMutationHookResult = ReturnType<typeof useCreateBookmarkMutation>;
+export type CreateBookmarkMutationResult = Apollo.MutationResult<CreateBookmarkMutation>;
+export type CreateBookmarkMutationOptions = Apollo.BaseMutationOptions<CreateBookmarkMutation, CreateBookmarkMutationVariables>;
+export const FolderBookmarksDocument = gql`
+    query folderBookmarks($id: Int!) {
+  folder(id: $id) {
+    ...FolderBookmarks
     ...BaseError
   }
 }
-    ${FoldersArrayFragmentDoc}
+    ${FolderBookmarksFragmentDoc}
 ${BaseErrorFragmentDoc}`;
 
 /**
- * __useRootFoldersQuery__
+ * __useFolderBookmarksQuery__
  *
- * To run a query within a React component, call `useRootFoldersQuery` and pass it any options that fit your needs.
- * When your component renders, `useRootFoldersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useFolderBookmarksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFolderBookmarksQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useRootFoldersQuery({
+ * const { data, loading, error } = useFolderBookmarksQuery({
  *   variables: {
+ *      id: // value for 'id'
  *   },
  * });
  */
-export function useRootFoldersQuery(baseOptions?: Apollo.QueryHookOptions<RootFoldersQuery, RootFoldersQueryVariables>) {
+export function useFolderBookmarksQuery(baseOptions: Apollo.QueryHookOptions<FolderBookmarksQuery, FolderBookmarksQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<RootFoldersQuery, RootFoldersQueryVariables>(RootFoldersDocument, options);
+        return Apollo.useQuery<FolderBookmarksQuery, FolderBookmarksQueryVariables>(FolderBookmarksDocument, options);
       }
-export function useRootFoldersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<RootFoldersQuery, RootFoldersQueryVariables>) {
+export function useFolderBookmarksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FolderBookmarksQuery, FolderBookmarksQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<RootFoldersQuery, RootFoldersQueryVariables>(RootFoldersDocument, options);
+          return Apollo.useLazyQuery<FolderBookmarksQuery, FolderBookmarksQueryVariables>(FolderBookmarksDocument, options);
         }
-export type RootFoldersQueryHookResult = ReturnType<typeof useRootFoldersQuery>;
-export type RootFoldersLazyQueryHookResult = ReturnType<typeof useRootFoldersLazyQuery>;
-export type RootFoldersQueryResult = Apollo.QueryResult<RootFoldersQuery, RootFoldersQueryVariables>;
+export type FolderBookmarksQueryHookResult = ReturnType<typeof useFolderBookmarksQuery>;
+export type FolderBookmarksLazyQueryHookResult = ReturnType<typeof useFolderBookmarksLazyQuery>;
+export type FolderBookmarksQueryResult = Apollo.QueryResult<FolderBookmarksQuery, FolderBookmarksQueryVariables>;
+export const FolderDocument = gql`
+    query folder($id: Int!) {
+  folder(id: $id) {
+    ...Folder
+    ...BaseError
+  }
+}
+    ${FolderFragmentDoc}
+${BaseErrorFragmentDoc}`;
+
+/**
+ * __useFolderQuery__
+ *
+ * To run a query within a React component, call `useFolderQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFolderQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFolderQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useFolderQuery(baseOptions: Apollo.QueryHookOptions<FolderQuery, FolderQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FolderQuery, FolderQueryVariables>(FolderDocument, options);
+      }
+export function useFolderLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FolderQuery, FolderQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FolderQuery, FolderQueryVariables>(FolderDocument, options);
+        }
+export type FolderQueryHookResult = ReturnType<typeof useFolderQuery>;
+export type FolderLazyQueryHookResult = ReturnType<typeof useFolderLazyQuery>;
+export type FolderQueryResult = Apollo.QueryResult<FolderQuery, FolderQueryVariables>;
 export const Tree_QueryDocument = gql`
     query TREE_QUERY {
   getTree {
@@ -406,7 +593,8 @@ export type Tree_QueryQueryResult = Apollo.QueryResult<Tree_QueryQuery, Tree_Que
   "possibleTypes": {
     "BookmarkResult": [
       "BaseError",
-      "Bookmark"
+      "Bookmark",
+      "InputValidationError"
     ],
     "FolderArrayResult": [
       "BaseError",

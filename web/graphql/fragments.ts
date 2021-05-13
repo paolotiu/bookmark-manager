@@ -1,5 +1,18 @@
 import gql from 'graphql-tag';
 
+export const BookmarkFragments = {
+    bookmark: gql`
+        fragment Bookmark on Bookmark {
+            id
+            title
+            url
+            description
+            createdDate
+            folderId
+        }
+    `,
+};
+
 export const FolderFragments = {
     tree: gql`
         fragment Tree on Tree {
@@ -14,6 +27,30 @@ export const FolderFragments = {
             }
         }
     `,
+    folder: gql`
+        fragment Folder on Folder {
+            id
+            name
+            children {
+                id
+                name
+            }
+            bookmarks {
+                ...Bookmark
+            }
+        }
+        ${BookmarkFragments.bookmark}
+    `,
+
+    folderBookmarks: gql`
+        fragment FolderBookmarks on Folder {
+            bookmarks {
+                ...Bookmark
+            }
+        }
+
+        ${BookmarkFragments.bookmark}
+    `,
 };
 
 export const ErrorFragments = {
@@ -21,6 +58,15 @@ export const ErrorFragments = {
         fragment BaseError on BaseError {
             path
             message
+        }
+    `,
+    validation: gql`
+        fragment ValidationError on InputValidationError {
+            path
+            errors {
+                message
+                path
+            }
         }
     `,
 };

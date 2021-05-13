@@ -1,14 +1,13 @@
 import { ErrorFragments, FolderFragments } from '@graphql/fragments';
 import gql from 'graphql-tag';
 
-export const ROOT_FOLDERS_QUERY = gql`
-    query rootFolders {
-        foldersByDepth(depth: 0) {
-            ...FoldersArray
+export const FOLDER_BOOKMARKS = gql`
+    query folderBookmarks($id: Int!) {
+        folder(id: $id) {
+            ...FolderBookmarks
             ...BaseError
         }
     }
-
-    ${FolderFragments.folders}
+    ${FolderFragments.folderBookmarks}
     ${ErrorFragments.base}
 `;
