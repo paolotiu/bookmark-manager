@@ -76,6 +76,6 @@ export function setTokenCookies(
     res: Response,
     { refreshToken, accessToken }: { refreshToken: string; accessToken: string },
 ): void {
-    res.cookie('refresh-token', refreshToken, getCookieOptions(1000 * 60 * 60 * 7)); // 7 days
+    res.cookie('refresh-token', refreshToken, getCookieOptions(1000 * 60 * 60 * 24 * 7)); // 7 days
     res.cookie('access-token', accessToken, getCookieOptions(1000 * 60 * 15)); //15 minutes
 }
