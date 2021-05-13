@@ -39,7 +39,7 @@ export type Bookmark = {
 export type BookmarkResult = BaseError | Bookmark | InputValidationError;
 
 export type CreateBookmarkInput = {
-  title: Scalars['String'];
+  title?: Maybe<Scalars['String']>;
   url: Scalars['String'];
   description?: Maybe<Scalars['String']>;
   folderId?: Maybe<Scalars['Int']>;

@@ -7,7 +7,7 @@ type Bookmark {
     folderId: Int
 }
 input CreateBookmarkInput {
-    title: String!
+    title: String
     url: String!
     description: String
     folderId: Int

@@ -11,6 +11,7 @@ import {
 } from '@gql/shared/errorMessages';
 import { Folder } from '@entity/Folder';
 import { bookmarkSchema } from './yupSchema';
+import { scrapeMetadata } from '@utils/scrapeMetadata';
 
 export const resolvers: Resolvers = {
     BookmarkResult: {
@@ -31,8 +32,16 @@ export const resolvers: Resolvers = {
             if (x.errors) {
                 return createValidationError('createBookmark', x);
             }
-            // Get unNullified object
-            const cleaned = unNullifyObj({ title, description, url });
+
+            const res = await scrapeMetadata(url);
+
+            const data = {
+                title: res.ogTitle || 'New Bookmark',
+                description: res.ogDescription || '',
+                url,
+                folderId,
+            };
+
 
             // Put bookmark in a folder
             if (folderId) {
@@ -40,12 +49,12 @@ export const resolvers: Resolvers = {
                 // TODO: Decide if it should error out if a folder isn't found
                 // or just dont add the folder id to the bookmark
                 if (!folder) return createEntityIdNotFoundError('createBookmark', 'folder');
-                cleaned.folderId = folder.id;
+                data.folderId = folder.id;
             }
 
             // Create bookmark
             const bookmark = Bookmark.create({
-                ...cleaned,
+                ...data,
                 userId,
             });
 

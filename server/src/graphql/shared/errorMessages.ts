@@ -30,9 +30,11 @@ export const unauthorizedError = (path: string): BaseError => ({
 });
 
 export function isBaseError(obj: unknown): obj is BaseError {
-    return (obj as BaseError).message !== undefined && (obj as BaseError).path !== undefined;
+    return !!obj && (obj as BaseError).message !== undefined && (obj as BaseError).path !== undefined;
 }
 
 export const isValidationError = (obj: unknown): obj is InputValidationError => {
-    return (obj as InputValidationError) !== undefined && isBaseError((obj as InputValidationError).errors[0]);
+    return (
+        !!obj && (obj as InputValidationError) !== undefined && isBaseError((obj as InputValidationError).errors?.[0])
+    );
 };
