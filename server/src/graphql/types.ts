@@ -36,7 +36,16 @@ export type Bookmark = {
   folderId?: Maybe<Scalars['Int']>;
 };
 
-export type BookmarkResult = BaseError | Bookmark | InputValidationError;
+export type BookmarkResult = BaseError | Bookmark;
+
+export type BookmarkResultWithInput = BaseError | Bookmark | InputValidationError;
+
+export type Bookmarks = {
+  __typename?: 'Bookmarks';
+  bookmarks: Array<Maybe<Bookmark>>;
+};
+
+export type BookmarksResult = BaseError | Bookmarks;
 
 export type CreateBookmarkInput = {
   title?: Maybe<Scalars['String']>;
@@ -79,7 +88,7 @@ export type InputValidationError = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createBookmark: BookmarkResult;
+  createBookmark: BookmarkResultWithInput;
   createFolder: FolderResult;
   deleteFolder: FolderResult;
   hardDeleteBookmark: BookmarkResult;
@@ -92,7 +101,7 @@ export type Mutation = {
   register: UserResult;
   softDeleteBookmark: BookmarkResult;
   softDeleteFolder: FolderResult;
-  updateBookmark: BookmarkResult;
+  updateBookmark: BookmarkResultWithInput;
   updateFolderName: FolderResult;
 };
 
@@ -164,6 +173,7 @@ export type MutationUpdateFolderNameArgs = {
 export type Query = {
   __typename?: 'Query';
   bookmark: BookmarkResult;
+  bookmarks: BookmarksResult;
   folder: FolderResult;
   getTree: TreeResult;
   me?: Maybe<UserResult>;
@@ -174,6 +184,12 @@ export type Query = {
 
 export type QueryBookmarkArgs = {
   id: Scalars['Int'];
+  deleted?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type QueryBookmarksArgs = {
+  deleted?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -291,7 +307,10 @@ export type ResolversTypes = ResolversObject<{
   String: ResolverTypeWrapper<Scalars['String']>;
   Bookmark: ResolverTypeWrapper<BookmarkModel>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
-  BookmarkResult: ResolversTypes['BaseError'] | ResolversTypes['Bookmark'] | ResolversTypes['InputValidationError'];
+  BookmarkResult: ResolversTypes['BaseError'] | ResolversTypes['Bookmark'];
+  BookmarkResultWithInput: ResolversTypes['BaseError'] | ResolversTypes['Bookmark'] | ResolversTypes['InputValidationError'];
+  Bookmarks: ResolverTypeWrapper<Omit<Bookmarks, 'bookmarks'> & { bookmarks: Array<Maybe<ResolversTypes['Bookmark']>> }>;
+  BookmarksResult: ResolversTypes['BaseError'] | ResolversTypes['Bookmarks'];
   CreateBookmarkInput: CreateBookmarkInput;
   CreateFolderInput: CreateFolderInput;
   Date: ResolverTypeWrapper<Scalars['Date']>;
@@ -317,7 +336,10 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String'];
   Bookmark: BookmarkModel;
   Int: Scalars['Int'];
-  BookmarkResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Bookmark'] | ResolversParentTypes['InputValidationError'];
+  BookmarkResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Bookmark'];
+  BookmarkResultWithInput: ResolversParentTypes['BaseError'] | ResolversParentTypes['Bookmark'] | ResolversParentTypes['InputValidationError'];
+  Bookmarks: Omit<Bookmarks, 'bookmarks'> & { bookmarks: Array<Maybe<ResolversParentTypes['Bookmark']>> };
+  BookmarksResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Bookmarks'];
   CreateBookmarkInput: CreateBookmarkInput;
   CreateFolderInput: CreateFolderInput;
   Date: Scalars['Date'];
@@ -358,7 +380,20 @@ export type BookmarkResolvers<ContextType = MyContext, ParentType extends Resolv
 }>;
 
 export type BookmarkResultResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['BookmarkResult'] = ResolversParentTypes['BookmarkResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'BaseError' | 'Bookmark', ParentType, ContextType>;
+}>;
+
+export type BookmarkResultWithInputResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['BookmarkResultWithInput'] = ResolversParentTypes['BookmarkResultWithInput']> = ResolversObject<{
   __resolveType: TypeResolveFn<'BaseError' | 'Bookmark' | 'InputValidationError', ParentType, ContextType>;
+}>;
+
+export type BookmarksResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Bookmarks'] = ResolversParentTypes['Bookmarks']> = ResolversObject<{
+  bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type BookmarksResultResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['BookmarksResult'] = ResolversParentTypes['BookmarksResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'BaseError' | 'Bookmarks', ParentType, ContextType>;
 }>;
 
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
@@ -396,7 +431,7 @@ export type InputValidationErrorResolvers<ContextType = MyContext, ParentType ex
 }>;
 
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  createBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
+  createBookmark?: Resolver<ResolversTypes['BookmarkResultWithInput'], ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
   createFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationCreateFolderArgs, 'data'>>;
   deleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationDeleteFolderArgs, 'id'>>;
   hardDeleteBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationHardDeleteBookmarkArgs, 'id'>>;
@@ -407,12 +442,13 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   register?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
   softDeleteBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationSoftDeleteBookmarkArgs, 'id'>>;
   softDeleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationSoftDeleteFolderArgs, 'id'>>;
-  updateBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationUpdateBookmarkArgs, 'data'>>;
+  updateBookmark?: Resolver<ResolversTypes['BookmarkResultWithInput'], ParentType, ContextType, RequireFields<MutationUpdateBookmarkArgs, 'data'>>;
   updateFolderName?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationUpdateFolderNameArgs, 'id' | 'name'>>;
 }>;
 
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   bookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<QueryBookmarkArgs, 'id'>>;
+  bookmarks?: Resolver<ResolversTypes['BookmarksResult'], ParentType, ContextType, RequireFields<QueryBookmarksArgs, never>>;
   folder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<QueryFolderArgs, 'id'>>;
   getTree?: Resolver<ResolversTypes['TreeResult'], ParentType, ContextType>;
   me?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType>;
@@ -446,6 +482,9 @@ export type Resolvers<ContextType = MyContext> = ResolversObject<{
   BaseError?: BaseErrorResolvers<ContextType>;
   Bookmark?: BookmarkResolvers<ContextType>;
   BookmarkResult?: BookmarkResultResolvers<ContextType>;
+  BookmarkResultWithInput?: BookmarkResultWithInputResolvers<ContextType>;
+  Bookmarks?: BookmarksResolvers<ContextType>;
+  BookmarksResult?: BookmarksResultResolvers<ContextType>;
   Date?: GraphQLScalarType;
   Folder?: FolderResolvers<ContextType>;
   FolderArrayResult?: FolderArrayResultResolvers<ContextType>;

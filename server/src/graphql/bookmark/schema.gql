@@ -6,6 +6,10 @@ type Bookmark {
     createdDate: Date!
     folderId: Int
 }
+
+type Bookmarks {
+    bookmarks: [Bookmark]!
+}
 input CreateBookmarkInput {
     title: String
     url: String!
@@ -21,15 +25,19 @@ input UpdateBookmarkInput {
     folderId: Int
 }
 
-union BookmarkResult = BaseError | Bookmark | InputValidationError
+union BookmarkResultWithInput = BaseError | Bookmark | InputValidationError
+
+union BookmarkResult = BaseError | Bookmark
+union BookmarksResult = BaseError | Bookmarks
 
 type Query {
-    bookmark(id: Int!): BookmarkResult! @auth
+    bookmark(id: Int!, deleted: Boolean): BookmarkResult! @auth
+    bookmarks(deleted: Boolean): BookmarksResult! @auth
 }
 
 type Mutation {
-    createBookmark(data: CreateBookmarkInput!): BookmarkResult! @auth
-    updateBookmark(data: UpdateBookmarkInput!): BookmarkResult! @auth
+    createBookmark(data: CreateBookmarkInput!): BookmarkResultWithInput! @auth
+    updateBookmark(data: UpdateBookmarkInput!): BookmarkResultWithInput! @auth
     softDeleteBookmark(id: Int!): BookmarkResult! @auth
     hardDeleteBookmark(id: Int!): BookmarkResult! @auth
 }

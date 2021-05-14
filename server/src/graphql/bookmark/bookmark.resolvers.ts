@@ -14,8 +14,14 @@ import { scrapeMetadata } from '@utils/scrapeMetadata';
 
 export const resolvers: Resolvers = {
     BookmarkResult: {
+        __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmark'),
+    },
+    BookmarkResultWithInput: {
         __resolveType: (parent) =>
             isBaseError(parent) ? 'BaseError' : isValidationError(parent) ? 'InputValidationError' : 'Bookmark',
+    },
+    BookmarksResult: {
+        __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmarks'),
     },
 
     Query: {
@@ -23,6 +29,12 @@ export const resolvers: Resolvers = {
             const bookmark = await Bookmark.findOne({ id, userId });
             if (!bookmark) return createEntityIdNotFoundError('bookmark', 'bookmark');
             return bookmark;
+        },
+
+        bookmarks: async (_, { deleted }, { userId }) => {
+            const withDeleted = deleted || false;
+            const bookmarks = await Bookmark.find({ where: { userId }, withDeleted });
+            return { bookmarks };
         },
     },
     Mutation: {
