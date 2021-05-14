@@ -1,6 +1,7 @@
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/General/ErrorMessage';
-import { useCreateBookmarkMutation } from '@graphql/generated/graphql';
+import { BookmarkFragments } from '@graphql/fragments';
+import { Bookmark, useCreateBookmarkMutation } from '@graphql/generated/graphql';
 import { Transition } from '@headlessui/react';
 import { useForm } from '@lib/useForm';
 import React, { Fragment, useState } from 'react';
@@ -15,7 +16,7 @@ interface Props {
 const createBookmarkSchema = yup.object().shape({
     url: yup.string().url('Must be a valid URL'),
 });
-const AddBookmarkDropdown = ({ folderId, isOpen, onSubmit }: Props) => {
+const AddBookmarkDropdown = ({ folderId, isOpen }: Props) => {
     const { inputs, handleChange, errors, isError, resetForm } = useForm(
         {
             url: '',
@@ -23,7 +24,34 @@ const AddBookmarkDropdown = ({ folderId, isOpen, onSubmit }: Props) => {
         createBookmarkSchema,
     );
     const [willShowErrors, setWillShowErrors] = useState(false);
-    const [createBookmark, { data: createBookmarkData }] = useCreateBookmarkMutation();
+    const [createBookmark] = useCreateBookmarkMutation({
+        update(cache, { data }) {
+            if (data && data.createBookmark.__typename === 'Bookmark') {
+                cache.modify({
+                    id: cache.identify({ __typename: 'Folder', id: folderId }),
+                    fields: {
+                        bookmarks(existingBookmarksRef = [], { readField }) {
+                            const newBookmarkRef = cache.writeFragment({
+                                data: data.createBookmark,
+                                fragment: BookmarkFragments.bookmark,
+                            });
+
+                            // Quick safety check - if the new comment is already
+                            // present in the cache, we don't need to add it again.
+                            if (
+                                existingBookmarksRef.some(
+                                    (ref: any) => readField('id', ref) === (data.createBookmark as Bookmark).id,
+                                )
+                            ) {
+                                return existingBookmarksRef;
+                            }
+                            return [...existingBookmarksRef, newBookmarkRef];
+                        },
+                    },
+                });
+            }
+        },
+    });
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -40,8 +68,12 @@ const AddBookmarkDropdown = ({ folderId, isOpen, onSubmit }: Props) => {
                 url: inputs.url,
             },
         });
+        if (data?.createBookmark.__typename === 'InputValidationError') {
+        }
+        if (data?.createBookmark.__typename === 'BaseError') {
+            console.log(data.createBookmark.message);
+        }
         resetForm();
-        onSubmit();
     };
     return (
         <Transition
@@ -77,9 +109,7 @@ const AddBookmarkDropdown = ({ folderId, isOpen, onSubmit }: Props) => {
                                 <ErrorMessage size="small" text={errors.url.message} />
                             )}
                         </div>
-                        <Button className="w-min justify-self-end no-outline" disabled={!inputs.url}>
-                            Save
-                        </Button>
+                        <Button className="w-min justify-self-end no-outline">Save</Button>
                     </form>
                 </div>
             </div>
