@@ -30,7 +30,7 @@ export const useForm = <T extends Record<string, unknown>>(initialState: T, sche
     };
 
     useEffect(() => {
-        // Runs whenever
+        // Runs whenever inputs change
         const run = async () => {
             if (schema) {
                 const res = await schema?.validate(inputs, { abortEarly: false }).catch((e) => e);
