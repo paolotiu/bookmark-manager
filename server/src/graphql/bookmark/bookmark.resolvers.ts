@@ -2,6 +2,7 @@ import { Bookmark } from '@entity/Bookmark';
 import { Resolvers } from '@gql/types';
 import { unNullifyObj } from '@utils/unNullifyObj';
 import {
+    createBaseError,
     createEntityIdNotFoundError,
     createUnexpectedError,
     createValidationError,
@@ -33,42 +34,59 @@ export const resolvers: Resolvers = {
 
         bookmarks: async (_, { deleted }, { userId }) => {
             const withDeleted = deleted || false;
+
+            if (deleted) {
+                const bookmarks = await Bookmark.createQueryBuilder()
+                    .select()
+                    .where('"deletedDate" IS NOT NULL')
+                    .andWhere('"userId" = :userId', { userId })
+                    .withDeleted()
+                    .getMany();
+                return { bookmarks };
+            }
+
             const bookmarks = await Bookmark.find({ where: { userId }, withDeleted });
             return { bookmarks };
         },
     },
     Mutation: {
         createBookmark: async (_, { data: { title, description, url, folderId } }, { userId }) => {
-            const x = await bookmarkSchema.validate({ title, description, url }, { abortEarly: false }).catch((e) => e);
-            if (x.errors) {
-                return createValidationError('createBookmark', x);
+            try {
+                const x = await bookmarkSchema
+                    .validate({ title, description, url }, { abortEarly: false })
+                    .catch((e) => e);
+                if (x.errors) {
+                    return createValidationError('createBookmark', x);
+                }
+
+                const res = await scrapeMetadata(url);
+
+                const data = {
+                    title: res.ogTitle || 'New Bookmark',
+                    description: res.ogDescription || '',
+                    url,
+                    folderId,
+                };
+
+                // Put bookmark in a folder
+                if (folderId) {
+                    const folder = await Folder.findOne(folderId, { where: { userId } });
+                    // TODO: Decide if it should error out if a folder isn't found
+                    // or just dont add the folder id to the bookmark
+                    if (!folder) return createEntityIdNotFoundError('createBookmark', 'folder');
+                    data.folderId = folder.id;
+                }
+
+                // Create bookmark
+                const bookmark = Bookmark.create({
+                    ...data,
+                    userId,
+                });
+
+                return bookmark.save();
+            } catch (err) {
+                return createBaseError('createBookmark', err.message);
             }
-
-            const res = await scrapeMetadata(url);
-
-            const data = {
-                title: res.ogTitle || 'New Bookmark',
-                description: res.ogDescription || '',
-                url,
-                folderId,
-            };
-
-            // Put bookmark in a folder
-            if (folderId) {
-                const folder = await Folder.findOne(folderId, { where: { userId } });
-                // TODO: Decide if it should error out if a folder isn't found
-                // or just dont add the folder id to the bookmark
-                if (!folder) return createEntityIdNotFoundError('createBookmark', 'folder');
-                data.folderId = folder.id;
-            }
-
-            // Create bookmark
-            const bookmark = Bookmark.create({
-                ...data,
-                userId,
-            });
-
-            return bookmark.save();
         },
 
         updateBookmark: async (_, { data: { id, description, title, url, folderId } }, { userId }) => {
