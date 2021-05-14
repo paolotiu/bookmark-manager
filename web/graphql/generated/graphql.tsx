@@ -33,7 +33,16 @@ export type Bookmark = {
   folderId?: Maybe<Scalars['Int']>;
 };
 
-export type BookmarkResult = BaseError | Bookmark | InputValidationError;
+export type BookmarkResult = BaseError | Bookmark;
+
+export type BookmarkResultWithInput = BaseError | Bookmark | InputValidationError;
+
+export type Bookmarks = {
+  __typename?: 'Bookmarks';
+  bookmarks: Array<Maybe<Bookmark>>;
+};
+
+export type BookmarksResult = BaseError | Bookmarks;
 
 export type CreateBookmarkInput = {
   title?: Maybe<Scalars['String']>;
@@ -81,8 +90,8 @@ export type Mutation = {
   /** Returns null if login failed */
   login: UserResult;
   invalidateTokens: Scalars['Boolean'];
-  createBookmark: BookmarkResult;
-  updateBookmark: BookmarkResult;
+  createBookmark: BookmarkResultWithInput;
+  updateBookmark: BookmarkResultWithInput;
   softDeleteBookmark: BookmarkResult;
   hardDeleteBookmark: BookmarkResult;
   createFolder: FolderResult;
@@ -161,6 +170,7 @@ export type MutationDeleteFolderArgs = {
 export type Query = {
   __typename?: 'Query';
   bookmark: BookmarkResult;
+  bookmarks: BookmarksResult;
   folder: FolderResult;
   getTree: TreeResult;
   q?: Maybe<Folder>;
@@ -171,6 +181,12 @@ export type Query = {
 
 export type QueryBookmarkArgs = {
   id: Scalars['Int'];
+  deleted?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type QueryBookmarksArgs = {
+  deleted?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -242,6 +258,52 @@ export type CreateBookmarkMutation = (
   ) }
 );
 
+export type SoftDeleteBookmarkMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type SoftDeleteBookmarkMutation = (
+  { __typename?: 'Mutation' }
+  & { softDeleteBookmark: (
+    { __typename?: 'BaseError' }
+    & BaseErrorFragment
+  ) | (
+    { __typename?: 'Bookmark' }
+    & BookmarkFragment
+  ) }
+);
+
+export type HardDeleteBookmarkMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type HardDeleteBookmarkMutation = (
+  { __typename?: 'Mutation' }
+  & { hardDeleteBookmark: (
+    { __typename?: 'BaseError' }
+    & BaseErrorFragment
+  ) | (
+    { __typename?: 'Bookmark' }
+    & BookmarkFragment
+  ) }
+);
+
+export type DeletedBookmarksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DeletedBookmarksQuery = (
+  { __typename?: 'Query' }
+  & { bookmarks: (
+    { __typename?: 'BaseError' }
+    & BaseErrorFragment
+  ) | (
+    { __typename?: 'Bookmarks' }
+    & BookmarksFragment
+  ) }
+);
+
 export type FolderBookmarksQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -293,6 +355,14 @@ export type BookmarkFragment = (
   & Pick<Bookmark, 'id' | 'title' | 'url' | 'description' | 'createdDate' | 'folderId'>
 );
 
+export type BookmarksFragment = (
+  { __typename?: 'Bookmarks' }
+  & { bookmarks: Array<Maybe<(
+    { __typename?: 'Bookmark' }
+    & Pick<Bookmark, 'id' | 'title' | 'url' | 'description' | 'createdDate' | 'folderId'>
+  )>> }
+);
+
 export type TreeFragment = (
   { __typename?: 'Tree' }
   & Pick<Tree, 'tree'>
@@ -340,6 +410,18 @@ export type ValidationErrorFragment = (
   )>> }
 );
 
+export const BookmarksFragmentDoc = gql`
+    fragment Bookmarks on Bookmarks {
+  bookmarks {
+    id
+    title
+    url
+    description
+    createdDate
+    folderId
+  }
+}
+    `;
 export const TreeFragmentDoc = gql`
     fragment Tree on Tree {
   tree
@@ -473,6 +555,112 @@ export function useCreateBookmarkMutation(baseOptions?: Apollo.MutationHookOptio
 export type CreateBookmarkMutationHookResult = ReturnType<typeof useCreateBookmarkMutation>;
 export type CreateBookmarkMutationResult = Apollo.MutationResult<CreateBookmarkMutation>;
 export type CreateBookmarkMutationOptions = Apollo.BaseMutationOptions<CreateBookmarkMutation, CreateBookmarkMutationVariables>;
+export const SoftDeleteBookmarkDocument = gql`
+    mutation softDeleteBookmark($id: Int!) {
+  softDeleteBookmark(id: $id) {
+    ...Bookmark
+    ...BaseError
+  }
+}
+    ${BookmarkFragmentDoc}
+${BaseErrorFragmentDoc}`;
+export type SoftDeleteBookmarkMutationFn = Apollo.MutationFunction<SoftDeleteBookmarkMutation, SoftDeleteBookmarkMutationVariables>;
+
+/**
+ * __useSoftDeleteBookmarkMutation__
+ *
+ * To run a mutation, you first call `useSoftDeleteBookmarkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSoftDeleteBookmarkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [softDeleteBookmarkMutation, { data, loading, error }] = useSoftDeleteBookmarkMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useSoftDeleteBookmarkMutation(baseOptions?: Apollo.MutationHookOptions<SoftDeleteBookmarkMutation, SoftDeleteBookmarkMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SoftDeleteBookmarkMutation, SoftDeleteBookmarkMutationVariables>(SoftDeleteBookmarkDocument, options);
+      }
+export type SoftDeleteBookmarkMutationHookResult = ReturnType<typeof useSoftDeleteBookmarkMutation>;
+export type SoftDeleteBookmarkMutationResult = Apollo.MutationResult<SoftDeleteBookmarkMutation>;
+export type SoftDeleteBookmarkMutationOptions = Apollo.BaseMutationOptions<SoftDeleteBookmarkMutation, SoftDeleteBookmarkMutationVariables>;
+export const HardDeleteBookmarkDocument = gql`
+    mutation hardDeleteBookmark($id: Int!) {
+  hardDeleteBookmark(id: $id) {
+    ...Bookmark
+    ...BaseError
+  }
+}
+    ${BookmarkFragmentDoc}
+${BaseErrorFragmentDoc}`;
+export type HardDeleteBookmarkMutationFn = Apollo.MutationFunction<HardDeleteBookmarkMutation, HardDeleteBookmarkMutationVariables>;
+
+/**
+ * __useHardDeleteBookmarkMutation__
+ *
+ * To run a mutation, you first call `useHardDeleteBookmarkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useHardDeleteBookmarkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [hardDeleteBookmarkMutation, { data, loading, error }] = useHardDeleteBookmarkMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useHardDeleteBookmarkMutation(baseOptions?: Apollo.MutationHookOptions<HardDeleteBookmarkMutation, HardDeleteBookmarkMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<HardDeleteBookmarkMutation, HardDeleteBookmarkMutationVariables>(HardDeleteBookmarkDocument, options);
+      }
+export type HardDeleteBookmarkMutationHookResult = ReturnType<typeof useHardDeleteBookmarkMutation>;
+export type HardDeleteBookmarkMutationResult = Apollo.MutationResult<HardDeleteBookmarkMutation>;
+export type HardDeleteBookmarkMutationOptions = Apollo.BaseMutationOptions<HardDeleteBookmarkMutation, HardDeleteBookmarkMutationVariables>;
+export const DeletedBookmarksDocument = gql`
+    query deletedBookmarks {
+  bookmarks(deleted: true) {
+    ...Bookmarks
+    ...BaseError
+  }
+}
+    ${BookmarksFragmentDoc}
+${BaseErrorFragmentDoc}`;
+
+/**
+ * __useDeletedBookmarksQuery__
+ *
+ * To run a query within a React component, call `useDeletedBookmarksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDeletedBookmarksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDeletedBookmarksQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useDeletedBookmarksQuery(baseOptions?: Apollo.QueryHookOptions<DeletedBookmarksQuery, DeletedBookmarksQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DeletedBookmarksQuery, DeletedBookmarksQueryVariables>(DeletedBookmarksDocument, options);
+      }
+export function useDeletedBookmarksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DeletedBookmarksQuery, DeletedBookmarksQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DeletedBookmarksQuery, DeletedBookmarksQueryVariables>(DeletedBookmarksDocument, options);
+        }
+export type DeletedBookmarksQueryHookResult = ReturnType<typeof useDeletedBookmarksQuery>;
+export type DeletedBookmarksLazyQueryHookResult = ReturnType<typeof useDeletedBookmarksLazyQuery>;
+export type DeletedBookmarksQueryResult = Apollo.QueryResult<DeletedBookmarksQuery, DeletedBookmarksQueryVariables>;
 export const FolderBookmarksDocument = gql`
     query folderBookmarks($id: Int!) {
   folder(id: $id) {
@@ -593,8 +781,16 @@ export type Tree_QueryQueryResult = Apollo.QueryResult<Tree_QueryQuery, Tree_Que
   "possibleTypes": {
     "BookmarkResult": [
       "BaseError",
+      "Bookmark"
+    ],
+    "BookmarkResultWithInput": [
+      "BaseError",
       "Bookmark",
       "InputValidationError"
+    ],
+    "BookmarksResult": [
+      "BaseError",
+      "Bookmarks"
     ],
     "FolderArrayResult": [
       "BaseError",

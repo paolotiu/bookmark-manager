@@ -11,6 +11,18 @@ export const BookmarkFragments = {
             folderId
         }
     `,
+    bookmarks: gql`
+        fragment Bookmarks on Bookmarks {
+            bookmarks {
+                id
+                title
+                url
+                description
+                createdDate
+                folderId
+            }
+        }
+    `,
 };
 
 export const FolderFragments = {
