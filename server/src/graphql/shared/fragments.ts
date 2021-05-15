@@ -14,11 +14,13 @@ export const FolderFragments = {
             parentId
             depth
             name
+            type
             children {
                 id
                 depth
                 name
                 parentId
+                type
             }
         }
     `,
@@ -42,6 +44,7 @@ export const FolderFragments = {
             parentId
             depth
             name
+            type
         }
     `,
     tree: gql`
@@ -60,6 +63,18 @@ export const BookmarkFragments = {
             description
             createdDate
             folderId
+        }
+    `,
+    bookmarks: gql`
+        fragment Bookmarks on Bookmarks {
+            bookmarks {
+                id
+                title
+                url
+                description
+                createdDate
+                folderId
+            }
         }
     `,
 };
