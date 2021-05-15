@@ -62,8 +62,8 @@ export const resolvers: Resolvers = {
                 const res = await scrapeMetadata(url);
 
                 const data = {
-                    title: res.ogTitle || 'New Bookmark',
-                    description: res.ogDescription || '',
+                    title: res?.ogTitle || url,
+                    description: res?.ogDescription || '',
                     url,
                     folderId,
                 };
