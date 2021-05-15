@@ -14,26 +14,36 @@ export const SOFT_DELETE_BOOKMARK = gql`
 `;
 
 export const HARD_DELETE_BOOKMARK = gql`
-mutation hardDeleteBookmark($id: Int!){
-    hardDeleteBookmark(id: $id){
-        ...Bookmark
-        ...BaseError
+    mutation hardDeleteBookmark($id: Int!) {
+        hardDeleteBookmark(id: $id) {
+            ...Bookmark
+            ...BaseError
+        }
     }
 
     ${ErrorFragments.base}
     ${BookmarkFragments.bookmark}
-}
 `;
 
-export const DELTED_BOOMARKS = gql`
-query deletedBookmarks{
-    bookmarks(deleted: true){
-
+export const HARD_DELETE_BOOKMARKS = gql`
+    mutation hardDeleteBookmarks($ids: [Int!]!) {
+        hardDeleteBookmarks(ids: $ids) {
             ...Bookmarks
             ...BaseError
+        }
     }
 
     ${ErrorFragments.base}
+    ${BookmarkFragments.bookmark}
+`;
+
+export const DELTED_BOOMARKS = gql`
+    query deletedBookmarks {
+        bookmarks(deleted: true) {
+            ...Bookmarks
+            ...BaseError
+        }
+    }
+    ${ErrorFragments.base}
     ${BookmarkFragments.bookmarks}
-}
 `;

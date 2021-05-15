@@ -93,7 +93,9 @@ export type Mutation = {
   createBookmark: BookmarkResultWithInput;
   updateBookmark: BookmarkResultWithInput;
   softDeleteBookmark: BookmarkResult;
+  softDeleteBookmarks: BookmarksResult;
   hardDeleteBookmark: BookmarkResult;
+  hardDeleteBookmarks: BookmarksResult;
   createFolder: FolderResult;
   updateFolderName: FolderResult;
   softDeleteFolder: FolderResult;
@@ -131,8 +133,18 @@ export type MutationSoftDeleteBookmarkArgs = {
 };
 
 
+export type MutationSoftDeleteBookmarksArgs = {
+  ids: Array<Maybe<Scalars['Int']>>;
+};
+
+
 export type MutationHardDeleteBookmarkArgs = {
   id: Scalars['Int'];
+};
+
+
+export type MutationHardDeleteBookmarksArgs = {
+  ids: Array<Maybe<Scalars['Int']>>;
 };
 
 
@@ -287,6 +299,22 @@ export type HardDeleteBookmarkMutation = (
   ) | (
     { __typename?: 'Bookmark' }
     & BookmarkFragment
+  ) }
+);
+
+export type HardDeleteBookmarksMutationVariables = Exact<{
+  ids: Array<Scalars['Int']> | Scalars['Int'];
+}>;
+
+
+export type HardDeleteBookmarksMutation = (
+  { __typename?: 'Mutation' }
+  & { hardDeleteBookmarks: (
+    { __typename?: 'BaseError' }
+    & BaseErrorFragment
+  ) | (
+    { __typename?: 'Bookmarks' }
+    & BookmarksFragment
   ) }
 );
 
@@ -625,6 +653,41 @@ export function useHardDeleteBookmarkMutation(baseOptions?: Apollo.MutationHookO
 export type HardDeleteBookmarkMutationHookResult = ReturnType<typeof useHardDeleteBookmarkMutation>;
 export type HardDeleteBookmarkMutationResult = Apollo.MutationResult<HardDeleteBookmarkMutation>;
 export type HardDeleteBookmarkMutationOptions = Apollo.BaseMutationOptions<HardDeleteBookmarkMutation, HardDeleteBookmarkMutationVariables>;
+export const HardDeleteBookmarksDocument = gql`
+    mutation hardDeleteBookmarks($ids: [Int!]!) {
+  hardDeleteBookmarks(ids: $ids) {
+    ...Bookmarks
+    ...BaseError
+  }
+}
+    ${BookmarksFragmentDoc}
+${BaseErrorFragmentDoc}`;
+export type HardDeleteBookmarksMutationFn = Apollo.MutationFunction<HardDeleteBookmarksMutation, HardDeleteBookmarksMutationVariables>;
+
+/**
+ * __useHardDeleteBookmarksMutation__
+ *
+ * To run a mutation, you first call `useHardDeleteBookmarksMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useHardDeleteBookmarksMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [hardDeleteBookmarksMutation, { data, loading, error }] = useHardDeleteBookmarksMutation({
+ *   variables: {
+ *      ids: // value for 'ids'
+ *   },
+ * });
+ */
+export function useHardDeleteBookmarksMutation(baseOptions?: Apollo.MutationHookOptions<HardDeleteBookmarksMutation, HardDeleteBookmarksMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<HardDeleteBookmarksMutation, HardDeleteBookmarksMutationVariables>(HardDeleteBookmarksDocument, options);
+      }
+export type HardDeleteBookmarksMutationHookResult = ReturnType<typeof useHardDeleteBookmarksMutation>;
+export type HardDeleteBookmarksMutationResult = Apollo.MutationResult<HardDeleteBookmarksMutation>;
+export type HardDeleteBookmarksMutationOptions = Apollo.BaseMutationOptions<HardDeleteBookmarksMutation, HardDeleteBookmarksMutationVariables>;
 export const DeletedBookmarksDocument = gql`
     query deletedBookmarks {
   bookmarks(deleted: true) {
