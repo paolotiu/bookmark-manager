@@ -1,4 +1,5 @@
 import Button from '@components/Button/Button';
+import dynamic from 'next/dynamic';
 import ErrorMessage from '@components/General/ErrorMessage';
 import { BookmarkFragments } from '@graphql/fragments';
 import { Bookmark, useCreateBookmarkMutation } from '@graphql/generated/graphql';
@@ -6,6 +7,7 @@ import { Transition } from '@headlessui/react';
 import { useForm } from '@lib/useForm';
 import React, { Fragment, useState } from 'react';
 import * as yup from 'yup';
+const Spinner = dynamic(() => import('./Spinner/Spinner'));
 
 interface Props {
     onSubmit: () => void;
@@ -14,7 +16,7 @@ interface Props {
 }
 
 const createBookmarkSchema = yup.object().shape({
-    url: yup.string().url('Must be a valid URL'),
+    url: yup.string().url('Must be a valid URL').required(''),
 });
 const AddBookmarkDropdown = ({ folderId, isOpen }: Props) => {
     const { inputs, handleChange, errors, isError, resetForm } = useForm(
@@ -23,6 +25,7 @@ const AddBookmarkDropdown = ({ folderId, isOpen }: Props) => {
         },
         createBookmarkSchema,
     );
+    const [isSaving, setIsSaving] = useState(false);
     const [willShowErrors, setWillShowErrors] = useState(false);
     const [createBookmark] = useCreateBookmarkMutation({
         update(cache, { data }) {
@@ -55,13 +58,13 @@ const AddBookmarkDropdown = ({ folderId, isOpen }: Props) => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
         setWillShowErrors(true);
         if (isError) {
             // Prevent network call
             return;
         }
 
+        setIsSaving(true);
         const { data } = await createBookmark({
             variables: {
                 folderId: Number(folderId),
@@ -73,6 +76,8 @@ const AddBookmarkDropdown = ({ folderId, isOpen }: Props) => {
         if (data?.createBookmark.__typename === 'BaseError') {
             console.log(data.createBookmark.message);
         }
+
+        setIsSaving(false);
         resetForm();
     };
     return (
@@ -98,18 +103,21 @@ const AddBookmarkDropdown = ({ folderId, isOpen }: Props) => {
                             <label htmlFor="url">URL</label>
                             <input
                                 type="text"
-                                name="url"
                                 className="px-2 py-1 text-sm border rounded-sm "
                                 value={inputs.url}
                                 onChange={handleChange}
                                 placeholder="https://example.com"
                                 autoComplete="off"
+                                name="url"
                             />
                             {willShowErrors && errors.url.message && (
                                 <ErrorMessage size="small" text={errors.url.message} />
                             )}
                         </div>
-                        <Button className="w-min justify-self-end no-outline">Save</Button>
+                        <Button className={`relative w-min justify-self-end no-outline`} disabled={isSaving || isError}>
+                            <p className={`${isSaving && 'invisible'}`}>Save</p>
+                            <Spinner showSpinner={isSaving} />
+                        </Button>
                     </form>
                 </div>
             </div>

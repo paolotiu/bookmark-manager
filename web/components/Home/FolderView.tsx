@@ -1,9 +1,10 @@
+import dynamic from 'next/dynamic';
 import Button from '@components/Button/Button';
 import { useFolderQuery } from '@graphql/generated/graphql';
 import { isBaseError } from '@graphql/helpers';
 import React, { useEffect, useState } from 'react';
-import AddBookmarkDropdown from './AddBookmarkDropdown';
 import BookmarkCard from './BookmarkCard';
+const AddBookmarkDropdown = dynamic(() => import('./AddBookmarkDropdown'));
 
 interface Props {
     folderId: number;
