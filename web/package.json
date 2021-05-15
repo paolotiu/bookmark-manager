@@ -5,7 +5,7 @@
         "dev": "next",
         "build": "next build",
         "start": "next start",
-        "type-check": "tsc",
+        "lint": "tsc",
         "generate": "graphql-codegen --config codegen.yml"
     },
     "dependencies": {

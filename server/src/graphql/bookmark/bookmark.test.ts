@@ -7,6 +7,8 @@ import { BookmarkResult, CreateBookmarkInput, UpdateBookmarkInput } from '@gql/t
 import { createApolloTestClient } from '@utils/createApolloTestClient';
 import { gql } from 'apollo-server-express';
 
+jest.setTimeout(30000);
+
 // Initialize user
 const testUser = { email: 'tomtom@tom.com', password: 'passwreodd', name: 'tom', id: 0 };
 
@@ -32,6 +34,18 @@ const BOOKMARK_QUERY = gql`
         }
     }
     ${BookmarkFragments.base}
+    ${BaseErrorFragment}
+`;
+
+const BOOKMARKS_QUERY = gql`
+    query BOOKMARKS_QUERY($deleted: Boolean!) {
+        bookmarks(deleted: $deleted) {
+            ...Bookmarks
+            ...BaseError
+        }
+    }
+
+    ${BookmarkFragments.bookmarks}
     ${BaseErrorFragment}
 `;
 
@@ -87,6 +101,14 @@ type BookmarkRes<T extends string> = {
     };
 };
 
+type BookmarksRes = {
+    data: {
+        bookmarks: {
+            bookmarks: BookmarkResult[];
+        };
+    };
+};
+
 const createBookmarkMutation = (variables: CreateBookmarkInput) =>
     mutate<BookmarkRes<'createBookmark'>>(CREATE_BOOKMARK_MUTATION, { variables: { createBookmarkData: variables } });
 const bookmarkQuery = (variables: { id: number }) => query<BookmarkRes<'bookmark'>>(BOOKMARK_QUERY, { variables });
@@ -96,6 +118,7 @@ const softDeleteBookmarkMuatation = (variables: { id: number }) =>
     mutate<BookmarkRes<'softDeleteBookmark'>>(SOFT_DELETE_BOOKMARK_MUTATION, { variables });
 const hardDeleteBookmarkMuatation = (variables: { id: number }) =>
     mutate<BookmarkRes<'hardDeleteBookmark'>>(HARD_DELETE_BOOKMARK_MUTATION, { variables });
+const deleteBookmarksQuery = (variables: { deleted: boolean }) => query<BookmarksRes>(BOOKMARKS_QUERY, { variables });
 
 interface TestBookmark extends Partial<Bookmark> {
     title: string;
@@ -176,6 +199,13 @@ describe('Happy Path :)', () => {
 
         const bookmark = await Bookmark.findOne(testBookmark2.id);
         expect(bookmark).toBeUndefined();
+    });
+
+    test('Query deleted bookmarks', async () => {
+        const {
+            data: { bookmarks },
+        } = await deleteBookmarksQuery({ deleted: true });
+        expect(bookmarks.bookmarks.length).toEqual(1);
     });
 
     test('Hard deletes bookmark', async () => {
