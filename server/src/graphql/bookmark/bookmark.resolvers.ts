@@ -146,5 +146,14 @@ export const resolvers: Resolvers = {
                 .execute();
             return { bookmarks };
         },
+        hardDeleteBookmarks: async (_, { ids }, { userId }) => {
+            const { raw: bookmarks } = await Bookmark.createQueryBuilder()
+                .delete()
+                .where('id in (:...ids)', { ids })
+                .andWhere('userId = :userId', { userId })
+                .returning('*')
+                .execute();
+            return { bookmarks };
+        },
     },
 };

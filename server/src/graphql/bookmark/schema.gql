@@ -41,4 +41,5 @@ type Mutation {
     softDeleteBookmark(id: Int!): BookmarkResult! @auth
     softDeleteBookmarks(ids: [Int]!): BookmarksResult! @auth
     hardDeleteBookmark(id: Int!): BookmarkResult! @auth
+    hardDeleteBookmarks(ids: [Int]!): BookmarksResult! @auth
 }

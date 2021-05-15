@@ -106,6 +106,17 @@ const SOFT_DELETE_BOOKMARKS_MUTATION = gql`
     ${BaseErrorFragment}
 `;
 
+const HARD_DELETE_BOOKMARKS_MUTATION = gql`
+    mutation HARD_DELETE_BOOKMARKS_MUTATION($ids: [Int!]!) {
+        hardDeleteBookmarks(ids: $ids) {
+            ...Bookmarks
+            ...BaseError
+        }
+    }
+    ${BookmarkFragments.bookmarks}
+    ${BaseErrorFragment}
+`;
+
 type BookmarkRes<T extends string> = {
     data: {
         [key in T]: BookmarkResult;
@@ -133,6 +144,9 @@ const deleteBookmarksQuery = (variables: { deleted: boolean }) =>
     query<BookmarksRes<'bookmarks'>>(BOOKMARKS_QUERY, { variables });
 const softDeleteBookmarksMutation = (variables: { ids: number[] }) =>
     mutate<BookmarksRes<'softDeleteBookmarks'>>(SOFT_DELETE_BOOKMARKS_MUTATION, { variables });
+
+const hardDeleteBookmarksMutation = (variables: { ids: number[] }) =>
+    mutate<BookmarksRes<'softDeleteBookmarks'>>(HARD_DELETE_BOOKMARKS_MUTATION, { variables });
 
 interface TestBookmark extends Partial<Bookmark> {
     title: string;
@@ -244,12 +258,17 @@ describe('Happy Path :)', () => {
             data: { createBookmark: b3 },
         } = await createBookmarkMutation({ url: 'https://kasdksa.com', title: 'Hey' });
 
+        const ids = [(b1 as Bookmark).id, (b2 as Bookmark).id, (b3 as Bookmark).id];
         const {
             data: { softDeleteBookmarks },
         } = await softDeleteBookmarksMutation({
-            ids: [(b1 as Bookmark).id, (b2 as Bookmark).id, (b3 as Bookmark).id],
+            ids,
         });
 
         expect(softDeleteBookmarks.bookmarks).toEqual([b1, b2, b3]);
+
+        await hardDeleteBookmarksMutation({ ids });
+        const res = await Bookmark.find();
+        expect(res.length).toEqual(0);
     });
 });
