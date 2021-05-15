@@ -1,6 +1,5 @@
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
+import { ImSpinner } from 'react-icons/im';
 
 interface Props {
     showSpinner?: boolean;
@@ -13,7 +12,7 @@ const Spinner = ({ showSpinner }: Props) => {
                 showSpinner ? 'block' : 'hidden'
             }`}
         >
-            <FontAwesomeIcon icon={faSpinner} spin />
+            <ImSpinner className="animate-spin" />
         </div>
     );
 };

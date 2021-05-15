@@ -1,7 +1,7 @@
 import { ApolloCache } from '@apollo/client';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Bookmark, useHardDeleteBookmarkMutation, useSoftDeleteBookmarkMutation } from '@graphql/generated/graphql';
 import { decode } from 'html-entities';
+import { FaTrash } from 'react-icons/fa';
 import ActionButton from './ActionButton/ActionButton';
 
 interface Props {
@@ -52,7 +52,7 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId }: Props) => {
                     <h3 className="pr-5 text-base font-medium line-clamp-3 ">{decode(bookmark.title)}</h3>
 
                     <div className="flex items-start justify-around">
-                        <ActionButton onClick={handleDelete} icon={faTrash} />
+                        <ActionButton onClick={handleDelete} icon={<FaTrash />} />
                     </div>
                 </div>
                 <p className="text-sm leading-5 line-clamp-3">{decode(bookmark.description)}</p>

@@ -1,16 +1,17 @@
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
+import { IconContext } from 'react-icons/lib';
 
 interface Props {
     onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
-    icon: IconDefinition;
+    icon: React.ReactElement;
 }
 
 const ActionButton = ({ onClick, icon }: Props) => {
     return (
         <button onClick={onClick} className={'hidden group-hover:block'}>
-            <FontAwesomeIcon icon={icon} className="text-iconPassive hover:text-iconActive no-outline" />
+            <IconContext.Provider value={{ className: 'text-iconPassive hover:text-iconActive no-outline' }}>
+                {icon}
+            </IconContext.Provider>
         </button>
     );
 };
