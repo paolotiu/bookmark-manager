@@ -1,12 +1,12 @@
-import { UserModel } from '../entity/User';
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
+import { UserModel } from '../entity/User';
 import { BookmarkModel } from '../entity/Bookmark';
 import { Folder } from '../entity/Folder';
 import { MyContext } from './contextType';
+export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type Maybe<T> = T | null;
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
@@ -100,6 +100,7 @@ export type Mutation = {
   /** true => success | false => fail */
   register: UserResult;
   softDeleteBookmark: BookmarkResult;
+  softDeleteBookmarks: BookmarksResult;
   softDeleteFolder: FolderResult;
   updateBookmark: BookmarkResultWithInput;
   updateFolderName: FolderResult;
@@ -152,6 +153,11 @@ export type MutationRegisterArgs = {
 
 export type MutationSoftDeleteBookmarkArgs = {
   id: Scalars['Int'];
+};
+
+
+export type MutationSoftDeleteBookmarksArgs = {
+  ids: Array<Maybe<Scalars['Int']>>;
 };
 
 
@@ -441,6 +447,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   recoverFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationRecoverFolderArgs, 'id'>>;
   register?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password'>>;
   softDeleteBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationSoftDeleteBookmarkArgs, 'id'>>;
+  softDeleteBookmarks?: Resolver<ResolversTypes['BookmarksResult'], ParentType, ContextType, RequireFields<MutationSoftDeleteBookmarksArgs, 'ids'>>;
   softDeleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationSoftDeleteFolderArgs, 'id'>>;
   updateBookmark?: Resolver<ResolversTypes['BookmarkResultWithInput'], ParentType, ContextType, RequireFields<MutationUpdateBookmarkArgs, 'data'>>;
   updateFolderName?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationUpdateFolderNameArgs, 'id' | 'name'>>;

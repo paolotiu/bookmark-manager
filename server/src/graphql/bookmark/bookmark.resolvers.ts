@@ -62,8 +62,8 @@ export const resolvers: Resolvers = {
                 const res = await scrapeMetadata(url);
 
                 const data = {
-                    title: res?.ogTitle || url,
-                    description: res?.ogDescription || '',
+                    title: res?.ogTitle || title || url,
+                    description: res?.ogDescription || description || '',
                     url,
                     folderId,
                 };
@@ -135,6 +135,16 @@ export const resolvers: Resolvers = {
             await Bookmark.delete({ id: bookmark.id, userId });
 
             return bookmark;
+        },
+
+        softDeleteBookmarks: async (_, { ids }, { userId }) => {
+            const { raw: bookmarks } = await Bookmark.createQueryBuilder()
+                .softDelete()
+                .where('id in (:...ids)', { ids })
+                .andWhere('userId = :userId', { userId })
+                .returning('*')
+                .execute();
+            return { bookmarks };
         },
     },
 };

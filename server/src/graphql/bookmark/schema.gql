@@ -39,5 +39,6 @@ type Mutation {
     createBookmark(data: CreateBookmarkInput!): BookmarkResultWithInput! @auth
     updateBookmark(data: UpdateBookmarkInput!): BookmarkResultWithInput! @auth
     softDeleteBookmark(id: Int!): BookmarkResult! @auth
+    softDeleteBookmarks(ids: [Int]!): BookmarksResult! @auth
     hardDeleteBookmark(id: Int!): BookmarkResult! @auth
 }
