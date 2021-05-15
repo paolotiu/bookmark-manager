@@ -1,4 +1,6 @@
 import { ApolloCache } from '@apollo/client';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Bookmark, useHardDeleteBookmarkMutation, useSoftDeleteBookmarkMutation } from '@graphql/generated/graphql';
 import { decode } from 'html-entities';
 
@@ -46,16 +48,24 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId }: Props) => {
             className="relative block border-b border-gray-200 hover:bg-gray-50 group"
         >
             <div className="grid gap-2 p-3">
-                <h3 className="pr-5 text-base font-medium line-clamp-3">{decode(bookmark.title)}</h3>
+                <div className="flex justify-between pr-4">
+                    <h3 className="pr-5 text-base font-medium line-clamp-3">{decode(bookmark.title)}</h3>
+
+                    <div className="hidden top-2 right-8 group-hover:block">
+                        <button onClick={handleDelete}>
+                            <FontAwesomeIcon
+                                icon={faTrash}
+                                className="text-iconPassive hover:text-iconActive no-outline"
+                            />
+                        </button>
+                    </div>
+                </div>
                 <p className="text-sm leading-5 line-clamp-3">{decode(bookmark.description)}</p>
                 <div className="flex">
                     <span className="text-xs text-gray-400">{bookmark.url} &nbsp;</span>
 
                     <span className="text-xs text-gray-400">{new Date(bookmark.createdDate).toDateString()}</span>
                 </div>
-            </div>
-            <div className="absolute hidden top-2 right-2 group-hover:block">
-                <button onClick={handleDelete}>Delete</button>
             </div>
         </a>
     );

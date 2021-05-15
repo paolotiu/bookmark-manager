@@ -15,6 +15,8 @@ module.exports = {
                 },
                 header: '#212121',
                 sidebar: '#F4F4F1',
+                iconActive: '#A1A1A1',
+                iconPassive: '#CBCBCB',
             },
             screens: {
                 '3xl': '1600px',
