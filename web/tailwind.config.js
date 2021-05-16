@@ -17,6 +17,7 @@ module.exports = {
                 sidebar: '#F4F4F1',
                 iconActive: '#A1A1A1',
                 iconPassive: '#CBCBCB',
+                hoverColor: 'rgba(55, 53, 47, 0.08)',
             },
             screens: {
                 '3xl': '1600px',
@@ -24,7 +25,7 @@ module.exports = {
                 1665: '1665px',
             },
             margin: {
-                'sidebar-width': '200px',
+                'sidebar-width': '250px',
             },
             keyframes: {
                 dropdown: {
