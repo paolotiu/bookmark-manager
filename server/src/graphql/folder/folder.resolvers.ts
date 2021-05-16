@@ -168,6 +168,7 @@ export const resolvers: Resolvers = {
                 .update()
                 .set({
                     folderId: () => 'null',
+                    deletedDate: new Date(),
                 })
                 .where('folderId = :fid', { fid: id })
                 .andWhere('userId = :uid', { uid: userId })
@@ -175,7 +176,6 @@ export const resolvers: Resolvers = {
 
             // Delete folder
             await Folder.delete({ id, userId });
-
             return folder;
         },
     },
