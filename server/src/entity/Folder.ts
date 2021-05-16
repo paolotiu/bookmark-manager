@@ -12,7 +12,7 @@ import {
 import { User } from '@entity/User';
 import { Bookmark } from '@entity/Bookmark';
 
-@Unique(['name', 'userId', 'depth'])
+@Unique(['id', 'userId', 'depth'])
 @Entity()
 export class Folder extends BaseEntity {
     children: Folder[];
@@ -61,10 +61,12 @@ export class Folder extends BaseEntity {
 
     async getDescendantsTree(): Promise<Folder> {
         const childrenArr = await this.getDescendants();
-        return arrayToTree({
-            foldersArr: childrenArr,
-            parentId: this.id,
-        });
+        return (
+            arrayToTree({
+                foldersArr: childrenArr,
+                parentId: this.id,
+            }) || { ...this, children: [] }
+        );
     }
 
     // Returns A tuple
