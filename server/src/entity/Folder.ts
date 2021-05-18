@@ -77,8 +77,12 @@ export class Folder extends BaseEntity {
         // $2: Source path
         // Concatenates target path with the source's id
         // We use the id as path markers
+        Folder.query('update folder set "parentId" = ltree2text(subpath($1, -1, 1))::int where id = $2', [
+            targetFolderPath,
+            this.id,
+        ]);
         return Folder.query(
-            'update folder set path = $1 || subpath(path, nlevel($2) - 1), depth = nlevel($1), "parentId" = ltree2text(subpath($1, -1, 1))::int where path <@ $2 returning *',
+            'update folder set path = $1 || subpath(path, nlevel($2) - 1), depth = nlevel($1) where path <@ $2 returning *',
             [targetFolderPath, this.path],
         );
     }
@@ -126,6 +130,7 @@ function arrayToTree({ parentId, foldersArr }: ArrayToTreeWithParent) {
     foldersArr.forEach((folder) => {
         // Skip root node
         if (folder.id !== parentId && folder.parentId !== null) {
+            console.log(map[folder.parentId], folder.parentId);
             map[folder.parentId].children.push(folder);
         }
     });
