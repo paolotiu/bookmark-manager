@@ -90,8 +90,9 @@ export class Folder extends BaseEntity {
     // Returns the values as move
     // moves the folder to the top level (root)
     moveToRoot(): Promise<[Folder[], number]> {
+        Folder.query('update folder set "parentId" = null where id = $1', [this.id]);
         return Folder.query(
-            'update folder set path = subpath(path, nlevel($1) - 1), depth = 0, "parentId" = null where path <@ $1 returning *',
+            'update folder set path = subpath(path, nlevel($1) - 1), depth = 0 where path <@ $1 returning *',
             [this.path],
         );
     }
@@ -130,7 +131,6 @@ function arrayToTree({ parentId, foldersArr }: ArrayToTreeWithParent) {
     foldersArr.forEach((folder) => {
         // Skip root node
         if (folder.id !== parentId && folder.parentId !== null) {
-            console.log(map[folder.parentId], folder.parentId);
             map[folder.parentId].children.push(folder);
         }
     });

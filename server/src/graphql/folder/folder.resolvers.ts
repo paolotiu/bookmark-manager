@@ -95,7 +95,7 @@ export const resolvers: Resolvers = {
         },
         moveFolder: async (_, { folderId, targetFolderId }, { userId }) => {
             // Move folder to root
-            if (!targetFolderId) {
+            if (!targetFolderId || targetFolderId < 0) {
                 const folder = await Folder.findOne(folderId, { where: { userId } });
                 const res = await folder?.moveToRoot();
                 if (!res) return createEntityIdNotFoundError('moveFolder', 'folder');
