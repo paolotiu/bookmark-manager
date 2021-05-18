@@ -396,6 +396,20 @@ export type DeleteFolderMutation = (
   ) }
 );
 
+export type MoveFolderMutationVariables = Exact<{
+  targetId: Scalars['Int'];
+  folderId: Scalars['Int'];
+}>;
+
+
+export type MoveFolderMutation = (
+  { __typename?: 'Mutation' }
+  & { moveFolder: (
+    { __typename?: 'BaseError' }
+    & BaseErrorFragment
+  ) | { __typename?: 'Folder' } }
+);
+
 export type Tree_QueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -900,6 +914,40 @@ export function useDeleteFolderMutation(baseOptions?: Apollo.MutationHookOptions
 export type DeleteFolderMutationHookResult = ReturnType<typeof useDeleteFolderMutation>;
 export type DeleteFolderMutationResult = Apollo.MutationResult<DeleteFolderMutation>;
 export type DeleteFolderMutationOptions = Apollo.BaseMutationOptions<DeleteFolderMutation, DeleteFolderMutationVariables>;
+export const MoveFolderDocument = gql`
+    mutation moveFolder($targetId: Int!, $folderId: Int!) {
+  moveFolder(targetFolderId: $targetId, folderId: $folderId) {
+    ...BaseError
+  }
+}
+    ${BaseErrorFragmentDoc}`;
+export type MoveFolderMutationFn = Apollo.MutationFunction<MoveFolderMutation, MoveFolderMutationVariables>;
+
+/**
+ * __useMoveFolderMutation__
+ *
+ * To run a mutation, you first call `useMoveFolderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMoveFolderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [moveFolderMutation, { data, loading, error }] = useMoveFolderMutation({
+ *   variables: {
+ *      targetId: // value for 'targetId'
+ *      folderId: // value for 'folderId'
+ *   },
+ * });
+ */
+export function useMoveFolderMutation(baseOptions?: Apollo.MutationHookOptions<MoveFolderMutation, MoveFolderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MoveFolderMutation, MoveFolderMutationVariables>(MoveFolderDocument, options);
+      }
+export type MoveFolderMutationHookResult = ReturnType<typeof useMoveFolderMutation>;
+export type MoveFolderMutationResult = Apollo.MutationResult<MoveFolderMutation>;
+export type MoveFolderMutationOptions = Apollo.BaseMutationOptions<MoveFolderMutation, MoveFolderMutationVariables>;
 export const Tree_QueryDocument = gql`
     query TREE_QUERY {
   getTree {

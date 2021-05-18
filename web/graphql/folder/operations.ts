@@ -23,3 +23,13 @@ export const DELETE_FOLDER_MUTATION = gql`
     ${FolderFragments.folder}
     ${ErrorFragments.base}
 `;
+
+export const MOVE_FOLDER_MUTATION = gql`
+    mutation moveFolder($targetId: Int!, $folderId: Int!) {
+        moveFolder(targetFolderId: $targetId, folderId: $folderId) {
+            ...BaseError
+        }
+    }
+
+    ${ErrorFragments.base}
+`;
