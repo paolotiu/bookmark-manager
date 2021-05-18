@@ -1,4 +1,7 @@
 import {
+    AfterInsert,
+    AfterLoad,
+    AfterUpdate,
     BaseEntity,
     Column,
     CreateDateColumn,
@@ -35,9 +38,6 @@ export class Folder extends BaseEntity {
     @Column('int', { default: 0 })
     depth: number;
 
-    @Column({ default: 'folder' })
-    type: 'folder';
-
     @ManyToOne(() => User, (user) => user.folders)
     @JoinColumn({ name: 'userId' })
     user: User;
@@ -50,6 +50,15 @@ export class Folder extends BaseEntity {
 
     @Column('boolean', { default: false })
     deleted: boolean;
+
+    type: 'folder';
+
+    @AfterLoad()
+    @AfterInsert()
+    @AfterUpdate()
+    setType() {
+        this.type = 'folder';
+    }
 
     getDescendants(): Promise<Folder[]> {
         return Folder.createQueryBuilder()
