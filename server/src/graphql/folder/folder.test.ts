@@ -94,8 +94,8 @@ const MOVE_FOLDER_MUTATION = gql`
     ${FolderFragments.base}
 `;
 
-const DELETE_BOOKMARK_MUTATION = gql`
-    mutation DELETE_BOOKMARK_MUTATION($id: Int!) {
+const DELETE_FOLDER_MUTATION = gql`
+    mutation DELETE_FOLDER_MUTATION($id: Int!) {
         deleteFolder(id: $id) {
             ...Folder
             ...BaseError
@@ -128,8 +128,8 @@ const withChildrenQuery = (variables: { id: number }) =>
     mutate<FolderRes<'folder'>>(WITH_CHILDREN_QUERY, { variables });
 
 const withBookmarksQuery = (variables: any) => query<FolderRes<'folder'>>(WITH_BOOKMARKS_QUERY, { variables });
-const deleteFolderMutation = (variables: any) =>
-    mutate<FolderRes<'deleteFolder'>>(DELETE_BOOKMARK_MUTATION, { variables });
+const deleteFolderMutation = (variables: { id: number }) =>
+    mutate<FolderRes<'deleteFolder'>>(DELETE_FOLDER_MUTATION, { variables });
 
 const treeQuery = () => query<{ data: any }>(TREE_QUERY);
 
@@ -240,7 +240,7 @@ describe('Happy Path :)', () => {
     test('Folder deletion ', async () => {
         const {
             data: { deleteFolder },
-        } = await deleteFolderMutation(testChildFolder);
+        } = await deleteFolderMutation({ id: testChildFolder.id! });
         expect(deleteFolder).toEqual(expect.objectContaining(testChildFolder));
 
         // Check if folder not in db
@@ -316,5 +316,70 @@ describe('Tree ', () => {
         folders.forEach((folder) => (folder.children = folder.children || []));
         const sampleTree = [parentFolder1, parentFolder2];
         expect(JSON.parse(tree)).toEqual(sampleTree);
+    });
+});
+
+describe.only('Nesting manipulation', () => {
+    const folder1: TestFolder = {
+        name: 'Folder1',
+    };
+    const folder2: TestFolder = {
+        name: 'Folder2',
+    };
+    const folder3: TestFolder = {
+        name: 'Folder3',
+    };
+    const folder4: TestFolder = {
+        name: 'Folder4',
+    };
+    const folder5: TestFolder = {
+        name: 'Folder5',
+    };
+
+    test('Create folder', async () => {
+        const {
+            data: { createFolder },
+        } = await createFolderMutation({ ...folder1 });
+        Object.assign(folder1, createFolder);
+        folder2.parentId = folder1.id;
+
+        const {
+            data: { createFolder: res2 },
+        } = await createFolderMutation(folder2);
+        Object.assign(folder2, res2);
+        folder3.parentId = folder2.id;
+
+        const {
+            data: { createFolder: res3 },
+        } = await createFolderMutation(folder3);
+        Object.assign(folder3, res3);
+        folder4.parentId = folder3.id;
+
+        const {
+            data: { createFolder: res4 },
+        } = await createFolderMutation(folder4);
+        Object.assign(folder4, res4);
+
+        /// Intentional
+        folder5.parentId = folder3.id;
+
+        const {
+            data: { createFolder: res5 },
+        } = await createFolderMutation(folder5);
+        Object.assign(folder5, res5);
+
+        const { data } = await treeQuery();
+        const root: Folder[] = JSON.parse(data.getTree.tree);
+        const parent = root[0];
+        expect(parent.children.length).toEqual(1);
+        expect(parent.children[0].children[0].children.length).toEqual(2);
+    });
+
+    test('Delete Folder2', async () => {
+        await deleteFolderMutation({ id: folder2.id! });
+
+        const [f4, f5] = await Folder.findByIds([folder4.id, folder5.id]);
+        expect(f4.path).toEqual([folder1.id, folder3.id, folder4.id].join('.'));
+        expect(f5.path).toEqual([folder1.id, folder3.id, folder5.id].join('.'));
     });
 });

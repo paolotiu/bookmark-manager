@@ -187,7 +187,7 @@ export const resolvers: Resolvers = {
 
             // Update descendants paths
             await Folder.query(
-                'update folder set path = $1 || subpath(path, nlevel($2)) where path <@ $2 and id != $3',
+                'update folder set path = $1 || subpath(path, nlevel($2)), depth = depth - 1 where path <@ $2 and id != $3',
                 [parentPath, folder.path, folder.id],
             );
 
