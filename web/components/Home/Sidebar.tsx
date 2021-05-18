@@ -1,21 +1,17 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { KremeProvider, Tree } from 'kreme';
-import { Folder, useCreateFolderMutation, useMoveFolderMutation, useGetTreeQuery } from '@graphql/generated/graphql';
+import { useCreateFolderMutation, useMoveFolderMutation, useGetTreeQuery } from '@graphql/generated/graphql';
 import { useRouter } from 'next/dist/client/router';
 import { isBaseError } from '@graphql/helpers';
 import { useForm } from '@lib/useForm';
 import dynamic from 'next/dynamic';
+import { TreeDataType } from 'kreme/build/Tree/types';
 
 const FolderActionsPopup = dynamic(() => import('./FolderActionsPopup/FolderActionsPopup'));
 
-interface FolderWithFolderType extends Folder {
-    type: 'folder';
-    children: [] | FolderWithFolderType[];
-}
-
 const Sidebar = () => {
-    const { data, refetch, loading } = useGetTreeQuery();
-    const [struct, setStruct] = useState([]);
+    const { data, loading } = useGetTreeQuery();
+    const [struct, setStruct] = useState<TreeDataType[]>([]);
     const router = useRouter();
     const [actionClickLocation, setActionClickLocation] = useState({ x: 0, y: 0 });
     const [actionFolderId, setActionFolderId] = useState(0);
@@ -64,7 +60,7 @@ const Sidebar = () => {
                     action=""
                     onSubmit={async (e) => {
                         e.preventDefault();
-                        const x = await createFolder({
+                        await createFolder({
                             variables: { name: inputs.name },
                             refetchQueries: ['getTree'],
                             awaitRefetchQueries: true,
@@ -77,7 +73,6 @@ const Sidebar = () => {
             </div>
             {willShowActions && (
                 <FolderActionsPopup
-                    onDelete={refetch}
                     closePopup={() => setWillShowActions(false)}
                     folderId={Number(actionFolderId)}
                     style={{ top: actionClickLocation.y + 2, left: actionClickLocation.x + 2 }}

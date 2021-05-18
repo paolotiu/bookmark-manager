@@ -11,11 +11,6 @@ interface Props {
 
 const FolderActionsPopup = ({ folderId, style, closePopup, onDelete }: Props) => {
     const [deleteFolder] = useDeleteFolderMutation({
-        update(cache, { data }) {
-            if (data?.deleteFolder.__typename === 'Folder') {
-                cache.evict({ id: cache.identify({ __typename: 'Folder', id: data.deleteFolder.id }) });
-            }
-        },
         awaitRefetchQueries: true,
         refetchQueries: ['getTree'],
     });
