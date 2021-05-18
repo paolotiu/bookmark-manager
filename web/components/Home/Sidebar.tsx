@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { KremeProvider, Tree } from 'kreme';
-import { Folder, useCreateFolderMutation, useMoveFolderMutation, useTree_QueryQuery } from '@graphql/generated/graphql';
+import { Folder, useCreateFolderMutation, useMoveFolderMutation, useGetTreeQuery } from '@graphql/generated/graphql';
 import { useRouter } from 'next/dist/client/router';
 import { isBaseError } from '@graphql/helpers';
 import { useForm } from '@lib/useForm';
@@ -14,21 +14,22 @@ interface FolderWithFolderType extends Folder {
 }
 
 const Sidebar = () => {
-    const { data, refetch } = useTree_QueryQuery();
+    const { data, refetch, loading } = useGetTreeQuery();
+    const [struct, setStruct] = useState([]);
     const router = useRouter();
     const [actionClickLocation, setActionClickLocation] = useState({ x: 0, y: 0 });
     const [actionFolderId, setActionFolderId] = useState(0);
     const [willShowActions, setWillShowActions] = useState(false);
-    const struct = useMemo<FolderWithFolderType[]>(() => {
-        if (!data || isBaseError(data.getTree)) {
-            return [];
+    useEffect(() => {
+        if (!loading && data?.getTree.__typename === 'Tree') {
+            setStruct(JSON.parse(data.getTree.tree || '[]'));
         }
-        return JSON.parse(data.getTree.tree || '[]');
-    }, [data]);
-    const [createFolder] = useCreateFolderMutation();
+    }, [data, loading]);
+
+    const [createFolder] = useCreateFolderMutation({});
     const [moveFolder] = useMoveFolderMutation();
     const { inputs, handleChange } = useForm({ name: '' });
-    if (!data || isBaseError(data.getTree)) return null;
+    if (!data || isBaseError(data?.getTree)) return <p>he</p>;
 
     return (
         <div className="fixed w-[235px] z-[1]  h-screen bg-sidebar">
@@ -54,7 +55,6 @@ const Sidebar = () => {
                                 targetId: Number(data.targetId),
                             },
                         });
-                        console.log(data);
                     }}
                     draggable
                 />
@@ -64,9 +64,11 @@ const Sidebar = () => {
                     action=""
                     onSubmit={async (e) => {
                         e.preventDefault();
-                        console.log('hey');
-                        const x = await createFolder({ variables: { name: inputs.name } });
-                        console.log(x);
+                        const x = await createFolder({
+                            variables: { name: inputs.name },
+                            refetchQueries: ['getTree'],
+                            awaitRefetchQueries: true,
+                        });
                     }}
                 >
                     <input type="text" name="name" onChange={handleChange} className="px-1 bg-transparent border-b" />

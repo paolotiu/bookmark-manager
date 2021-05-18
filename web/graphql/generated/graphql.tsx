@@ -410,10 +410,10 @@ export type MoveFolderMutation = (
   ) | { __typename?: 'Folder' } }
 );
 
-export type Tree_QueryQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetTreeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type Tree_QueryQuery = (
+export type GetTreeQuery = (
   { __typename?: 'Query' }
   & { getTree: (
     { __typename?: 'BaseError' }
@@ -948,8 +948,8 @@ export function useMoveFolderMutation(baseOptions?: Apollo.MutationHookOptions<M
 export type MoveFolderMutationHookResult = ReturnType<typeof useMoveFolderMutation>;
 export type MoveFolderMutationResult = Apollo.MutationResult<MoveFolderMutation>;
 export type MoveFolderMutationOptions = Apollo.BaseMutationOptions<MoveFolderMutation, MoveFolderMutationVariables>;
-export const Tree_QueryDocument = gql`
-    query TREE_QUERY {
+export const GetTreeDocument = gql`
+    query getTree {
   getTree {
     ...Tree
     ...BaseError
@@ -959,31 +959,31 @@ export const Tree_QueryDocument = gql`
 ${BaseErrorFragmentDoc}`;
 
 /**
- * __useTree_QueryQuery__
+ * __useGetTreeQuery__
  *
- * To run a query within a React component, call `useTree_QueryQuery` and pass it any options that fit your needs.
- * When your component renders, `useTree_QueryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetTreeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTreeQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useTree_QueryQuery({
+ * const { data, loading, error } = useGetTreeQuery({
  *   variables: {
  *   },
  * });
  */
-export function useTree_QueryQuery(baseOptions?: Apollo.QueryHookOptions<Tree_QueryQuery, Tree_QueryQueryVariables>) {
+export function useGetTreeQuery(baseOptions?: Apollo.QueryHookOptions<GetTreeQuery, GetTreeQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<Tree_QueryQuery, Tree_QueryQueryVariables>(Tree_QueryDocument, options);
+        return Apollo.useQuery<GetTreeQuery, GetTreeQueryVariables>(GetTreeDocument, options);
       }
-export function useTree_QueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Tree_QueryQuery, Tree_QueryQueryVariables>) {
+export function useGetTreeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTreeQuery, GetTreeQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<Tree_QueryQuery, Tree_QueryQueryVariables>(Tree_QueryDocument, options);
+          return Apollo.useLazyQuery<GetTreeQuery, GetTreeQueryVariables>(GetTreeDocument, options);
         }
-export type Tree_QueryQueryHookResult = ReturnType<typeof useTree_QueryQuery>;
-export type Tree_QueryLazyQueryHookResult = ReturnType<typeof useTree_QueryLazyQuery>;
-export type Tree_QueryQueryResult = Apollo.QueryResult<Tree_QueryQuery, Tree_QueryQueryVariables>;
+export type GetTreeQueryHookResult = ReturnType<typeof useGetTreeQuery>;
+export type GetTreeLazyQueryHookResult = ReturnType<typeof useGetTreeLazyQuery>;
+export type GetTreeQueryResult = Apollo.QueryResult<GetTreeQuery, GetTreeQueryVariables>;
 
       export interface PossibleTypesResultData {
         possibleTypes: {
