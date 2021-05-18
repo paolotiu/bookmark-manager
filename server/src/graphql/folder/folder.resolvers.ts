@@ -16,6 +16,18 @@ export const resolvers: Resolvers = {
         },
         children: async (parent) => {
             if (parent.children) return parent.children;
+
+            // POJO given
+            if (!parent.getDescendantsTree) {
+                const _parent = await Folder.findOne(parent.id);
+
+                if (!_parent) {
+                    return [];
+                }
+                const tree = await _parent.getDescendantsTree();
+                return tree.children;
+            }
+
             const tree = await parent.getDescendantsTree();
             return tree.children;
         },
