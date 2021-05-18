@@ -165,9 +165,8 @@ export const resolvers: Resolvers = {
         },
         deleteFolder: async (_, { id }, { userId }) => {
             const folder = await Folder.findOne(id, { where: { userId } });
-
             if (!folder) return createEntityIdNotFoundError('deleteFolder', 'folder');
-
+            const parentPath = folder.path.split('.').slice(0, folder.depth).join('.');
             // Soft delete
             await Bookmark.createQueryBuilder()
                 .softDelete()
@@ -184,6 +183,20 @@ export const resolvers: Resolvers = {
                 })
                 .where('folderId = :fid', { fid: id })
                 .andWhere('userId = :uid', { uid: userId })
+                .execute();
+
+            // Update descendants paths
+            await Folder.query(
+                'update folder set path = $1 || subpath(path, nlevel($2)) where path <@ $2 and id != $3',
+                [parentPath, folder.path, folder.id],
+            );
+
+            // Update parentIds of direct descendants
+            await Folder.createQueryBuilder()
+                .update()
+                .set({ parentId: folder.parentId })
+                .where('"parentId" = :id', { id: folder.id })
+                .andWhere('userId = :userId', { userId })
                 .execute();
 
             // Delete folder
