@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import microCors from 'micro-cors';
 import { ApolloServer } from 'apollo-server-micro';
 import { genSchema } from '@gql/genSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -8,6 +9,7 @@ import { User } from '@entity/User';
 import { createTokens } from '@utils/createTokens';
 import { setTokenCookies } from '@gql/auth/auth.resolvers';
 
+const cors = microCors({ origin: 'https://studio.apollographql.com', allowCredentials: true });
 interface AccessTokenPayload {
     userId: number;
     iat: number;
@@ -17,23 +19,27 @@ interface AccessTokenPayload {
 interface RefreshTokenPayload extends AccessTokenPayload {
     count: number;
 }
+
+const schema = genSchema();
 const getApolloServerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     await ensureConnection();
     const server = (userId?: number) =>
         new ApolloServer({
-            schema: genSchema(),
+            schema,
             context: ({ req, res }) => {
                 return { req, res, userId: userId || undefined };
             },
 
             tracing: true,
         }).createHandler({ path: '/api/graphql' });
+
     const accessToken = req.cookies['access-token'];
     const refreshToken = req.cookies['refresh-token'];
 
     try {
         const data = jwt.verify(accessToken, process.env.JWT_SECRET as string) as AccessTokenPayload;
         const userId = data.userId;
+
         return server(userId);
     } catch {}
 
@@ -55,7 +61,6 @@ const getApolloServerHandler = async (req: NextApiRequest, res: NextApiResponse)
     // Set tokens
     setTokenCookies(res, tokens);
 
-    console.log('Hey');
     return server(user.id);
 };
 
@@ -65,7 +70,12 @@ export const config = {
     },
 };
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-    const apolloServerHandler = await getApolloServerHandler(req, res);
-    return apolloServerHandler(req, res);
-};
+export default cors(async (req, res) => {
+    if (req.method === 'OPTIONS') {
+        res.end();
+        return false;
+    }
+    const serverHandler = await getApolloServerHandler(req as any, res as any);
+
+    return serverHandler(req, res);
+});
