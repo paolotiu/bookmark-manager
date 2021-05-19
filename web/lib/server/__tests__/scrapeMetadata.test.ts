@@ -1,4 +1,4 @@
-import { scrapeMetadata } from '@utils/scrapeMetadata';
+import { scrapeMetadata } from '@lib/server/scrapeMetadata';
 
 it('Scraping works', async () => {
     const res = await scrapeMetadata(

@@ -12,8 +12,8 @@ import {
     PrimaryGeneratedColumn,
     Unique,
 } from 'typeorm';
-import { User } from '@entity/User';
-import { Bookmark } from '@entity/Bookmark';
+import { User } from 'entity/User';
+import { Bookmark } from 'entity/Bookmark';
 import { IBookmark, IFolder, IUser } from './interfaces';
 
 @Unique(['id', 'userId', 'depth'])
@@ -168,3 +168,4 @@ function arrayToTreeWithRoot({ foldersArr }: ArrayToTreeWithRoot) {
     });
     return roots;
 }
+export type FolderModel = Folder;

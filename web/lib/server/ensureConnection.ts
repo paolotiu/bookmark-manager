@@ -1,7 +1,7 @@
 import { Connection, getConnectionManager } from 'typeorm';
-import { User } from '@entity/User';
-import { Bookmark } from '@entity/Bookmark';
-import { Folder } from '@entity/Folder';
+import { User } from 'entity/User';
+import { Bookmark } from 'entity/Bookmark';
+import { Folder } from 'entity/Folder';
 
 // Serverless typeorm workaround
 // https://github.com/typeorm/typeorm/issues/6241#issuecomment-643690383

@@ -10,10 +10,10 @@ import {
 } from 'typeorm';
 import { User } from './User';
 import { Folder } from './Folder';
-import { IFolder, IUser } from './interfaces';
+import { IBookmark, IFolder, IUser } from './interfaces';
 
 @Entity()
-export class Bookmark extends BaseEntity {
+export class Bookmark extends BaseEntity implements IBookmark {
     @PrimaryGeneratedColumn()
     id: number;
 

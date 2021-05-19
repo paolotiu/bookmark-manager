@@ -1,12 +1,12 @@
-import { Bookmark } from '@entity/Bookmark';
-import { Folder, getFolderStructure } from '@entity/Folder';
+import { Bookmark } from 'entity/Bookmark';
+import { Folder, getFolderStructure } from 'entity/Folder';
 import {
     createEntityIdNotFoundError,
     createUnexpectedError,
     isBaseError,
     unauthorizedError,
-} from '@gql/shared/errorMessages';
-import { Resolvers } from '@gql/types';
+} from '@graphql/shared/errorMessages';
+import { Resolvers } from '@graphql/generated/graphql';
 
 export const folderResolvers: Resolvers = {
     Folder: {
@@ -14,6 +14,7 @@ export const folderResolvers: Resolvers = {
             if (parent.bookmarks) return parent.bookmarks;
             return Bookmark.find({ where: { folderId: parent.id } });
         },
+
         children: async (parent) => {
             if (parent.children) return parent.children;
 

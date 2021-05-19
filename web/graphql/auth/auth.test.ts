@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createApolloTestClient } from '@utils/createApolloTestClient';
+import { createApolloTestClient } from '@lib/server/createApolloTestClient';
 import { gql } from 'apollo-server-express';
 
 // Get test client
@@ -60,7 +60,7 @@ describe('Catches errors', () => {
     const testUser = { name: 'badBob', email: 'bob@bob.com', password: 'password' };
 
     test('Rejects duplciate email', async () => {
-        const res = await registerMutation(testUser);
+        const res = (await registerMutation(testUser)) as any;
         expect(res.data.register).toEqual({
             path: 'register',
             message: 'A user with that email already exists',
@@ -71,7 +71,7 @@ describe('Catches errors', () => {
         // Mutate testUser
         testUser.email = 'notanemail.com';
 
-        const res = await registerMutation(testUser);
+        const res = (await registerMutation(testUser)) as any;
         expect(res.data.register).toEqual({
             path: 'register',
             message: 'The email is invalid',
@@ -81,7 +81,7 @@ describe('Catches errors', () => {
     test('Rejects short password', async () => {
         // Mutate password property
         testUser.password = 's';
-        const res = await registerMutation(testUser);
+        const res = (await registerMutation(testUser)) as any;
         expect(res.data.register).toEqual({
             path: 'register',
             message: 'The password is too short - Minimum of 8 characters required',

@@ -1,6 +1,4 @@
-import { Bookmark } from '@entity/Bookmark';
-import { Resolvers } from '@gql/types';
-import { unNullifyObj } from '@utils/unNullifyObj';
+import { Bookmark } from 'entity/Bookmark';
 import {
     createBaseError,
     createEntityIdNotFoundError,
@@ -8,10 +6,12 @@ import {
     createValidationError,
     isBaseError,
     isValidationError,
-} from '@gql/shared/errorMessages';
-import { Folder } from '@entity/Folder';
+} from '@graphql/shared/errorMessages';
+import { Folder } from 'entity/Folder';
 import { bookmarkSchema } from './yupSchema';
-import { scrapeMetadata } from '@utils/scrapeMetadata';
+import { scrapeMetadata } from '@lib/server/scrapeMetadata';
+import { unNullifyObj } from '@lib/server/unNullifyObj';
+import { Resolvers } from '@graphql/generated/graphql';
 
 export const bookmarkResolvers: Resolvers = {
     BookmarkResult: {

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Bookmark } from '@entity/Bookmark';
-import { Folder } from '@entity/Folder';
-import { User } from '@entity/User';
-import { BaseErrorFragment, BookmarkFragments } from '@gql/shared/fragments';
-import { BookmarkResult, CreateBookmarkInput, UpdateBookmarkInput } from '@gql/types';
-import { createApolloTestClient } from '@utils/createApolloTestClient';
+import { Bookmark } from 'entity/Bookmark';
+import { Folder } from 'entity/Folder';
+import { User } from 'entity/User';
+import { createApolloTestClient } from '@lib/server/createApolloTestClient';
 import { gql } from 'apollo-server-express';
+import { BaseErrorFragment, BookmarkFragments } from '@graphql/shared/test.fragments';
+import { BookmarkResult, CreateBookmarkInput, UpdateBookmarkInput } from '@graphql/generated/graphql';
 
 jest.setTimeout(30000);
 

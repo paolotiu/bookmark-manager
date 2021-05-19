@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { User } from '@entity/User';
-import { createApolloTestClient } from '@utils/createApolloTestClient';
+import { User } from 'entity/User';
+import { createApolloTestClient } from '@lib/server/createApolloTestClient';
 import { gql } from 'apollo-server-express';
 
 const testUser = { email: 'bob@2bob.com', password: 'password', name: 'bob', id: 0 };

@@ -1,13 +1,13 @@
 import 'reflect-metadata';
 import microCors from 'micro-cors';
 import { ApolloServer } from 'apollo-server-micro';
-import { genSchema } from '@gql/genSchema';
+import { genSchema } from '@graphql/genSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { ensureConnection } from '@utils/ensureConnection';
 import jwt from 'jsonwebtoken';
-import { User } from '@entity/User';
-import { createTokens } from '@utils/createTokens';
-import { setTokenCookies } from '@gql/auth/auth.resolvers';
+import { User } from 'entity/User';
+import { setTokenCookies } from '@graphql/auth/auth.resolvers';
+import { ensureConnection } from '@lib/server/ensureConnection';
+import { createTokens } from '@lib/server/createTokens';
 
 const cors = microCors({ origin: 'https://studio.apollographql.com', allowCredentials: true });
 interface AccessTokenPayload {

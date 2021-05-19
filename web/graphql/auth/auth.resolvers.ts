@@ -1,13 +1,12 @@
-import { BaseError } from '../types';
 import { setCookie } from 'nookies';
-import { Resolvers } from '@gql/types';
 import bcrypt from 'bcryptjs';
-import { createTokens } from '@utils/createTokens';
-import { User } from '@entity/User';
-import { createBaseError, createUnexpectedError } from '@gql/shared/errorMessages';
-import { registerSchema } from './yupSchemas';
+import { User } from 'entity/User';
+import { createBaseError, createUnexpectedError } from '@graphql/shared/errorMessages';
 import { NextApiResponse } from 'next';
 import { CookieSerializeOptions } from 'cookie';
+import { createTokens } from '@lib/server/createTokens';
+import { BaseError, Resolvers } from '@graphql/generated/graphql';
+import { registerSchema } from './yupSchemas';
 
 const loginError: BaseError = {
     path: 'login',

@@ -1,4 +1,6 @@
-export interface IBookmark {
+import { BaseEntity } from 'typeorm';
+
+export interface IBookmark extends BaseEntity {
     id: number;
 
     title: string;

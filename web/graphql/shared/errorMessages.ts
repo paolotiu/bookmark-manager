@@ -1,4 +1,4 @@
-import { BaseError, InputValidationError } from '@gql/types';
+import { BaseError, InputValidationError } from '@graphql/generated/graphql';
 import { ValidationError } from 'yup';
 
 export const createBaseError = (path: string, message: string): BaseError => ({

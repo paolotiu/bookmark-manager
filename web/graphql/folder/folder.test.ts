@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Bookmark } from '@entity/Bookmark';
-import { Folder } from '@entity/Folder';
-import { User } from '@entity/User';
-import { BaseErrorFragment, FolderFragments } from '@gql/shared/fragments';
-import { CreateFolderInput, FolderResult } from '@gql/types';
-import { createApolloTestClient } from '@utils/createApolloTestClient';
+import { Bookmark } from 'entity/Bookmark';
+import { Folder } from 'entity/Folder';
+import { User } from 'entity/User';
+import { createApolloTestClient } from '@lib/server/createApolloTestClient';
 import { gql } from 'apollo-server-express';
+import { BaseErrorFragment, FolderFragments } from '@graphql/shared/test.fragments';
+import { CreateFolderInput, FolderResult } from '@graphql/generated/graphql';
 
 const testUser = { email: 'tommy@2bob.com', password: 'password', name: 'bob', id: 0 };
 const testClient = createApolloTestClient();
@@ -214,7 +214,7 @@ describe('Happy Path :)', () => {
 
         const {
             data: { folder },
-        } = (await withBookmarksQuery(testChildFolder)) as DataWithFolder;
+        } = (await withBookmarksQuery(testChildFolder)) as unknown as DataWithFolder;
 
         expect(folder.bookmarks.length).toBe(1);
         expect(folder.bookmarks[0]).toEqual({
@@ -228,7 +228,7 @@ describe('Happy Path :)', () => {
     test('Gives back folder children', async () => {
         const {
             data: { folder },
-        } = (await withChildrenQuery({ id: testFolder.id! })) as DataWithFolder;
+        } = (await withChildrenQuery({ id: testFolder.id! })) as unknown as DataWithFolder;
         expect(folder.children).toEqual(expect.arrayContaining([expect.objectContaining(testChildFolder)]));
     });
 
@@ -282,7 +282,7 @@ describe('Tree ', () => {
 
         const {
             data: { createFolder: res1 },
-        } = (await createFolderMutation(parentFolder1)) as DataWithFolder;
+        } = (await createFolderMutation(parentFolder1)) as unknown as DataWithFolder;
         Object.assign(parentFolder1, res1);
         const {
             data: { createFolder: res2 },

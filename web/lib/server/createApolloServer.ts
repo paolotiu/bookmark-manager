@@ -1,4 +1,4 @@
-import { genSchema } from '@gql/genSchema';
+import { genSchema } from '@graphql/genSchema';
 import { ApolloServer } from 'apollo-server-express';
 import { Express } from 'express';
 

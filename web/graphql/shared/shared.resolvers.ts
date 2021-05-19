@@ -1,4 +1,4 @@
-import { Resolvers } from '@gql/types';
+import { Resolvers } from '@graphql/generated/graphql';
 import { GraphQLScalarType, Kind } from 'graphql';
 export const sharedResolvers: Resolvers = {
     Date: new GraphQLScalarType({
