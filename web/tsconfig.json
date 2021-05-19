@@ -21,13 +21,19 @@
         "noImplicitAny": true,
         "noImplicitReturns": false,
         "baseUrl": ".",
+        "strictPropertyInitialization": false,
         "paths": {
             "@graphql/*": ["graphql/*"],
             "@assets/*": ["assets/*"],
             "@components/*": ["components/*"],
-            "@lib/*": ["lib/*"]
-        }
+            "@lib/*": ["lib/*"],
+            "@gql/*": ["server/graphql/*"],
+            "@entity/*": ["server/entity/*"],
+            "@utils/*": ["server/utils/*"]
+        },
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     },
-    "exclude": ["node_modules"],
-    "include": ["**/*.ts", "**/*.tsx"]
+    "exclude": ["node_modules", "./**/*.test.ts"],
+    "include": ["**/*.ts", "**/*.tsx", "**/*.resolvers.ts"]
 }

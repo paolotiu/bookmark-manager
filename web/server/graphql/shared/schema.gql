@@ -1,0 +1,13 @@
+scalar Date
+
+directive @auth on FIELD_DEFINITION
+
+type BaseError {
+    message: String!
+    path: String!
+}
+
+type InputValidationError {
+    path: String!
+    errors: [BaseError]!
+}

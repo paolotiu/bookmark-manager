@@ -1,0 +1,41 @@
+type Folder {
+    id: Int!
+    parentId: Int
+    children: [Folder]!
+    bookmarks: [Bookmark]!
+    depth: Int!
+    name: String!
+    type: String!
+}
+
+type Tree {
+    tree: String
+}
+
+type Folders {
+    folders: [Folder]!
+}
+
+union FolderResult = BaseError | Folder
+union FolderArrayResult = BaseError | Folders
+union TreeResult = BaseError | Tree
+
+input CreateFolderInput {
+    name: String!
+    parentId: Int
+}
+
+type Query {
+    folder(id: Int!): FolderResult! @auth
+    getTree: TreeResult! @auth
+    q: Folder
+}
+
+type Mutation {
+    createFolder(data: CreateFolderInput!): FolderResult! @auth
+    updateFolderName(id: Int!, name: String!): FolderResult! @auth
+    softDeleteFolder(id: Int!): FolderResult! @auth
+    recoverFolder(id: Int!): FolderResult! @auth
+    moveFolder(folderId: Int!, targetFolderId: Int): FolderResult! @auth
+    deleteFolder(id: Int!): FolderResult! @auth
+}

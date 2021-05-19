@@ -1,0 +1,71 @@
+import 'reflect-metadata';
+import { ApolloServer } from 'apollo-server-micro';
+import { genSchema } from '@gql/genSchema';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { ensureConnection } from '@utils/ensureConnection';
+import jwt from 'jsonwebtoken';
+import { User } from '@entity/User';
+import { createTokens } from '@utils/createTokens';
+import { setTokenCookies } from '@gql/auth/auth.resolvers';
+
+interface AccessTokenPayload {
+    userId: number;
+    iat: number;
+    exp: number;
+}
+
+interface RefreshTokenPayload extends AccessTokenPayload {
+    count: number;
+}
+const getApolloServerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+    await ensureConnection();
+    const server = (userId?: number) =>
+        new ApolloServer({
+            schema: genSchema(),
+            context: ({ req, res }) => {
+                return { req, res, userId: userId || undefined };
+            },
+
+            tracing: true,
+        }).createHandler({ path: '/api/graphql' });
+    const accessToken = req.cookies['access-token'];
+    const refreshToken = req.cookies['refresh-token'];
+
+    try {
+        const data = jwt.verify(accessToken, process.env.JWT_SECRET as string) as AccessTokenPayload;
+        const userId = data.userId;
+        return server(userId);
+    } catch {}
+
+    let refreshData;
+    try {
+        refreshData = jwt.verify(refreshToken, process.env.JWT_SECRET as string) as RefreshTokenPayload;
+    } catch {
+        return server();
+    }
+
+    // Refresh token is valid
+    const user = await User.findOne(refreshData.userId);
+
+    // token is invalidated
+    if (!user || user.count !== refreshData.count) return server();
+
+    // Get tokens
+    const tokens = createTokens(user);
+    // Set tokens
+    setTokenCookies(res, tokens);
+
+    console.log('Hey');
+    return server(user.id);
+};
+
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
+
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+    const apolloServerHandler = await getApolloServerHandler(req, res);
+    return apolloServerHandler(req, res);
+};

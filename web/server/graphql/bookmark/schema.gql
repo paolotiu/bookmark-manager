@@ -1,0 +1,45 @@
+type Bookmark {
+    id: Int!
+    title: String!
+    url: String!
+    description: String
+    createdDate: Date!
+    folderId: Int
+}
+
+type Bookmarks {
+    bookmarks: [Bookmark]!
+}
+input CreateBookmarkInput {
+    title: String
+    url: String!
+    description: String
+    folderId: Int
+}
+
+input UpdateBookmarkInput {
+    id: Int!
+    title: String
+    description: String
+    url: String
+    folderId: Int
+}
+
+union BookmarkResultWithInput = BaseError | Bookmark | InputValidationError
+
+union BookmarkResult = BaseError | Bookmark
+union BookmarksResult = BaseError | Bookmarks
+
+type Query {
+    bookmark(id: Int!, deleted: Boolean): BookmarkResult! @auth
+    bookmarks(deleted: Boolean): BookmarksResult! @auth
+}
+
+type Mutation {
+    createBookmark(data: CreateBookmarkInput!): BookmarkResultWithInput! @auth
+    updateBookmark(data: UpdateBookmarkInput!): BookmarkResultWithInput! @auth
+    softDeleteBookmark(id: Int!): BookmarkResult! @auth
+    softDeleteBookmarks(ids: [Int]!): BookmarksResult! @auth
+    hardDeleteBookmark(id: Int!): BookmarkResult! @auth
+    hardDeleteBookmarks(ids: [Int]!): BookmarksResult! @auth
+}
