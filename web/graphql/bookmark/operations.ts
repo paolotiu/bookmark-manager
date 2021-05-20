@@ -47,3 +47,14 @@ export const DELTED_BOOMARKS = gql`
     ${ErrorFragments.base}
     ${BookmarkFragments.bookmarks}
 `;
+
+export const MOVE_BOOKMARKS_MUATION = gql`
+    mutation moveBookmark($id: Int!, $folderId: Int!) {
+        updateBookmark(data: { id: $id, folderId: $folderId }) {
+            ...Bookmark
+        }
+    }
+
+    ${ErrorFragments.base}
+    ${BookmarkFragments.bookmark}
+`;

@@ -1,6 +1,7 @@
 import { ApolloCache } from '@apollo/client';
 import { Bookmark, useHardDeleteBookmarkMutation, useSoftDeleteBookmarkMutation } from '@graphql/generated/graphql';
 import { decode } from 'html-entities';
+import { useDrag } from 'react-dnd';
 import { FaTrash } from 'react-icons/fa';
 import ActionButton from './ActionButton/ActionButton';
 
@@ -22,6 +23,10 @@ const bookmarkSoftDeletionCacheUpdate = (cache: ApolloCache<any>, bookmarkId: nu
     });
 };
 const BookmarkCard = ({ bookmark, hardDelete = false, folderId }: Props) => {
+    const [, drag] = useDrag(() => ({
+        type: 'Bookmark',
+        item: bookmark,
+    }));
     const [softDeleteBookmark] = useSoftDeleteBookmarkMutation({
         update(cache) {
             bookmarkSoftDeletionCacheUpdate(cache, bookmark.id, folderId);
@@ -46,6 +51,7 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId }: Props) => {
             rel="noreferrer"
             target="_blank"
             className="relative block border-b border-gray-200 hover:bg-gray-50 group"
+            ref={drag}
         >
             <div className="grid gap-2 p-3">
                 <div className="grid justify-between pr-4" style={{ gridTemplateColumns: '8fr 1fr' }}>

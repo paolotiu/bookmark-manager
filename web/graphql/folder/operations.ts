@@ -15,7 +15,6 @@ export const CREATE_FOLDER_MUTATION = gql`
 export const DELETE_FOLDER_MUTATION = gql`
     mutation deleteFolder($id: Int!) {
         deleteFolder(id: $id) {
-            ...Folder
             ...BaseError
         }
     }

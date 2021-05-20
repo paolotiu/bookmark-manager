@@ -338,6 +338,20 @@ export type DeletedBookmarksQuery = (
   ) }
 );
 
+export type MoveBookmarkMutationVariables = Exact<{
+  id: Scalars['Int'];
+  folderId: Scalars['Int'];
+}>;
+
+
+export type MoveBookmarkMutation = (
+  { __typename?: 'Mutation' }
+  & { updateBookmark: { __typename?: 'BaseError' } | (
+    { __typename?: 'Bookmark' }
+    & BookmarkFragment
+  ) | { __typename?: 'InputValidationError' } }
+);
+
 export type FolderBookmarksQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -396,10 +410,7 @@ export type DeleteFolderMutation = (
   & { deleteFolder: (
     { __typename?: 'BaseError' }
     & BaseErrorFragment
-  ) | (
-    { __typename?: 'Folder' }
-    & FolderFragment
-  ) }
+  ) | { __typename?: 'Folder' } }
 );
 
 export type MoveFolderMutationVariables = Exact<{
@@ -1069,6 +1080,40 @@ export function useDeletedBookmarksLazyQuery(baseOptions?: Apollo.LazyQueryHookO
 export type DeletedBookmarksQueryHookResult = ReturnType<typeof useDeletedBookmarksQuery>;
 export type DeletedBookmarksLazyQueryHookResult = ReturnType<typeof useDeletedBookmarksLazyQuery>;
 export type DeletedBookmarksQueryResult = Apollo.QueryResult<DeletedBookmarksQuery, DeletedBookmarksQueryVariables>;
+export const MoveBookmarkDocument = gql`
+    mutation moveBookmark($id: Int!, $folderId: Int!) {
+  updateBookmark(data: {id: $id, folderId: $folderId}) {
+    ...Bookmark
+  }
+}
+    ${BookmarkFragmentDoc}`;
+export type MoveBookmarkMutationFn = Apollo.MutationFunction<MoveBookmarkMutation, MoveBookmarkMutationVariables>;
+
+/**
+ * __useMoveBookmarkMutation__
+ *
+ * To run a mutation, you first call `useMoveBookmarkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMoveBookmarkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [moveBookmarkMutation, { data, loading, error }] = useMoveBookmarkMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      folderId: // value for 'folderId'
+ *   },
+ * });
+ */
+export function useMoveBookmarkMutation(baseOptions?: Apollo.MutationHookOptions<MoveBookmarkMutation, MoveBookmarkMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MoveBookmarkMutation, MoveBookmarkMutationVariables>(MoveBookmarkDocument, options);
+      }
+export type MoveBookmarkMutationHookResult = ReturnType<typeof useMoveBookmarkMutation>;
+export type MoveBookmarkMutationResult = Apollo.MutationResult<MoveBookmarkMutation>;
+export type MoveBookmarkMutationOptions = Apollo.BaseMutationOptions<MoveBookmarkMutation, MoveBookmarkMutationVariables>;
 export const FolderBookmarksDocument = gql`
     query folderBookmarks($id: Int!) {
   folder(id: $id) {
@@ -1181,12 +1226,10 @@ export type CreateFolderMutationOptions = Apollo.BaseMutationOptions<CreateFolde
 export const DeleteFolderDocument = gql`
     mutation deleteFolder($id: Int!) {
   deleteFolder(id: $id) {
-    ...Folder
     ...BaseError
   }
 }
-    ${FolderFragmentDoc}
-${BaseErrorFragmentDoc}`;
+    ${BaseErrorFragmentDoc}`;
 export type DeleteFolderMutationFn = Apollo.MutationFunction<DeleteFolderMutation, DeleteFolderMutationVariables>;
 
 /**

@@ -4,6 +4,7 @@ import { useFolderQuery } from '@graphql/generated/graphql';
 import { isBaseError } from '@graphql/helpers';
 import React, { useEffect, useState } from 'react';
 import BookmarkCard from './BookmarkCard';
+
 const AddBookmarkDropdown = dynamic(() => import('./AddBookmarkDropdown'));
 
 interface Props {
