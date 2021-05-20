@@ -14,7 +14,6 @@ const options: any = {
         username: 'postgres',
         password: process.env.DB_PASSWORD,
         database: 'bookmark',
-        synchronize: true,
         logging: true,
         entities: [User, Bookmark, Folder],
     },
