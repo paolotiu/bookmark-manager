@@ -36,15 +36,15 @@ function getRefreshAndAcessToken(req: IncomingMessage) {
 
 function createCookieString(cookies: { [key: string]: string }) {
     let str = '';
-    for (const [key, value] of Object.entries(cookies)){
-        str += `${key}=${value};`
+    for (const [key, value] of Object.entries(cookies)) {
+        str += `${key}=${value};`;
     }
-    return str
+    return str;
 }
 
 function createApolloClient(context?: ResolverContext) {
     const httpLink = new HttpLink({
-        uri: 'http://localhost:4000/graphql', // Server URL (must be absolute)
+        uri: 'http://localhost:3000/api/graphql', // Server URL (must be absolute)
         credentials: 'include', // Additional fetch() options like `credentials` or `headers`
     });
 
@@ -52,13 +52,13 @@ function createApolloClient(context?: ResolverContext) {
         // get the tokens
         if (context?.req) {
             const tokens = getRefreshAndAcessToken(context?.req);
-            const cookie = createCookieString(tokens)
+            const cookie = createCookieString(tokens);
             return {
                 headers: {
                     ...headers,
-                    cookie
-                }
-            }
+                    cookie,
+                },
+            };
         }
 
         return {
