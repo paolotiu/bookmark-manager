@@ -8,7 +8,7 @@ import {
 import { KremeProvider, Tree as KremeTree } from 'kreme';
 import { TreeDataType } from 'kreme/build/Tree/types';
 import { useRouter } from 'next/dist/client/router';
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 
 interface Props {
     struct: TreeDataType[];
@@ -62,7 +62,7 @@ const Tree = ({ struct, setActionClickLocation, setActionFolderId, setWillShowAc
                         await moveBookmark({ variables: { id: item.id, folderId: Number(folder.id) } });
                     },
                 }}
-                className="text-sm"
+                className="text-sm text-inactiveSidebar"
                 hoverColor="#5138ED40"
                 hoverBarColor="#5138ED80"
                 spaceLeft="1rem"
