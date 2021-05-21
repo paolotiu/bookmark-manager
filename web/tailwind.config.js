@@ -18,6 +18,9 @@ module.exports = {
                 iconActive: '#A1A1A1',
                 iconPassive: '#CBCBCB',
                 hoverColor: 'rgba(55, 53, 47, 0.08)',
+                sidebarIcon: '#B0B0B0',
+                chevron: '#9E9E9E',
+                inactiveSidebar: '#8B8B8B',
             },
             screens: {
                 '3xl': '1600px',
