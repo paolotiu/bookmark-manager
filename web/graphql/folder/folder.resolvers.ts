@@ -90,6 +90,8 @@ export const folderResolvers: Resolvers = {
             // save the folder without the path to generate an id
             const prePathFolder = await folder.save();
 
+            await User.update({ id: userId }, { rootOrder: () => `"rootOrder" || '{${prePathFolder.id}}'` });
+
             // Append the id to the path
             prePathFolder.path = path + prePathFolder.id;
 
@@ -192,6 +194,22 @@ export const folderResolvers: Resolvers = {
                 'update folder set path = $1 || subpath(path, nlevel($2)), depth = depth - 1 where path <@ $2 and id != $3',
                 [parentPath, folder.path, folder.id],
             );
+
+            // Update parent order
+            if (folder.parentId) {
+                await Folder.createQueryBuilder()
+                    .update()
+                    .set({ childrenOrder: () => `array_remove("childrenOrder", ${folder.id})` })
+                    .where('userId = :userId', { userId })
+                    .andWhere('id = :id', { id: folder.parentId })
+                    .execute();
+            } else {
+                await User.createQueryBuilder()
+                    .update()
+                    .set({ rootOrder: () => `array_remove("rootOrder", ${folder.id})` })
+                    .where('id = :id', { id: userId })
+                    .execute();
+            }
 
             // Update parentIds of direct descendants
             await Folder.createQueryBuilder()
