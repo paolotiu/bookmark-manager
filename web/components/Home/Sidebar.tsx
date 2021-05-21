@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { KremeProvider, Tree } from 'kreme';
-import { useMoveFolderMutation, useGetTreeQuery, useMoveBookmarkMutation } from '@graphql/generated/graphql';
+import {
+    useMoveFolderMutation,
+    useGetTreeQuery,
+    useMoveBookmarkMutation,
+    useChangeFolderOrderMutation,
+} from '@graphql/generated/graphql';
 import { useRouter } from 'next/dist/client/router';
 import { isBaseError } from '@graphql/helpers';
 import { TreeDataType } from 'kreme/build/Tree/types';
@@ -34,6 +39,7 @@ const Sidebar = () => {
         },
         refetchQueries: [{ query: FOLDER, variables: { id: folderIdRef.current } }],
     });
+    const [changeFolderOrder] = useChangeFolderOrderMutation();
     const [struct, setStruct] = useState<TreeDataType[]>([]);
     const router = useRouter();
     const [actionClickLocation, setActionClickLocation] = useState({ x: 0, y: 0 });
@@ -59,7 +65,6 @@ const Sidebar = () => {
                             prevFolderIdRef.current = item.folderId || 0;
                             folderIdRef.current = Number(folder.id);
 
-                            console.log(item.folderId, folder.id);
                             if (item.folderId === folder.id) {
                                 return;
                             }
@@ -81,12 +86,23 @@ const Sidebar = () => {
                         setWillShowActions(true);
                     }}
                     onFolderDrop={(data) => {
-                        moveFolder({
-                            variables: {
-                                folderId: Number(data.sourceId),
-                                targetId: Number(data.targetId),
-                            },
-                        });
+                        const orderVars = {
+                            sourceFolderOrder: data.sourceParent.children?.map((c) => Number(c.id)) || [],
+                            targetFolderOrder: data.targetParent.children?.map((c) => Number(c.id)) || [],
+                            targetParentId: Number(data.targetParent.id),
+                            sourceParentId: Number(data.sourceParent.id),
+                        };
+                        if (data.sourceParent.id === data.targetParent.id) {
+                            changeFolderOrder({ variables: orderVars });
+                        } else {
+                            moveFolder({
+                                variables: {
+                                    folderId: Number(data.sourceId),
+                                    targetId: Number(data.targetId),
+                                    ...orderVars,
+                                },
+                            });
+                        }
                     }}
                     draggable
                 />

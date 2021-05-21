@@ -7,6 +7,7 @@ import {
     unauthorizedError,
 } from '@graphql/shared/errorMessages';
 import { Resolvers } from '@graphql/generated/graphql';
+import { User } from '@entity/User';
 
 export const folderResolvers: Resolvers = {
     Folder: {
@@ -43,8 +44,8 @@ export const folderResolvers: Resolvers = {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Folders'),
     },
     Query: {
-        folder: async (_, { id }) => {
-            return (await Folder.findOne(id)) || createEntityIdNotFoundError('folder', 'folder');
+        folder: async (_, { id }, { userId }) => {
+            return (await Folder.findOne(id, { where: { userId } })) || createEntityIdNotFoundError('folder', 'folder');
         },
 
         // q: async (_, __, { dataSources: { iconsApi } }) => {
@@ -203,6 +204,20 @@ export const folderResolvers: Resolvers = {
             // Delete folder
             await Folder.delete({ id, userId });
             return folder;
+        },
+        changeFolderOrder: async (_, { id, order }, { userId }) => {
+            if (id < 0) {
+                const res = await User.update({ id: userId }, { rootOrder: order });
+                if (res.affected !== 1) {
+                    return false;
+                }
+                return true;
+            }
+            const folder = await Folder.findOne(id, { where: { userId } });
+            if (!folder) return false;
+            folder.childrenOrder = order;
+            folder.save();
+            return true;
         },
     },
 };

@@ -6,7 +6,8 @@
         "build": "next build",
         "start": "next start",
         "lint": "tsc",
-        "generate": "graphql-codegen --config codegen.yml"
+        "generate": "graphql-codegen --config codegen.yml",
+        "migrate": "TS_NODE_PROJECT=tsconfig.ts-node.json ts-node -r tsconfig-paths/register --transpile-only ./node_modules/typeorm/cli.js -c development migration:run"
     },
     "dependencies": {
         "@apollo/client": "^3.3.13",
@@ -76,6 +77,7 @@
         "postcss": "^8.2.9",
         "tailwindcss": "^2.0.4",
         "ts-jest": "^26.5.6",
+        "tsconfig-paths": "^3.9.0",
         "typescript": "4.0"
     },
     "license": "MIT"

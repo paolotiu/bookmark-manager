@@ -19,6 +19,9 @@ export class User extends BaseEntity implements IUser {
     @Column()
     password: string;
 
+    @Column('int', { array: true, default: [] })
+    rootOrder: number[];
+
     @OneToMany(() => Bookmark, (bookmark) => bookmark.user)
     bookmarks: IBookmark[];
 

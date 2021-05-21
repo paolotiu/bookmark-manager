@@ -52,6 +52,9 @@ export class Folder extends BaseEntity implements IFolder {
     @Column('boolean', { default: false })
     deleted: boolean;
 
+    @Column('int', { array: true, default: [] })
+    childrenOrder: number[];
+
     type: 'folder';
 
     @AfterLoad()
@@ -111,6 +114,8 @@ export class Folder extends BaseEntity implements IFolder {
 export const getFolderStructure = async (userId: number): Promise<Folder[]> => {
     const foldersArr = await Folder.find({ where: { userId }, order: { path: 'ASC' } });
 
+    const user = await User.findOne(userId);
+    if (!user) return [];
     // Delte unnecesarry field
     foldersArr.forEach((folder: Partial<Folder>) => {
         delete folder.createdDate;
@@ -118,11 +123,12 @@ export const getFolderStructure = async (userId: number): Promise<Folder[]> => {
         delete folder.path;
         delete folder.userId;
     });
-    return arrayToTreeWithRoot({ foldersArr });
+    return arrayToTreeWithRoot({ foldersArr, rootOrder: user.rootOrder });
 };
 
 interface ArrayToTreeWithRoot {
     foldersArr: Folder[];
+    rootOrder: number[];
 }
 
 interface ArrayToTreeWithParent {
@@ -141,13 +147,14 @@ function arrayToTree({ parentId, foldersArr }: ArrayToTreeWithParent) {
     foldersArr.forEach((folder) => {
         // Skip root node
         if (folder.id !== parentId && folder.parentId !== null) {
-            map[folder.parentId].children.push(folder);
+            const index = map[folder.parentId].childrenOrder.findIndex((id) => id === folder.id);
+            map[folder.parentId].children[index] = folder
         }
     });
     return map[parentId];
 }
 
-function arrayToTreeWithRoot({ foldersArr }: ArrayToTreeWithRoot) {
+function arrayToTreeWithRoot({ foldersArr, rootOrder }: ArrayToTreeWithRoot) {
     const map: Record<string, Folder> = {};
     const roots: Folder[] = [];
 
@@ -159,11 +166,14 @@ function arrayToTreeWithRoot({ foldersArr }: ArrayToTreeWithRoot) {
     foldersArr.forEach((folder) => {
         // Skip root node
         if (folder.parentId !== null) {
+            const index = map[folder.parentId].childrenOrder.findIndex((v) => v === folder.id);
             // Gets the parent id from the path
             // 1.2.3 => 2
-            map[folder.parentId].children.push(folder);
+
+            map[folder.parentId].children[index] = folder
         } else {
-            roots.push(folder);
+            const index = rootOrder.findIndex((id) => id === folder.id);
+            roots[index] = folder
         }
     });
     return roots;

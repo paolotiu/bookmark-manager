@@ -91,6 +91,7 @@ export type InputValidationError = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  changeFolderOrder: Scalars['Boolean'];
   createBookmark: BookmarkResultWithInput;
   createFolder: FolderResult;
   deleteFolder: FolderResult;
@@ -108,6 +109,12 @@ export type Mutation = {
   softDeleteFolder: FolderResult;
   updateBookmark: BookmarkResultWithInput;
   updateFolderName: FolderResult;
+};
+
+
+export type MutationChangeFolderOrderArgs = {
+  id: Scalars['Int'];
+  order: Array<Scalars['Int']>;
 };
 
 
@@ -416,15 +423,35 @@ export type DeleteFolderMutation = (
 export type MoveFolderMutationVariables = Exact<{
   targetId: Scalars['Int'];
   folderId: Scalars['Int'];
+  targetFolderOrder: Array<Scalars['Int']> | Scalars['Int'];
+  sourceFolderOrder: Array<Scalars['Int']> | Scalars['Int'];
+  targetParentId: Scalars['Int'];
+  sourceParentId: Scalars['Int'];
 }>;
 
 
 export type MoveFolderMutation = (
   { __typename?: 'Mutation' }
+  & Pick<Mutation, 'changeFolderOrder'>
+  & { targetChangeOrder: Mutation['changeFolderOrder'] }
   & { moveFolder: (
     { __typename?: 'BaseError' }
     & BaseErrorFragment
   ) | { __typename?: 'Folder' } }
+);
+
+export type ChangeFolderOrderMutationVariables = Exact<{
+  targetFolderOrder: Array<Scalars['Int']> | Scalars['Int'];
+  sourceFolderOrder: Array<Scalars['Int']> | Scalars['Int'];
+  targetParentId: Scalars['Int'];
+  sourceParentId: Scalars['Int'];
+}>;
+
+
+export type ChangeFolderOrderMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'changeFolderOrder'>
+  & { targetChangeOrder: Mutation['changeFolderOrder'] }
 );
 
 export type GetTreeQueryVariables = Exact<{ [key: string]: never; }>;
@@ -708,6 +735,7 @@ export type InputValidationErrorResolvers<ContextType = MyContext, ParentType ex
 }>;
 
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  changeFolderOrder?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationChangeFolderOrderArgs, 'id' | 'order'>>;
   createBookmark?: Resolver<ResolversTypes['BookmarkResultWithInput'], ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
   createFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationCreateFolderArgs, 'data'>>;
   deleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationDeleteFolderArgs, 'id'>>;
@@ -1257,10 +1285,15 @@ export type DeleteFolderMutationHookResult = ReturnType<typeof useDeleteFolderMu
 export type DeleteFolderMutationResult = Apollo.MutationResult<DeleteFolderMutation>;
 export type DeleteFolderMutationOptions = Apollo.BaseMutationOptions<DeleteFolderMutation, DeleteFolderMutationVariables>;
 export const MoveFolderDocument = gql`
-    mutation moveFolder($targetId: Int!, $folderId: Int!) {
+    mutation moveFolder($targetId: Int!, $folderId: Int!, $targetFolderOrder: [Int!]!, $sourceFolderOrder: [Int!]!, $targetParentId: Int!, $sourceParentId: Int!) {
   moveFolder(targetFolderId: $targetId, folderId: $folderId) {
     ...BaseError
   }
+  changeFolderOrder(id: $sourceParentId, order: $sourceFolderOrder)
+  targetChangeOrder: changeFolderOrder(
+    id: $targetParentId
+    order: $targetFolderOrder
+  )
 }
     ${BaseErrorFragmentDoc}`;
 export type MoveFolderMutationFn = Apollo.MutationFunction<MoveFolderMutation, MoveFolderMutationVariables>;
@@ -1280,6 +1313,10 @@ export type MoveFolderMutationFn = Apollo.MutationFunction<MoveFolderMutation, M
  *   variables: {
  *      targetId: // value for 'targetId'
  *      folderId: // value for 'folderId'
+ *      targetFolderOrder: // value for 'targetFolderOrder'
+ *      sourceFolderOrder: // value for 'sourceFolderOrder'
+ *      targetParentId: // value for 'targetParentId'
+ *      sourceParentId: // value for 'sourceParentId'
  *   },
  * });
  */
@@ -1290,6 +1327,44 @@ export function useMoveFolderMutation(baseOptions?: Apollo.MutationHookOptions<M
 export type MoveFolderMutationHookResult = ReturnType<typeof useMoveFolderMutation>;
 export type MoveFolderMutationResult = Apollo.MutationResult<MoveFolderMutation>;
 export type MoveFolderMutationOptions = Apollo.BaseMutationOptions<MoveFolderMutation, MoveFolderMutationVariables>;
+export const ChangeFolderOrderDocument = gql`
+    mutation changeFolderOrder($targetFolderOrder: [Int!]!, $sourceFolderOrder: [Int!]!, $targetParentId: Int!, $sourceParentId: Int!) {
+  changeFolderOrder(id: $sourceParentId, order: $sourceFolderOrder)
+  targetChangeOrder: changeFolderOrder(
+    id: $targetParentId
+    order: $targetFolderOrder
+  )
+}
+    `;
+export type ChangeFolderOrderMutationFn = Apollo.MutationFunction<ChangeFolderOrderMutation, ChangeFolderOrderMutationVariables>;
+
+/**
+ * __useChangeFolderOrderMutation__
+ *
+ * To run a mutation, you first call `useChangeFolderOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeFolderOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeFolderOrderMutation, { data, loading, error }] = useChangeFolderOrderMutation({
+ *   variables: {
+ *      targetFolderOrder: // value for 'targetFolderOrder'
+ *      sourceFolderOrder: // value for 'sourceFolderOrder'
+ *      targetParentId: // value for 'targetParentId'
+ *      sourceParentId: // value for 'sourceParentId'
+ *   },
+ * });
+ */
+export function useChangeFolderOrderMutation(baseOptions?: Apollo.MutationHookOptions<ChangeFolderOrderMutation, ChangeFolderOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeFolderOrderMutation, ChangeFolderOrderMutationVariables>(ChangeFolderOrderDocument, options);
+      }
+export type ChangeFolderOrderMutationHookResult = ReturnType<typeof useChangeFolderOrderMutation>;
+export type ChangeFolderOrderMutationResult = Apollo.MutationResult<ChangeFolderOrderMutation>;
+export type ChangeFolderOrderMutationOptions = Apollo.BaseMutationOptions<ChangeFolderOrderMutation, ChangeFolderOrderMutationVariables>;
 export const GetTreeDocument = gql`
     query getTree {
   getTree {
