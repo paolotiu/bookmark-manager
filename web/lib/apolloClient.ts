@@ -5,6 +5,7 @@ import merge from 'deepmerge';
 import isEqual from 'lodash/isEqual';
 import cookie from 'cookie';
 import { IncomingMessage, ServerResponse } from 'http';
+import { unionBy } from 'lodash';
 
 type Client = ApolloClient<NormalizedCacheObject>;
 
@@ -72,9 +73,13 @@ function createApolloClient(context?: ResolverContext) {
         link: authLink.concat(httpLink),
         cache: new InMemoryCache({
             typePolicies: {
-                Query: {
+                Folder: {
                     fields: {
-                        bookmarks: {},
+                        bookmarks: {
+                            merge(existing = [], incoming) {
+                                return unionBy(existing, incoming, '__ref');
+                            },
+                        },
                     },
                 },
             },
