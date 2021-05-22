@@ -41,7 +41,7 @@ const FolderActionsPopup = ({ folderId, style, closePopup, onDelete }: Props) =>
                 onClick={handleDelete}
             >
                 <BiTrash className="text-iconPassive" size="20px" />
-                <span className="relative top-[1px]">Remove Folder</span>
+                <span className="pt-[3px] whitespace-nowrap">Remove Folder</span>
             </button>
         </div>
     );

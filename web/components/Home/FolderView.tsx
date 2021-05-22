@@ -8,13 +8,12 @@ import { cloneDeep } from 'lodash';
 import { bookmarkDateSort } from '@lib/sortFuncs';
 
 const AddBookmarkDropdown = dynamic(() => import('./AddBookmarkDropdown'));
-
 interface Props {
     folderId: number;
 }
 
 const FolderView = ({ folderId }: Props) => {
-    const { data, refetch } = useFolderQuery({
+    const { data } = useFolderQuery({
         variables: {
             id: Number(folderId),
         },
@@ -46,12 +45,7 @@ const FolderView = ({ folderId }: Props) => {
                     >
                         <span>Add +</span>
                     </Button>
-                    <AddBookmarkDropdown
-                        folderId={folderId}
-                        isOpen={isOpen}
-                        onSubmit={refetch}
-                        closeDropDown={() => setIsOpen(false)}
-                    />
+                    <AddBookmarkDropdown folderId={folderId} isOpen={isOpen} closeDropDown={() => setIsOpen(false)} />
                 </div>
             </div>
             <div>
