@@ -2,6 +2,7 @@ import { useRouter } from 'next/dist/client/router';
 import React from 'react';
 import { DndProvider } from 'react-dnd-multi-backend';
 import HTML5toTouch from 'react-dnd-multi-backend/dist/cjs/HTML5toTouch'; // or any other pipeline
+import AllBookmarksView from './AllBookmarksView';
 
 import DeletedBookmarksView from './DeletedBookmarksView';
 import FolderView from './FolderView';
@@ -20,6 +21,8 @@ const Home = () => {
                         {folderId ? (
                             folderId === 'deleted' ? (
                                 <DeletedBookmarksView />
+                            ) : folderId === 'all' ? (
+                                <AllBookmarksView />
                             ) : (
                                 <FolderView folderId={Number(folderId)} />
                             )

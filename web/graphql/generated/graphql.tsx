@@ -359,6 +359,17 @@ export type MoveBookmarkMutation = (
   ) | { __typename?: 'InputValidationError' } }
 );
 
+export type AllBookmarksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AllBookmarksQuery = (
+  { __typename?: 'Query' }
+  & { bookmarks: { __typename?: 'BaseError' } | (
+    { __typename?: 'Bookmarks' }
+    & BookmarksFragment
+  ) }
+);
+
 export type FolderBookmarksQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -526,6 +537,17 @@ export type ValidationErrorFragment = (
     { __typename?: 'BaseError' }
     & Pick<BaseError, 'message' | 'path'>
   )>> }
+);
+
+export type UserNameQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UserNameQuery = (
+  { __typename?: 'Query' }
+  & { me?: Maybe<{ __typename?: 'BaseError' } | (
+    { __typename?: 'User' }
+    & Pick<User, 'name'>
+  )> }
 );
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -1142,6 +1164,40 @@ export function useMoveBookmarkMutation(baseOptions?: Apollo.MutationHookOptions
 export type MoveBookmarkMutationHookResult = ReturnType<typeof useMoveBookmarkMutation>;
 export type MoveBookmarkMutationResult = Apollo.MutationResult<MoveBookmarkMutation>;
 export type MoveBookmarkMutationOptions = Apollo.BaseMutationOptions<MoveBookmarkMutation, MoveBookmarkMutationVariables>;
+export const AllBookmarksDocument = gql`
+    query allBookmarks {
+  bookmarks(deleted: false) {
+    ...Bookmarks
+  }
+}
+    ${BookmarksFragmentDoc}`;
+
+/**
+ * __useAllBookmarksQuery__
+ *
+ * To run a query within a React component, call `useAllBookmarksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllBookmarksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAllBookmarksQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAllBookmarksQuery(baseOptions?: Apollo.QueryHookOptions<AllBookmarksQuery, AllBookmarksQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AllBookmarksQuery, AllBookmarksQueryVariables>(AllBookmarksDocument, options);
+      }
+export function useAllBookmarksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllBookmarksQuery, AllBookmarksQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AllBookmarksQuery, AllBookmarksQueryVariables>(AllBookmarksDocument, options);
+        }
+export type AllBookmarksQueryHookResult = ReturnType<typeof useAllBookmarksQuery>;
+export type AllBookmarksLazyQueryHookResult = ReturnType<typeof useAllBookmarksLazyQuery>;
+export type AllBookmarksQueryResult = Apollo.QueryResult<AllBookmarksQuery, AllBookmarksQueryVariables>;
 export const FolderBookmarksDocument = gql`
     query folderBookmarks($id: Int!) {
   folder(id: $id) {
@@ -1401,6 +1457,42 @@ export function useGetTreeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ge
 export type GetTreeQueryHookResult = ReturnType<typeof useGetTreeQuery>;
 export type GetTreeLazyQueryHookResult = ReturnType<typeof useGetTreeLazyQuery>;
 export type GetTreeQueryResult = Apollo.QueryResult<GetTreeQuery, GetTreeQueryVariables>;
+export const UserNameDocument = gql`
+    query userName {
+  me {
+    ... on User {
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useUserNameQuery__
+ *
+ * To run a query within a React component, call `useUserNameQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserNameQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserNameQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUserNameQuery(baseOptions?: Apollo.QueryHookOptions<UserNameQuery, UserNameQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserNameQuery, UserNameQueryVariables>(UserNameDocument, options);
+      }
+export function useUserNameLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserNameQuery, UserNameQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserNameQuery, UserNameQueryVariables>(UserNameDocument, options);
+        }
+export type UserNameQueryHookResult = ReturnType<typeof useUserNameQuery>;
+export type UserNameLazyQueryHookResult = ReturnType<typeof useUserNameLazyQuery>;
+export type UserNameQueryResult = Apollo.QueryResult<UserNameQuery, UserNameQueryVariables>;
 
       export interface PossibleTypesResultData {
         possibleTypes: {

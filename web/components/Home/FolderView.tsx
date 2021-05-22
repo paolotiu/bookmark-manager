@@ -2,8 +2,10 @@ import dynamic from 'next/dynamic';
 import Button from '@components/Button/Button';
 import { useFolderQuery } from '@graphql/generated/graphql';
 import { isBaseError } from '@graphql/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import BookmarkCard from './BookmarkCard';
+import { cloneDeep } from 'lodash';
+import { bookmarkDateSort } from '@lib/sortFuncs';
 
 const AddBookmarkDropdown = dynamic(() => import('./AddBookmarkDropdown'));
 
@@ -19,19 +21,15 @@ const FolderView = ({ folderId }: Props) => {
     });
 
     const [isOpen, setIsOpen] = useState(false);
-    useEffect(() => {
-        const closeAddForm = () => {
-            setIsOpen(false);
-        };
-        // Close dropdown on outside click
-        window.addEventListener('mousedown', closeAddForm);
-        return () => {
-            window.removeEventListener('mousedown', closeAddForm);
-        };
-    }, []);
 
     if (!data || isBaseError(data.folder)) return null;
     const { name, bookmarks } = data.folder;
+    const sorted = cloneDeep(bookmarks).sort((prev, curr) => {
+        if (!prev || !curr) {
+            return 0;
+        }
+        return bookmarkDateSort(prev, curr);
+    });
     return (
         <div>
             <div className="relative flex items-center justify-between p-3 pb-10">
@@ -48,11 +46,16 @@ const FolderView = ({ folderId }: Props) => {
                     >
                         <span>Add +</span>
                     </Button>
-                    <AddBookmarkDropdown folderId={folderId} isOpen={isOpen} onSubmit={refetch} />
+                    <AddBookmarkDropdown
+                        folderId={folderId}
+                        isOpen={isOpen}
+                        onSubmit={refetch}
+                        closeDropDown={() => setIsOpen(false)}
+                    />
                 </div>
             </div>
             <div>
-                {bookmarks.map((bookmark) => {
+                {sorted.map((bookmark) => {
                     return bookmark && <BookmarkCard folderId={folderId} bookmark={bookmark} key={bookmark?.id} />;
                 })}
             </div>

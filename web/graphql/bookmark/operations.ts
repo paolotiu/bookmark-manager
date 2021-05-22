@@ -58,3 +58,13 @@ export const MOVE_BOOKMARKS_MUATION = gql`
     ${ErrorFragments.base}
     ${BookmarkFragments.bookmark}
 `;
+
+export const ALL_BOOKMARKS_QUERY = gql`
+    query allBookmarks {
+        bookmarks(deleted: false) {
+            ...Bookmarks
+        }
+    }
+
+    ${BookmarkFragments.bookmarks}
+`;

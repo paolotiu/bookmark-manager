@@ -1,4 +1,5 @@
 import { ApolloCache } from '@apollo/client';
+import { cloneDeep } from 'lodash';
 import { Bookmark, useHardDeleteBookmarkMutation, useSoftDeleteBookmarkMutation } from '@graphql/generated/graphql';
 import { decode } from 'html-entities';
 import { useDrag } from 'react-dnd';
@@ -9,7 +10,7 @@ interface Props {
     bookmark: Bookmark;
     hardDelete?: boolean;
     // For cache updates
-    folderId: number;
+    folderId: number | null;
 }
 
 const bookmarkSoftDeletionCacheUpdate = (cache: ApolloCache<any>, bookmarkId: number, folderId: number) => {
@@ -21,6 +22,18 @@ const bookmarkSoftDeletionCacheUpdate = (cache: ApolloCache<any>, bookmarkId: nu
             },
         },
     });
+    cache.modify({
+        id: 'ROOT_QUERY',
+        fields: {
+            bookmarks(existingBookmarks, { readField }) {
+                const clone = cloneDeep(existingBookmarks);
+                clone.bookmarks = existingBookmarks.bookmarks.filter(
+                    (bookmarkRef: any) => bookmarkId !== readField('id', bookmarkRef),
+                );
+                return clone;
+            },
+        },
+    });
 };
 const BookmarkCard = ({ bookmark, hardDelete = false, folderId }: Props) => {
     const [, drag] = useDrag(() => ({
@@ -29,7 +42,9 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId }: Props) => {
     }));
     const [softDeleteBookmark] = useSoftDeleteBookmarkMutation({
         update(cache) {
-            bookmarkSoftDeletionCacheUpdate(cache, bookmark.id, folderId);
+            if (folderId) {
+                bookmarkSoftDeletionCacheUpdate(cache, bookmark.id, folderId);
+            }
         },
     });
     const [hardDeleteBookmark] = useHardDeleteBookmarkMutation({
@@ -38,12 +53,12 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId }: Props) => {
         },
     });
 
-    const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         if (hardDelete) {
-            hardDeleteBookmark({ variables: { id: bookmark.id } });
+            await hardDeleteBookmark({ variables: { id: bookmark.id } });
         }
-        softDeleteBookmark({ variables: { id: bookmark.id } });
+        await softDeleteBookmark({ variables: { id: bookmark.id } });
     };
     return (
         <a

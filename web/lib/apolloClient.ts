@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
-import { concatPagination } from '@apollo/client/utilities';
 import merge from 'deepmerge';
 import isEqual from 'lodash/isEqual';
 import cookie from 'cookie';
@@ -75,7 +74,7 @@ function createApolloClient(context?: ResolverContext) {
             typePolicies: {
                 Query: {
                     fields: {
-                        allPosts: concatPagination(),
+                        bookmarks: {},
                     },
                 },
             },
