@@ -11,7 +11,6 @@ import { cloneDeep } from 'lodash';
 const Spinner = dynamic(() => import('./Spinner/Spinner'));
 
 interface Props {
-    onSubmit: () => void;
     folderId: number | string | null;
     isOpen: boolean;
     closeDropDown: () => void;
@@ -20,7 +19,7 @@ interface Props {
 const createBookmarkSchema = yup.object().shape({
     url: yup.string().url('Must be a valid URL').required(''),
 });
-const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown, onSubmit }: Props) => {
+const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
     const { inputs, handleChange, errors, isError, resetForm } = useForm(
         {
             url: '',
@@ -41,42 +40,40 @@ const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown, onSubmit }: Prop
     const [createBookmark] = useCreateBookmarkMutation({
         update(cache, { data }) {
             if (data && data.createBookmark.__typename === 'Bookmark') {
-                if (folderId) {
-                    cache.modify({
-                        id: cache.identify({ __typename: 'Folder', id: folderId }),
-                        fields: {
-                            bookmarks(existingBookmarksRef = [], { readField }) {
-                                const newBookmarkRef = cache.writeFragment({
-                                    data: data.createBookmark,
-                                    fragment: BookmarkFragments.bookmark,
-                                });
+                cache.modify({
+                    id: cache.identify({ __typename: 'Folder', id: folderId }),
+                    fields: {
+                        bookmarks(existingBookmarksRef = [], { readField }) {
+                            const newBookmarkRef = cache.writeFragment({
+                                data: data.createBookmark,
+                                fragment: BookmarkFragments.bookmark,
+                            });
 
-                                // Quick safety check - if the new comment is already
-                                // present in the cache, we don't need to add it again.
-                                if (
-                                    existingBookmarksRef.some(
-                                        (ref: any) => readField('id', ref) === (data.createBookmark as Bookmark).id,
-                                    )
-                                ) {
-                                    return existingBookmarksRef;
-                                }
-                                return [...existingBookmarksRef, newBookmarkRef];
-                            },
+                            // Quick safety check - if the new comment is already
+                            // present in the cache, we don't need to add it again.
+                            if (
+                                existingBookmarksRef.some(
+                                    (ref: any) => readField('id', ref) === (data.createBookmark as Bookmark).id,
+                                )
+                            ) {
+                                return existingBookmarksRef;
+                            }
+                            return [...existingBookmarksRef, newBookmarkRef];
                         },
-                    });
+                    },
+                });
 
-                    // Add to all bookmarks
-                    cache.modify({
-                        id: 'ROOT_QUERY',
-                        fields: {
-                            bookmarks(existingBookmarks) {
-                                const clone = cloneDeep(existingBookmarks);
-                                clone.bookmarks.push(data.createBookmark);
-                                return clone;
-                            },
+                // Add to all bookmarks
+                cache.modify({
+                    id: 'ROOT_QUERY',
+                    fields: {
+                        bookmarks(existingBookmarks) {
+                            const clone = cloneDeep(existingBookmarks);
+                            clone.bookmarks.push(data.createBookmark);
+                            return clone;
                         },
-                    });
-                }
+                    },
+                });
             }
         },
     });
