@@ -55,6 +55,7 @@ const Sidebar = () => {
     const [actionFolderId, setActionFolderId] = useState(0);
     const { data: userNameData } = useUserNameQuery();
     const [struct, setStruct] = useState<TreeDataType[]>([]);
+
     useEffect(() => {
         if (!loading && data?.getTree.__typename === 'Tree') {
             setStruct(JSON.parse(data.getTree.tree || '[]'));
@@ -96,7 +97,7 @@ const Sidebar = () => {
                         label="Settings"
                         icon={<FiSettings size="1.25em" />}
                         onClick={() => {
-                            router.push('/home/all');
+                            router.push('/settings/account');
                         }}
                     />
                     <SidebarItem
