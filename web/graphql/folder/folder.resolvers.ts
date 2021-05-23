@@ -1,5 +1,5 @@
-import { Bookmark } from 'entity/Bookmark';
-import { Folder, getFolderStructure } from 'entity/Folder';
+import { Bookmark } from '@entity/Bookmark';
+import { Folder, getFolderStructure } from '@entity/Folder';
 import {
     createEntityIdNotFoundError,
     createUnexpectedError,
@@ -73,9 +73,10 @@ export const folderResolvers: Resolvers = {
             let depth = 0;
             // Initialize path
             let path = '';
+            let parent: Folder | undefined;
             if (parentId) {
                 // Check if parent id exists
-                const parent = await Folder.findOne(parentId);
+                parent = await Folder.findOne(parentId);
                 if (parent) {
                     depth = parent.depth + 1;
                     // Parent path + '.'
@@ -91,6 +92,12 @@ export const folderResolvers: Resolvers = {
             const prePathFolder = await folder.save();
 
             await User.update({ id: userId }, { rootOrder: () => `"rootOrder" || '{${prePathFolder.id}}'` });
+
+            if (parent) {
+                // Update parent order
+                parent.childrenOrder.push(prePathFolder.id);
+                await parent.save();
+            }
 
             // Append the id to the path
             prePathFolder.path = path + prePathFolder.id;
