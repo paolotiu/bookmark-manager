@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { User } from 'entity/User';
+import { User } from '@entity/User';
 import { createApolloTestClient } from '@lib/server/createApolloTestClient';
 import { gql } from 'apollo-server-express';
 

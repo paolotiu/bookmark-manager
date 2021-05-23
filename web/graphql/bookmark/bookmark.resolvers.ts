@@ -1,4 +1,4 @@
-import { Bookmark } from 'entity/Bookmark';
+import { Bookmark } from '@entity/Bookmark';
 import {
     createBaseError,
     createEntityIdNotFoundError,
@@ -7,7 +7,7 @@ import {
     isBaseError,
     isValidationError,
 } from '@graphql/shared/errorMessages';
-import { Folder } from 'entity/Folder';
+import { Folder } from '@entity/Folder';
 import { bookmarkSchema } from './yupSchema';
 import { scrapeMetadata } from '@lib/server/scrapeMetadata';
 import { unNullifyObj } from '@lib/server/unNullifyObj';

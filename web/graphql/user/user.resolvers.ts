@@ -1,6 +1,6 @@
-import { Bookmark } from 'entity/Bookmark';
-import { Folder } from 'entity/Folder';
-import { User } from 'entity/User';
+import { Bookmark } from '@entity/Bookmark';
+import { Folder } from '@entity/Folder';
+import { User } from '@entity/User';
 import { isBaseError } from '@graphql/shared/errorMessages';
 import { Resolvers } from '@graphql/generated/graphql';
 
@@ -20,4 +20,10 @@ export const userResolvers: Resolvers = {
         },
         ping: () => 'pong',
     },
+    // Mutation: {
+    //     import: async (_, { file }: { file: FileUpload }, { userId }) => {
+    //         if (file.mimetype !== 'text/html')
+    //             return createBaseError('import', 'Files with the mimetype of text/html only are allowed');
+    //     },
+    // },
 };

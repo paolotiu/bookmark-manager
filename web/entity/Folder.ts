@@ -12,12 +12,12 @@ import {
     PrimaryGeneratedColumn,
     Unique,
 } from 'typeorm';
-import { User } from 'entity/User';
-import { Bookmark } from 'entity/Bookmark';
+import { User } from '@entity/User';
+import { Bookmark } from '@entity/Bookmark';
 import { IBookmark, IFolder, IUser } from './interfaces';
 
 @Unique(['id', 'userId', 'depth'])
-@Entity()
+@Entity({ synchronize: process.env.NODE_ENV === 'test' })
 export class Folder extends BaseEntity implements IFolder {
     children: Folder[];
 
@@ -148,7 +148,7 @@ function arrayToTree({ parentId, foldersArr }: ArrayToTreeWithParent) {
         // Skip root node
         if (folder.id !== parentId && folder.parentId !== null) {
             const index = map[folder.parentId].childrenOrder.findIndex((id) => id === folder.id);
-            map[folder.parentId].children[index] = folder
+            map[folder.parentId].children[index] = folder;
         }
     });
     return map[parentId];
@@ -170,10 +170,10 @@ function arrayToTreeWithRoot({ foldersArr, rootOrder }: ArrayToTreeWithRoot) {
             // Gets the parent id from the path
             // 1.2.3 => 2
 
-            map[folder.parentId].children[index] = folder
+            map[folder.parentId].children[index] = folder;
         } else {
             const index = rootOrder.findIndex((id) => id === folder.id);
-            roots[index] = folder
+            roots[index] = folder;
         }
     });
     return roots;

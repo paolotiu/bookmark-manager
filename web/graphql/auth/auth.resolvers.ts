@@ -1,6 +1,6 @@
 import { setCookie } from 'nookies';
 import bcrypt from 'bcryptjs';
-import { User } from 'entity/User';
+import { User } from '@entity/User';
 import { createBaseError, createUnexpectedError } from '@graphql/shared/errorMessages';
 import { NextApiResponse } from 'next';
 import { CookieSerializeOptions } from 'cookie';

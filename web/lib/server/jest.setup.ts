@@ -1,4 +1,4 @@
-import { createTypeormConn } from './createTypeormConn';
+import { createTypeormConn } from '@lib/server/createTypeormConn';
 
 beforeAll(async () => {
     global.__conn = await createTypeormConn();
