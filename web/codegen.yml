@@ -1,5 +1,8 @@
 overwrite: true
-schema: './graphql/**/*.gql'
+schema:
+    - './graphql/**/*.gql'
+    - |
+        scalar Upload
 documents:
     - 'graphql/**/*.ts'
     - '!**/*/test.fragments.ts'

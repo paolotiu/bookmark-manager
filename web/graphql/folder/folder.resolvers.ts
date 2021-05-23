@@ -8,6 +8,7 @@ import {
 } from '@graphql/shared/errorMessages';
 import { Resolvers } from '@graphql/generated/graphql';
 import { User } from '@entity/User';
+import { scrapeMetadata } from '@lib/server/scrapeMetadata';
 
 export const folderResolvers: Resolvers = {
     Folder: {
@@ -103,6 +104,38 @@ export const folderResolvers: Resolvers = {
             prePathFolder.path = path + prePathFolder.id;
 
             return prePathFolder.save();
+        },
+        createFolderWithBookmarks: async (_, { data: { bookmarks, folderName } }, { userId }) => {
+            const folder = await Folder.create({ name: folderName, userId }).save();
+            folder.path = String(folder.id);
+
+            // Get metadata
+            const bookmarksWithMeta = await Promise.all(
+                bookmarks.map(async (b) => {
+                    const meta = await scrapeMetadata(b.url);
+                    const bookmark = Bookmark.create({
+                        url: b.url,
+                        description:
+                            b.description || meta?.ogDescription || meta?.twitterDescription || meta?.dcDescription,
+                        title: b.title || meta?.ogTitle || meta?.twitterTitle || meta?.dcTitle || b.url,
+                        folderId: folder.id,
+                        userId,
+                    });
+                    return bookmark;
+                }),
+            );
+
+            // Parrallel saves/updates
+            await Promise.all([
+                User.update({ id: userId }, { rootOrder: () => `"rootOrder" || '{${folder.id}}'` }),
+                Bookmark.createQueryBuilder()
+                    .insert()
+                    .values(bookmarksWithMeta as Bookmark[])
+                    .execute(),
+                folder.save(),
+            ]);
+
+            return true;
         },
         moveFolder: async (_, { folderId, targetFolderId }, { userId }) => {
             // Move folder to root

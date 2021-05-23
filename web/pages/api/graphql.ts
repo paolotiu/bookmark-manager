@@ -8,8 +8,9 @@ import { User } from 'entity/User';
 import { setTokenCookies } from '@graphql/auth/auth.resolvers';
 import { ensureConnection } from '@lib/server/ensureConnection';
 import { createTokens } from '@lib/server/createTokens';
+import { processRequest } from 'graphql-upload';
 
-const cors = microCors({ origin: 'https://studio.apollographql.com', allowCredentials: true });
+const cors = microCors({ origin: '*', allowCredentials: true });
 interface AccessTokenPayload {
     userId: number;
     iat: number;
@@ -29,8 +30,8 @@ const getApolloServerHandler = async (req: NextApiRequest, res: NextApiResponse)
             context: ({ req, res }) => {
                 return { req, res, userId: userId || undefined };
             },
-
             tracing: true,
+            uploads: false,
         }).createHandler({ path: '/api/graphql' });
 
     const accessToken = req.cookies['access-token'];
@@ -74,6 +75,11 @@ export default cors(async (req, res) => {
     if (req.method === 'OPTIONS') {
         res.end();
         return false;
+    }
+
+    const contentType = req.headers['content-type'];
+    if (contentType && contentType.startsWith('multipart/form-data')) {
+        (req as any).filePayload = await processRequest(req, res);
     }
     const serverHandler = await getApolloServerHandler(req as any, res as any);
 

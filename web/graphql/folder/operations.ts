@@ -58,3 +58,8 @@ export const CHANGE_FOLDER_ORDER_MUTATION = gql`
 
     ${ErrorFragments.base}
 `;
+export const CREATE_FOLDER_WITH_BOOKMARKS = gql`
+    mutation createFolderWithBookmarks($folderName: String!, $bookmarks: [CreateBookmarkInput!]!) {
+        createFolderWithBookmarks(data: { folderName: $folderName, bookmarks: $bookmarks })
+    }
+`;

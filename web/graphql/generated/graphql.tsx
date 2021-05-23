@@ -20,6 +20,7 @@ export type Scalars = {
   Int: number;
   Float: number;
   Date: Date;
+  Upload: any;
 };
 
 
@@ -62,6 +63,11 @@ export type CreateFolderInput = {
   parentId?: Maybe<Scalars['Int']>;
 };
 
+export type CreateFolderWithBookmarksInput = {
+  folderName: Scalars['String'];
+  bookmarks: Array<CreateBookmarkInput>;
+};
+
 
 export type Folder = {
   __typename?: 'Folder';
@@ -94,9 +100,11 @@ export type Mutation = {
   changeFolderOrder: Scalars['Boolean'];
   createBookmark: BookmarkResultWithInput;
   createFolder: FolderResult;
+  createFolderWithBookmarks?: Maybe<Scalars['Boolean']>;
   deleteFolder: FolderResult;
   hardDeleteBookmark: BookmarkResult;
   hardDeleteBookmarks: BookmarksResult;
+  import?: Maybe<FolderResult>;
   invalidateTokens: Scalars['Boolean'];
   /** Returns null if login failed */
   login: UserResult;
@@ -128,6 +136,11 @@ export type MutationCreateFolderArgs = {
 };
 
 
+export type MutationCreateFolderWithBookmarksArgs = {
+  data: CreateFolderWithBookmarksInput;
+};
+
+
 export type MutationDeleteFolderArgs = {
   id: Scalars['Int'];
 };
@@ -140,6 +153,11 @@ export type MutationHardDeleteBookmarkArgs = {
 
 export type MutationHardDeleteBookmarksArgs = {
   ids: Array<Maybe<Scalars['Int']>>;
+};
+
+
+export type MutationImportArgs = {
+  file: Scalars['Upload'];
 };
 
 
@@ -233,6 +251,7 @@ export type UpdateBookmarkInput = {
   url?: Maybe<Scalars['String']>;
   folderId?: Maybe<Scalars['Int']>;
 };
+
 
 /** User */
 export type User = {
@@ -465,6 +484,17 @@ export type ChangeFolderOrderMutation = (
   & { targetChangeOrder: Mutation['changeFolderOrder'] }
 );
 
+export type CreateFolderWithBookmarksMutationVariables = Exact<{
+  folderName: Scalars['String'];
+  bookmarks: Array<CreateBookmarkInput> | CreateBookmarkInput;
+}>;
+
+
+export type CreateFolderWithBookmarksMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'createFolderWithBookmarks'>
+);
+
 export type GetTreeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -548,6 +578,16 @@ export type UserNameQuery = (
     { __typename?: 'User' }
     & Pick<User, 'name'>
   )> }
+);
+
+export type ImportMutationVariables = Exact<{
+  file: Scalars['Upload'];
+}>;
+
+
+export type ImportMutation = (
+  { __typename?: 'Mutation' }
+  & { import?: Maybe<{ __typename: 'BaseError' } | { __typename: 'Folder' }> }
 );
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -639,6 +679,7 @@ export type ResolversTypes = ResolversObject<{
   BookmarksResult: ResolversTypes['BaseError'] | ResolversTypes['Bookmarks'];
   CreateBookmarkInput: CreateBookmarkInput;
   CreateFolderInput: CreateFolderInput;
+  CreateFolderWithBookmarksInput: CreateFolderWithBookmarksInput;
   Date: ResolverTypeWrapper<Scalars['Date']>;
   Folder: ResolverTypeWrapper<FolderModel>;
   FolderArrayResult: ResolversTypes['BaseError'] | ResolversTypes['Folders'];
@@ -651,6 +692,7 @@ export type ResolversTypes = ResolversObject<{
   Tree: ResolverTypeWrapper<Tree>;
   TreeResult: ResolversTypes['BaseError'] | ResolversTypes['Tree'];
   UpdateBookmarkInput: UpdateBookmarkInput;
+  Upload: ResolverTypeWrapper<Scalars['Upload']>;
   User: ResolverTypeWrapper<UserModel>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   UserResult: ResolversTypes['BaseError'] | ResolversTypes['User'];
@@ -668,6 +710,7 @@ export type ResolversParentTypes = ResolversObject<{
   BookmarksResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Bookmarks'];
   CreateBookmarkInput: CreateBookmarkInput;
   CreateFolderInput: CreateFolderInput;
+  CreateFolderWithBookmarksInput: CreateFolderWithBookmarksInput;
   Date: Scalars['Date'];
   Folder: FolderModel;
   FolderArrayResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Folders'];
@@ -680,6 +723,7 @@ export type ResolversParentTypes = ResolversObject<{
   Tree: Tree;
   TreeResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Tree'];
   UpdateBookmarkInput: UpdateBookmarkInput;
+  Upload: Scalars['Upload'];
   User: UserModel;
   ID: Scalars['ID'];
   UserResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['User'];
@@ -760,9 +804,11 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   changeFolderOrder?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationChangeFolderOrderArgs, 'id' | 'order'>>;
   createBookmark?: Resolver<ResolversTypes['BookmarkResultWithInput'], ParentType, ContextType, RequireFields<MutationCreateBookmarkArgs, 'data'>>;
   createFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationCreateFolderArgs, 'data'>>;
+  createFolderWithBookmarks?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationCreateFolderWithBookmarksArgs, 'data'>>;
   deleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationDeleteFolderArgs, 'id'>>;
   hardDeleteBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationHardDeleteBookmarkArgs, 'id'>>;
   hardDeleteBookmarks?: Resolver<ResolversTypes['BookmarksResult'], ParentType, ContextType, RequireFields<MutationHardDeleteBookmarksArgs, 'ids'>>;
+  import?: Resolver<Maybe<ResolversTypes['FolderResult']>, ParentType, ContextType, RequireFields<MutationImportArgs, 'file'>>;
   invalidateTokens?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   login?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   moveFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationMoveFolderArgs, 'folderId'>>;
@@ -794,6 +840,10 @@ export type TreeResultResolvers<ContextType = MyContext, ParentType extends Reso
   __resolveType: TypeResolveFn<'BaseError' | 'Tree', ParentType, ContextType>;
 }>;
 
+export interface UploadScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Upload'], any> {
+  name: 'Upload';
+}
+
 export type UserResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -824,6 +874,7 @@ export type Resolvers<ContextType = MyContext> = ResolversObject<{
   Query?: QueryResolvers<ContextType>;
   Tree?: TreeResolvers<ContextType>;
   TreeResult?: TreeResultResolvers<ContextType>;
+  Upload?: GraphQLScalarType;
   User?: UserResolvers<ContextType>;
   UserResult?: UserResultResolvers<ContextType>;
 }>;
@@ -1421,6 +1472,40 @@ export function useChangeFolderOrderMutation(baseOptions?: Apollo.MutationHookOp
 export type ChangeFolderOrderMutationHookResult = ReturnType<typeof useChangeFolderOrderMutation>;
 export type ChangeFolderOrderMutationResult = Apollo.MutationResult<ChangeFolderOrderMutation>;
 export type ChangeFolderOrderMutationOptions = Apollo.BaseMutationOptions<ChangeFolderOrderMutation, ChangeFolderOrderMutationVariables>;
+export const CreateFolderWithBookmarksDocument = gql`
+    mutation createFolderWithBookmarks($folderName: String!, $bookmarks: [CreateBookmarkInput!]!) {
+  createFolderWithBookmarks(
+    data: {folderName: $folderName, bookmarks: $bookmarks}
+  )
+}
+    `;
+export type CreateFolderWithBookmarksMutationFn = Apollo.MutationFunction<CreateFolderWithBookmarksMutation, CreateFolderWithBookmarksMutationVariables>;
+
+/**
+ * __useCreateFolderWithBookmarksMutation__
+ *
+ * To run a mutation, you first call `useCreateFolderWithBookmarksMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateFolderWithBookmarksMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createFolderWithBookmarksMutation, { data, loading, error }] = useCreateFolderWithBookmarksMutation({
+ *   variables: {
+ *      folderName: // value for 'folderName'
+ *      bookmarks: // value for 'bookmarks'
+ *   },
+ * });
+ */
+export function useCreateFolderWithBookmarksMutation(baseOptions?: Apollo.MutationHookOptions<CreateFolderWithBookmarksMutation, CreateFolderWithBookmarksMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateFolderWithBookmarksMutation, CreateFolderWithBookmarksMutationVariables>(CreateFolderWithBookmarksDocument, options);
+      }
+export type CreateFolderWithBookmarksMutationHookResult = ReturnType<typeof useCreateFolderWithBookmarksMutation>;
+export type CreateFolderWithBookmarksMutationResult = Apollo.MutationResult<CreateFolderWithBookmarksMutation>;
+export type CreateFolderWithBookmarksMutationOptions = Apollo.BaseMutationOptions<CreateFolderWithBookmarksMutation, CreateFolderWithBookmarksMutationVariables>;
 export const GetTreeDocument = gql`
     query getTree {
   getTree {
@@ -1493,6 +1578,39 @@ export function useUserNameLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<U
 export type UserNameQueryHookResult = ReturnType<typeof useUserNameQuery>;
 export type UserNameLazyQueryHookResult = ReturnType<typeof useUserNameLazyQuery>;
 export type UserNameQueryResult = Apollo.QueryResult<UserNameQuery, UserNameQueryVariables>;
+export const ImportDocument = gql`
+    mutation import($file: Upload!) {
+  import(file: $file) {
+    __typename
+  }
+}
+    `;
+export type ImportMutationFn = Apollo.MutationFunction<ImportMutation, ImportMutationVariables>;
+
+/**
+ * __useImportMutation__
+ *
+ * To run a mutation, you first call `useImportMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useImportMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [importMutation, { data, loading, error }] = useImportMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *   },
+ * });
+ */
+export function useImportMutation(baseOptions?: Apollo.MutationHookOptions<ImportMutation, ImportMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ImportMutation, ImportMutationVariables>(ImportDocument, options);
+      }
+export type ImportMutationHookResult = ReturnType<typeof useImportMutation>;
+export type ImportMutationResult = Apollo.MutationResult<ImportMutation>;
+export type ImportMutationOptions = Apollo.BaseMutationOptions<ImportMutation, ImportMutationVariables>;
 
       export interface PossibleTypesResultData {
         possibleTypes: {

@@ -25,6 +25,11 @@ input CreateFolderInput {
     parentId: Int
 }
 
+input CreateFolderWithBookmarksInput {
+    folderName: String!
+    bookmarks: [CreateBookmarkInput!]!
+}
+
 type Query {
     folder(id: Int!): FolderResult! @auth
     getTree: TreeResult! @auth
@@ -33,6 +38,7 @@ type Query {
 
 type Mutation {
     createFolder(data: CreateFolderInput!): FolderResult! @auth
+    createFolderWithBookmarks(data: CreateFolderWithBookmarksInput!): Boolean @auth
     updateFolderName(id: Int!, name: String!): FolderResult! @auth
     softDeleteFolder(id: Int!): FolderResult! @auth
     recoverFolder(id: Int!): FolderResult! @auth

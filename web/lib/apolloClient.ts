@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
-import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
+import { ApolloClient, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import merge from 'deepmerge';
 import isEqual from 'lodash/isEqual';
 import cookie from 'cookie';
 import { IncomingMessage, ServerResponse } from 'http';
+import { createUploadLink } from 'apollo-upload-client';
 import { unionBy } from 'lodash';
 
 type Client = ApolloClient<NormalizedCacheObject>;
@@ -27,7 +28,7 @@ export function parseCookies(req?: any, options = {}) {
 }
 
 // get the refresh and access token from cookies
-function getRefreshAndAcessToken(req: IncomingMessage) {
+function getRefreshAndAccessToken(req: IncomingMessage) {
     const cookies = parseCookies(req);
     const acessToken = cookies['access-token'];
     const refreshToken = cookies['refresh-token'];
@@ -43,7 +44,7 @@ function createCookieString(cookies: { [key: string]: string }) {
 }
 
 function createApolloClient(context?: ResolverContext) {
-    const httpLink = new HttpLink({
+    const uploadLink = createUploadLink({
         uri: 'http://localhost:3000/api/graphql', // Server URL (must be absolute)
         credentials: 'include', // Additional fetch() options like `credentials` or `headers`
     });
@@ -51,7 +52,7 @@ function createApolloClient(context?: ResolverContext) {
     const authLink = setContext((_, { headers }) => {
         // get the tokens
         if (context?.req) {
-            const tokens = getRefreshAndAcessToken(context?.req);
+            const tokens = getRefreshAndAccessToken(context?.req);
             const cookie = createCookieString(tokens);
             return {
                 headers: {
@@ -70,7 +71,7 @@ function createApolloClient(context?: ResolverContext) {
 
     return new ApolloClient({
         ssrMode: typeof window === 'undefined',
-        link: authLink.concat(httpLink),
+        link: authLink.concat(uploadLink as any),
         cache: new InMemoryCache({
             typePolicies: {
                 Folder: {
