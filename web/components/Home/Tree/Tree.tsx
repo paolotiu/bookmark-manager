@@ -4,9 +4,11 @@ import {
     useChangeFolderOrderMutation,
     useMoveBookmarkMutation,
     useMoveFolderMutation,
+    useRenameFolderMutation,
 } from '@graphql/generated/graphql';
 import { KremeProvider, Tree as KremeTree } from 'kreme';
 import { TreeDataType } from 'kreme/build/Tree/types';
+import { cloneDeep } from 'lodash';
 import { useRouter } from 'next/dist/client/router';
 import React, { useRef } from 'react';
 
@@ -18,11 +20,13 @@ interface Props {
             y: number;
         }>
     >;
+
     setActionFolderId: React.Dispatch<React.SetStateAction<number>>;
     setWillShowActions: React.Dispatch<React.SetStateAction<boolean>>;
+    setStruct: React.Dispatch<React.SetStateAction<TreeDataType[]>>;
 }
 
-const Tree = ({ struct, setActionClickLocation, setActionFolderId, setWillShowActions }: Props) => {
+const Tree = ({ struct, setActionClickLocation, setActionFolderId, setWillShowActions, setStruct }: Props) => {
     const folderIdRef = useRef(-1);
     const prevFolderIdRef = useRef(-1);
     const [changeFolderOrder] = useChangeFolderOrderMutation();
@@ -46,9 +50,30 @@ const Tree = ({ struct, setActionClickLocation, setActionFolderId, setWillShowAc
         },
         refetchQueries: [{ query: FOLDER, variables: { id: folderIdRef.current } }],
     });
+
+    const [renameFolder] = useRenameFolderMutation();
     return (
         <KremeProvider>
             <KremeTree
+                onInputSubmit={(id, name) => {
+                    // Update server state
+                    renameFolder({ variables: { name, id: Number(id) } });
+                    // Update tree state
+                    setStruct((prev) => {
+                        const clone = cloneDeep(prev);
+                        const updateData = (item: TreeDataType) => {
+                            if (item.id === id) {
+                                item.isInput = false;
+                                item.name = name;
+                                return item;
+                            }
+                            item.children = item.children?.map(updateData);
+                            return item;
+                        };
+
+                        return clone.map(updateData);
+                    });
+                }}
                 noDropOnEmpty
                 acceptedDropTypes={['Bookmark']}
                 onDrop={{

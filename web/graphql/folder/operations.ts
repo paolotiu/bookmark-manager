@@ -63,3 +63,14 @@ export const CREATE_FOLDER_WITH_BOOKMARKS = gql`
         createFolderWithBookmarks(data: { folderName: $folderName, bookmarks: $bookmarks })
     }
 `;
+
+export const RENAME_FOLDER = gql`
+    mutation renameFolder($id: Int!, $name: String!) {
+        updateFolderName(id: $id, name: $name) {
+            ... on Folder {
+                id
+                name
+            }
+        }
+    }
+`;

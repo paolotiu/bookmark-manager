@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 import AddFolderForm from './AddFolderForm/AddFolderForm';
 import Tree from './Tree/Tree';
 import { useRouter } from 'next/dist/client/router';
+import { cloneDeep } from 'lodash';
 
 interface SidebarItemProps {
     icon?: any;
@@ -62,6 +63,22 @@ const Sidebar = () => {
         }
     }, [data, loading]);
 
+    const renameFolder = (id: number) => {
+        const updateStruct = (item: TreeDataType) => {
+            if (item.id === id) {
+                item.isInput = true;
+                return item;
+            }
+
+            item.children = item.children?.map(updateStruct);
+            return item;
+        };
+        setStruct((prev) => {
+            const clone = cloneDeep(prev);
+            return clone.map(updateStruct);
+        });
+    };
+
     if (!data || isBaseError(data?.getTree)) return null;
 
     return (
@@ -110,6 +127,7 @@ const Sidebar = () => {
                 </div>
                 <div className="pt-5">
                     <Tree
+                        setStruct={setStruct}
                         struct={struct}
                         setActionClickLocation={setActionClickLocation}
                         setActionFolderId={setActionFolderId}
@@ -129,9 +147,13 @@ const Sidebar = () => {
 
                 {willShowActions && (
                     <FolderActionsPopup
+                        renameFolder={renameFolder}
                         closePopup={() => setWillShowActions(false)}
                         folderId={Number(actionFolderId)}
-                        style={{ top: actionClickLocation.y + 2, left: actionClickLocation.x + 2 }}
+                        style={{
+                            top: Math.min(actionClickLocation.y + 4, window.innerHeight - 220),
+                            left: Math.min(actionClickLocation.x + 2, window.innerWidth - 220),
+                        }}
                     />
                 )}
             </div>

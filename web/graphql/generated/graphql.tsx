@@ -104,7 +104,6 @@ export type Mutation = {
   deleteFolder: FolderResult;
   hardDeleteBookmark: BookmarkResult;
   hardDeleteBookmarks: BookmarksResult;
-  import?: Maybe<FolderResult>;
   invalidateTokens: Scalars['Boolean'];
   /** Returns null if login failed */
   login: UserResult;
@@ -153,11 +152,6 @@ export type MutationHardDeleteBookmarkArgs = {
 
 export type MutationHardDeleteBookmarksArgs = {
   ids: Array<Maybe<Scalars['Int']>>;
-};
-
-
-export type MutationImportArgs = {
-  file: Scalars['Upload'];
 };
 
 
@@ -495,6 +489,20 @@ export type CreateFolderWithBookmarksMutation = (
   & Pick<Mutation, 'createFolderWithBookmarks'>
 );
 
+export type RenameFolderMutationVariables = Exact<{
+  id: Scalars['Int'];
+  name: Scalars['String'];
+}>;
+
+
+export type RenameFolderMutation = (
+  { __typename?: 'Mutation' }
+  & { updateFolderName: { __typename?: 'BaseError' } | (
+    { __typename?: 'Folder' }
+    & Pick<Folder, 'id' | 'name'>
+  ) }
+);
+
 export type GetTreeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -578,16 +586,6 @@ export type UserNameQuery = (
     { __typename?: 'User' }
     & Pick<User, 'name'>
   )> }
-);
-
-export type ImportMutationVariables = Exact<{
-  file: Scalars['Upload'];
-}>;
-
-
-export type ImportMutation = (
-  { __typename?: 'Mutation' }
-  & { import?: Maybe<{ __typename: 'BaseError' } | { __typename: 'Folder' }> }
 );
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -808,7 +806,6 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   deleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationDeleteFolderArgs, 'id'>>;
   hardDeleteBookmark?: Resolver<ResolversTypes['BookmarkResult'], ParentType, ContextType, RequireFields<MutationHardDeleteBookmarkArgs, 'id'>>;
   hardDeleteBookmarks?: Resolver<ResolversTypes['BookmarksResult'], ParentType, ContextType, RequireFields<MutationHardDeleteBookmarksArgs, 'ids'>>;
-  import?: Resolver<Maybe<ResolversTypes['FolderResult']>, ParentType, ContextType, RequireFields<MutationImportArgs, 'file'>>;
   invalidateTokens?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   login?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   moveFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationMoveFolderArgs, 'folderId'>>;
@@ -1506,6 +1503,43 @@ export function useCreateFolderWithBookmarksMutation(baseOptions?: Apollo.Mutati
 export type CreateFolderWithBookmarksMutationHookResult = ReturnType<typeof useCreateFolderWithBookmarksMutation>;
 export type CreateFolderWithBookmarksMutationResult = Apollo.MutationResult<CreateFolderWithBookmarksMutation>;
 export type CreateFolderWithBookmarksMutationOptions = Apollo.BaseMutationOptions<CreateFolderWithBookmarksMutation, CreateFolderWithBookmarksMutationVariables>;
+export const RenameFolderDocument = gql`
+    mutation renameFolder($id: Int!, $name: String!) {
+  updateFolderName(id: $id, name: $name) {
+    ... on Folder {
+      id
+      name
+    }
+  }
+}
+    `;
+export type RenameFolderMutationFn = Apollo.MutationFunction<RenameFolderMutation, RenameFolderMutationVariables>;
+
+/**
+ * __useRenameFolderMutation__
+ *
+ * To run a mutation, you first call `useRenameFolderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRenameFolderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [renameFolderMutation, { data, loading, error }] = useRenameFolderMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useRenameFolderMutation(baseOptions?: Apollo.MutationHookOptions<RenameFolderMutation, RenameFolderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RenameFolderMutation, RenameFolderMutationVariables>(RenameFolderDocument, options);
+      }
+export type RenameFolderMutationHookResult = ReturnType<typeof useRenameFolderMutation>;
+export type RenameFolderMutationResult = Apollo.MutationResult<RenameFolderMutation>;
+export type RenameFolderMutationOptions = Apollo.BaseMutationOptions<RenameFolderMutation, RenameFolderMutationVariables>;
 export const GetTreeDocument = gql`
     query getTree {
   getTree {
@@ -1578,39 +1612,6 @@ export function useUserNameLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<U
 export type UserNameQueryHookResult = ReturnType<typeof useUserNameQuery>;
 export type UserNameLazyQueryHookResult = ReturnType<typeof useUserNameLazyQuery>;
 export type UserNameQueryResult = Apollo.QueryResult<UserNameQuery, UserNameQueryVariables>;
-export const ImportDocument = gql`
-    mutation import($file: Upload!) {
-  import(file: $file) {
-    __typename
-  }
-}
-    `;
-export type ImportMutationFn = Apollo.MutationFunction<ImportMutation, ImportMutationVariables>;
-
-/**
- * __useImportMutation__
- *
- * To run a mutation, you first call `useImportMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useImportMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [importMutation, { data, loading, error }] = useImportMutation({
- *   variables: {
- *      file: // value for 'file'
- *   },
- * });
- */
-export function useImportMutation(baseOptions?: Apollo.MutationHookOptions<ImportMutation, ImportMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ImportMutation, ImportMutationVariables>(ImportDocument, options);
-      }
-export type ImportMutationHookResult = ReturnType<typeof useImportMutation>;
-export type ImportMutationResult = Apollo.MutationResult<ImportMutation>;
-export type ImportMutationOptions = Apollo.BaseMutationOptions<ImportMutation, ImportMutationVariables>;
 
       export interface PossibleTypesResultData {
         possibleTypes: {
