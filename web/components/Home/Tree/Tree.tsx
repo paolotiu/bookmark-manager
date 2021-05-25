@@ -4,8 +4,9 @@ import {
     useChangeFolderOrderMutation,
     useMoveBookmarkMutation,
     useMoveFolderMutation,
-    useRenameFolderMutation,
+    useUpdateFolderMutation,
 } from '@graphql/generated/graphql';
+import { useDebouncedCallback } from '@lib/useDebouncedCallback';
 import { KremeProvider, Tree as KremeTree } from 'kreme';
 import { TreeDataType } from 'kreme/build/Tree/types';
 import { cloneDeep } from 'lodash';
@@ -51,13 +52,14 @@ const Tree = ({ struct, setActionClickLocation, setActionFolderId, setWillShowAc
         refetchQueries: [{ query: FOLDER, variables: { id: folderIdRef.current } }],
     });
 
-    const [renameFolder] = useRenameFolderMutation();
+    const [updateFolder] = useUpdateFolderMutation();
+    const debouncedUpdateFolder = useDebouncedCallback(updateFolder, 5000);
     return (
         <KremeProvider>
             <KremeTree
                 onInputSubmit={(id, name) => {
                     // Update server state
-                    renameFolder({ variables: { name, id: Number(id) } });
+                    updateFolder({ variables: { data: { name, id: Number(id) } } });
                     // Update tree state
                     setStruct((prev) => {
                         const clone = cloneDeep(prev);
@@ -73,6 +75,9 @@ const Tree = ({ struct, setActionClickLocation, setActionFolderId, setWillShowAc
 
                         return clone.map(updateData);
                     });
+                }}
+                onItemToggle={(id, isOpen) => {
+                    debouncedUpdateFolder({ variables: { data: { id: Number(id), isOpen } } });
                 }}
                 noDropOnEmpty
                 acceptedDropTypes={['Bookmark']}
