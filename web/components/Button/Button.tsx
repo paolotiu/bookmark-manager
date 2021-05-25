@@ -2,12 +2,15 @@ import React from 'react';
 
 interface Props extends React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
     label?: string;
+    isSecondary?: boolean;
 }
 
-const Button = ({ label, children, className, ...props }: Props) => {
+const Button = ({ label, children, className, isSecondary, ...props }: Props) => {
     return (
         <button
-            className={`px-3 py-1 flex items-center text-sm font-bold text-white rounded-sm bg-primary h-[min-content] disabled:opacity-50 ${className}`}
+            className={`px-3 py-1 flex items-center text-sm font-bold rounded-sm  disabled:opacity-50 ${
+                isSecondary ? 'text-primary border border-primary ' : 'text-white bg-primary'
+            } ${className}`}
             {...props}
         >
             {label}
