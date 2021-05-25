@@ -14,7 +14,7 @@ const NavItem = ({ href, label }: NavItemProps) => {
     return (
         <Link href={href}>
             <a
-                className={`md:p-2 px-4 py-2 rounded-sm w-1/3 md:block text-center hover:bg-white ${
+                className={`md:p-2 px-4 py-2 rounded-sm w-1/3 md:w-full md:text-left md:block text-center hover:bg-white ${
                     isActive && 'bg-white'
                 }`}
             >
