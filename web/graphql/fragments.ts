@@ -50,6 +50,7 @@ export const FolderFragments = {
             bookmarks {
                 ...Bookmark
             }
+            isOpen
         }
         ${BookmarkFragments.bookmark}
     `,

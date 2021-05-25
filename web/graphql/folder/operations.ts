@@ -64,9 +64,9 @@ export const CREATE_FOLDER_WITH_BOOKMARKS = gql`
     }
 `;
 
-export const RENAME_FOLDER = gql`
-    mutation renameFolder($id: Int!, $name: String!) {
-        updateFolderName(id: $id, name: $name) {
+export const UPDATE_FOLDER = gql`
+    mutation updateFolder($data: UpdateFolderInput!) {
+        updateFolder(data: $data) {
             ... on Folder {
                 id
                 name

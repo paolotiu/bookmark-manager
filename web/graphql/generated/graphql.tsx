@@ -78,6 +78,7 @@ export type Folder = {
   depth: Scalars['Int'];
   name: Scalars['String'];
   type: Scalars['String'];
+  isOpen: Scalars['Boolean'];
 };
 
 export type FolderArrayResult = BaseError | Folders;
@@ -115,6 +116,7 @@ export type Mutation = {
   softDeleteBookmarks: BookmarksResult;
   softDeleteFolder: FolderResult;
   updateBookmark: BookmarkResultWithInput;
+  updateFolder: FolderResult;
   updateFolderName: FolderResult;
 };
 
@@ -199,6 +201,11 @@ export type MutationUpdateBookmarkArgs = {
 };
 
 
+export type MutationUpdateFolderArgs = {
+  data: UpdateFolderInput;
+};
+
+
 export type MutationUpdateFolderNameArgs = {
   id: Scalars['Int'];
   name: Scalars['String'];
@@ -244,6 +251,12 @@ export type UpdateBookmarkInput = {
   description?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['String']>;
   folderId?: Maybe<Scalars['Int']>;
+};
+
+export type UpdateFolderInput = {
+  id: Scalars['Int'];
+  name?: Maybe<Scalars['String']>;
+  isOpen?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -503,6 +516,19 @@ export type RenameFolderMutation = (
   ) }
 );
 
+export type UpdateFolderMutationVariables = Exact<{
+  data: UpdateFolderInput;
+}>;
+
+
+export type UpdateFolderMutation = (
+  { __typename?: 'Mutation' }
+  & { updateFolder: { __typename?: 'BaseError' } | (
+    { __typename?: 'Folder' }
+    & Pick<Folder, 'id' | 'name'>
+  ) }
+);
+
 export type GetTreeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -545,7 +571,7 @@ export type FoldersArrayFragment = (
 
 export type FolderFragment = (
   { __typename?: 'Folder' }
-  & Pick<Folder, 'id' | 'name'>
+  & Pick<Folder, 'id' | 'name' | 'isOpen'>
   & { children: Array<Maybe<(
     { __typename?: 'Folder' }
     & Pick<Folder, 'id' | 'name'>
@@ -680,16 +706,17 @@ export type ResolversTypes = ResolversObject<{
   CreateFolderWithBookmarksInput: CreateFolderWithBookmarksInput;
   Date: ResolverTypeWrapper<Scalars['Date']>;
   Folder: ResolverTypeWrapper<FolderModel>;
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   FolderArrayResult: ResolversTypes['BaseError'] | ResolversTypes['Folders'];
   FolderResult: ResolversTypes['BaseError'] | ResolversTypes['Folder'];
   Folders: ResolverTypeWrapper<Omit<Folders, 'folders'> & { folders: Array<Maybe<ResolversTypes['Folder']>> }>;
   InputValidationError: ResolverTypeWrapper<InputValidationError>;
   Mutation: ResolverTypeWrapper<{}>;
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Query: ResolverTypeWrapper<{}>;
   Tree: ResolverTypeWrapper<Tree>;
   TreeResult: ResolversTypes['BaseError'] | ResolversTypes['Tree'];
   UpdateBookmarkInput: UpdateBookmarkInput;
+  UpdateFolderInput: UpdateFolderInput;
   Upload: ResolverTypeWrapper<Scalars['Upload']>;
   User: ResolverTypeWrapper<UserModel>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
@@ -711,16 +738,17 @@ export type ResolversParentTypes = ResolversObject<{
   CreateFolderWithBookmarksInput: CreateFolderWithBookmarksInput;
   Date: Scalars['Date'];
   Folder: FolderModel;
+  Boolean: Scalars['Boolean'];
   FolderArrayResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Folders'];
   FolderResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Folder'];
   Folders: Omit<Folders, 'folders'> & { folders: Array<Maybe<ResolversParentTypes['Folder']>> };
   InputValidationError: InputValidationError;
   Mutation: {};
-  Boolean: Scalars['Boolean'];
   Query: {};
   Tree: Tree;
   TreeResult: ResolversParentTypes['BaseError'] | ResolversParentTypes['Tree'];
   UpdateBookmarkInput: UpdateBookmarkInput;
+  UpdateFolderInput: UpdateFolderInput;
   Upload: Scalars['Upload'];
   User: UserModel;
   ID: Scalars['ID'];
@@ -776,6 +804,7 @@ export type FolderResolvers<ContextType = MyContext, ParentType extends Resolver
   depth?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   type?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  isOpen?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -815,6 +844,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   softDeleteBookmarks?: Resolver<ResolversTypes['BookmarksResult'], ParentType, ContextType, RequireFields<MutationSoftDeleteBookmarksArgs, 'ids'>>;
   softDeleteFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationSoftDeleteFolderArgs, 'id'>>;
   updateBookmark?: Resolver<ResolversTypes['BookmarkResultWithInput'], ParentType, ContextType, RequireFields<MutationUpdateBookmarkArgs, 'data'>>;
+  updateFolder?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationUpdateFolderArgs, 'data'>>;
   updateFolderName?: Resolver<ResolversTypes['FolderResult'], ParentType, ContextType, RequireFields<MutationUpdateFolderNameArgs, 'id' | 'name'>>;
 }>;
 
@@ -937,6 +967,7 @@ export const FolderFragmentDoc = gql`
   bookmarks {
     ...Bookmark
   }
+  isOpen
 }
     ${BookmarkFragmentDoc}`;
 export const FolderBookmarksFragmentDoc = gql`
@@ -1540,6 +1571,42 @@ export function useRenameFolderMutation(baseOptions?: Apollo.MutationHookOptions
 export type RenameFolderMutationHookResult = ReturnType<typeof useRenameFolderMutation>;
 export type RenameFolderMutationResult = Apollo.MutationResult<RenameFolderMutation>;
 export type RenameFolderMutationOptions = Apollo.BaseMutationOptions<RenameFolderMutation, RenameFolderMutationVariables>;
+export const UpdateFolderDocument = gql`
+    mutation updateFolder($data: UpdateFolderInput!) {
+  updateFolder(data: $data) {
+    ... on Folder {
+      id
+      name
+    }
+  }
+}
+    `;
+export type UpdateFolderMutationFn = Apollo.MutationFunction<UpdateFolderMutation, UpdateFolderMutationVariables>;
+
+/**
+ * __useUpdateFolderMutation__
+ *
+ * To run a mutation, you first call `useUpdateFolderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateFolderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateFolderMutation, { data, loading, error }] = useUpdateFolderMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateFolderMutation(baseOptions?: Apollo.MutationHookOptions<UpdateFolderMutation, UpdateFolderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateFolderMutation, UpdateFolderMutationVariables>(UpdateFolderDocument, options);
+      }
+export type UpdateFolderMutationHookResult = ReturnType<typeof useUpdateFolderMutation>;
+export type UpdateFolderMutationResult = Apollo.MutationResult<UpdateFolderMutation>;
+export type UpdateFolderMutationOptions = Apollo.BaseMutationOptions<UpdateFolderMutation, UpdateFolderMutationVariables>;
 export const GetTreeDocument = gql`
     query getTree {
   getTree {

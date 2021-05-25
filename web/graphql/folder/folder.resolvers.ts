@@ -211,12 +211,6 @@ export const folderResolvers: Resolvers = {
             const folder = await Folder.findOne(id, { where: { userId } });
             if (!folder) return createEntityIdNotFoundError('deleteFolder', 'folder');
             const parentPath = folder.path.split('.').slice(0, folder.depth).join('.');
-            // Soft delete
-            await Bookmark.createQueryBuilder()
-                .softDelete()
-                .where('folderId = :fid', { fid: id })
-                .andWhere('userId = :uid', { uid: userId })
-                .execute();
 
             // Remove folder id
             await Bookmark.createQueryBuilder()
@@ -276,6 +270,20 @@ export const folderResolvers: Resolvers = {
             folder.childrenOrder = order;
             folder.save();
             return true;
+        },
+        updateFolder: async (_, { data: { id, isOpen = null, name = null } }, { userId }) => {
+            const folder = await Folder.createQueryBuilder()
+                .update()
+                .set({
+                    isOpen: () => `COALESCE(${isOpen}, "isOpen")`,
+                    name: () => `COALESCE(${name ? `'${name}'` : null}, name)`,
+                })
+                .where('id = :id and "userId" = :userId', { id, userId })
+                .returning('*')
+                .execute()
+                .then((res) => res.raw[0]);
+
+            return folder || createEntityIdNotFoundError('updateFolder', 'folder');
         },
     },
 };

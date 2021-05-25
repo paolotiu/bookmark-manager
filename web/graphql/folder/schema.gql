@@ -6,6 +6,7 @@ type Folder {
     depth: Int!
     name: String!
     type: String!
+    isOpen: Boolean!
 }
 
 type Tree {
@@ -36,10 +37,17 @@ type Query {
     q: Folder
 }
 
+input UpdateFolderInput {
+    id: Int!
+    name: String
+    isOpen: Boolean
+}
+
 type Mutation {
     createFolder(data: CreateFolderInput!): FolderResult! @auth
     createFolderWithBookmarks(data: CreateFolderWithBookmarksInput!): Boolean @auth
     updateFolderName(id: Int!, name: String!): FolderResult! @auth
+    updateFolder(data: UpdateFolderInput!): FolderResult! @auth
     softDeleteFolder(id: Int!): FolderResult! @auth
     recoverFolder(id: Int!): FolderResult! @auth
     changeFolderOrder(id: Int!, order: [Int!]!): Boolean! @auth
