@@ -21,6 +21,7 @@ module.exports = {
                 sidebarIcon: '#B0B0B0',
                 chevron: '#9E9E9E',
                 inactiveSidebar: '#8B8B8B',
+                altBg: '#F9F9F9',
             },
             screens: {
                 '3xl': '1600px',
@@ -28,7 +29,7 @@ module.exports = {
                 1665: '1665px',
             },
             margin: {
-                'sidebar-width': '250px',
+                'sidebar-width': '300px',
             },
             keyframes: {
                 dropdown: {
