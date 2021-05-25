@@ -17,7 +17,7 @@ import { Bookmark } from '@entity/Bookmark';
 import { IBookmark, IFolder, IUser } from './interfaces';
 
 @Unique(['id', 'userId', 'depth'])
-@Entity({ synchronize: process.env.NODE_ENV === 'test' })
+@Entity({})
 export class Folder extends BaseEntity implements IFolder {
     children: Folder[];
 
@@ -38,6 +38,9 @@ export class Folder extends BaseEntity implements IFolder {
 
     @Column('int', { default: 0 })
     depth: number;
+
+    @Column('boolean', { default: false })
+    isOpen?: boolean;
 
     @ManyToOne(() => User, (user) => user.folders)
     @JoinColumn({ name: 'userId' })
