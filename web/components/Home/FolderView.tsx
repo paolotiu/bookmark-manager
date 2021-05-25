@@ -32,10 +32,10 @@ const FolderView = ({ folderId }: Props) => {
     return (
         <div>
             <div className="relative flex items-center justify-between p-3 pb-10">
-                <h2 className="text-4xl font-bold text-header">{name}</h2>
+                <h2 className="text-4xl font-bold text-header line-clamp-1">{name}</h2>
                 <div className="relative">
                     <Button
-                        className="relative"
+                        className="relative whitespace-nowrap"
                         onClick={() => {
                             setIsOpen(true);
                         }}

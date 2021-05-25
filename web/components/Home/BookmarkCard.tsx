@@ -68,7 +68,7 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId }: Props) => {
             className="relative block overflow-hidden border-b border-gray-200 hover:bg-gray-50 group"
             ref={device.isDesktop() ? drag : undefined}
         >
-            <div className="grid gap-2 p-3">
+            <div className="grid gap-2 p-3 ">
                 <div className="grid justify-between pr-4 bookmark-card-header grid-cols-[1fr] sm:grid-cols-[8fr,1fr]">
                     <h3 className="pr-5 text-base font-medium sm:line-clamp-3 line-clamp-2 ">
                         {decode(bookmark.title)}
@@ -79,8 +79,10 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId }: Props) => {
                     </div>
                 </div>
                 <p className="text-sm leading-5 line-clamp-3">{decode(bookmark.description)}</p>
-                <div className="flex flex-wrap">
-                    <span className="pr-1 text-xs text-gray-400 line-clamp-1 ">{bookmark.url} &nbsp;</span>
+                <div className="flex flex-wrap w-full ">
+                    <span className="w-full pr-1 text-xs text-gray-400 line-clamp-1" style={{ wordBreak: 'break-all' }}>
+                        {bookmark.url}
+                    </span>
 
                     <span className="text-xs text-gray-400 whitespace-nowrap">
                         {new Date(bookmark.createdDate).toDateString()}
