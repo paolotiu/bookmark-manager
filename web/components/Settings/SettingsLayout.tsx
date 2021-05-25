@@ -21,7 +21,7 @@ const NavItem = ({ href, label }: NavItemProps) => {
 };
 
 interface Props {
-    children: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 const SettingsLayout = ({ children }: Props) => {

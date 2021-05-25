@@ -4,7 +4,7 @@ import SettingsLayout from './SettingsLayout';
 const Settings = () => {
     return (
         <>
-            <SettingsLayout />
+            <SettingsLayout></SettingsLayout>
         </>
     );
 };
