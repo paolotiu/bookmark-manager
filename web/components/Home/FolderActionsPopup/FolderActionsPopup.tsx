@@ -1,4 +1,6 @@
 import { useDeleteFolderMutation } from '@graphql/generated/graphql';
+import { treeVar } from '@lib/apolloClient';
+import { TreeDataType } from 'kreme/build/Tree/types';
 import React, { CSSProperties, useEffect } from 'react';
 import { IconType } from 'react-icons';
 import { BiTrash } from 'react-icons/bi';
@@ -9,8 +11,6 @@ interface Props {
     style?: CSSProperties;
     closePopup: () => void;
     onDelete?: () => void;
-
-    renameFolder: (id: number) => void;
 }
 
 interface FolderActionProps {
@@ -30,7 +30,7 @@ const FolderAction = ({ onClick, Icon, label, iconSize }: FolderActionProps) => 
         </button>
     );
 };
-const FolderActionsPopup = ({ folderId, style, closePopup, onDelete, renameFolder }: Props) => {
+const FolderActionsPopup = ({ folderId, style, closePopup, onDelete }: Props) => {
     const [deleteFolder] = useDeleteFolderMutation({
         awaitRefetchQueries: true,
         refetchQueries: ['getTree'],
@@ -41,6 +41,20 @@ const FolderActionsPopup = ({ folderId, style, closePopup, onDelete, renameFolde
 
         return () => window.removeEventListener('mousedown', closePopup);
     }, [closePopup]);
+
+    const initiateFolderRename = (id: number) => {
+        const updateTree = (item: TreeDataType) => {
+            if (item.id === id) {
+                item.isInput = true;
+                return item;
+            }
+
+            item.children = item.children?.map(updateTree);
+            return item;
+        };
+
+        treeVar(treeVar().map(updateTree));
+    };
 
     const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -62,7 +76,7 @@ const FolderActionsPopup = ({ folderId, style, closePopup, onDelete, renameFolde
             <FolderAction onClick={handleDelete} label="Delete" Icon={BiTrash} />
             <FolderAction
                 onClick={() => {
-                    renameFolder(folderId);
+                    initiateFolderRename(folderId);
                     closePopup();
                 }}
                 label="Rename"

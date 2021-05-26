@@ -502,20 +502,6 @@ export type CreateFolderWithBookmarksMutation = (
   & Pick<Mutation, 'createFolderWithBookmarks'>
 );
 
-export type RenameFolderMutationVariables = Exact<{
-  id: Scalars['Int'];
-  name: Scalars['String'];
-}>;
-
-
-export type RenameFolderMutation = (
-  { __typename?: 'Mutation' }
-  & { updateFolderName: { __typename?: 'BaseError' } | (
-    { __typename?: 'Folder' }
-    & Pick<Folder, 'id' | 'name'>
-  ) }
-);
-
 export type UpdateFolderMutationVariables = Exact<{
   data: UpdateFolderInput;
 }>;
@@ -1534,43 +1520,6 @@ export function useCreateFolderWithBookmarksMutation(baseOptions?: Apollo.Mutati
 export type CreateFolderWithBookmarksMutationHookResult = ReturnType<typeof useCreateFolderWithBookmarksMutation>;
 export type CreateFolderWithBookmarksMutationResult = Apollo.MutationResult<CreateFolderWithBookmarksMutation>;
 export type CreateFolderWithBookmarksMutationOptions = Apollo.BaseMutationOptions<CreateFolderWithBookmarksMutation, CreateFolderWithBookmarksMutationVariables>;
-export const RenameFolderDocument = gql`
-    mutation renameFolder($id: Int!, $name: String!) {
-  updateFolderName(id: $id, name: $name) {
-    ... on Folder {
-      id
-      name
-    }
-  }
-}
-    `;
-export type RenameFolderMutationFn = Apollo.MutationFunction<RenameFolderMutation, RenameFolderMutationVariables>;
-
-/**
- * __useRenameFolderMutation__
- *
- * To run a mutation, you first call `useRenameFolderMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRenameFolderMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [renameFolderMutation, { data, loading, error }] = useRenameFolderMutation({
- *   variables: {
- *      id: // value for 'id'
- *      name: // value for 'name'
- *   },
- * });
- */
-export function useRenameFolderMutation(baseOptions?: Apollo.MutationHookOptions<RenameFolderMutation, RenameFolderMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RenameFolderMutation, RenameFolderMutationVariables>(RenameFolderDocument, options);
-      }
-export type RenameFolderMutationHookResult = ReturnType<typeof useRenameFolderMutation>;
-export type RenameFolderMutationResult = Apollo.MutationResult<RenameFolderMutation>;
-export type RenameFolderMutationOptions = Apollo.BaseMutationOptions<RenameFolderMutation, RenameFolderMutationVariables>;
 export const UpdateFolderDocument = gql`
     mutation updateFolder($data: UpdateFolderInput!) {
   updateFolder(data: $data) {

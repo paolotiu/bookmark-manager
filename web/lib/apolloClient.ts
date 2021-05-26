@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ApolloClient, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
+import { ApolloClient, InMemoryCache, makeVar, NormalizedCacheObject } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import merge from 'deepmerge';
 import isEqual from 'lodash/isEqual';
@@ -7,6 +7,7 @@ import cookie from 'cookie';
 import { IncomingMessage, ServerResponse } from 'http';
 import { createUploadLink } from 'apollo-upload-client';
 import { unionBy } from 'lodash';
+import { TreeDataType } from 'kreme/build/Tree/types';
 
 type Client = ApolloClient<NormalizedCacheObject>;
 
@@ -42,6 +43,9 @@ function createCookieString(cookies: { [key: string]: string }) {
     }
     return str;
 }
+
+// Variables in local state
+export const treeVar = makeVar<TreeDataType[]>([]);
 
 function createApolloClient(context?: ResolverContext) {
     const uploadLink = createUploadLink({
@@ -79,6 +83,15 @@ function createApolloClient(context?: ResolverContext) {
                         bookmarks: {
                             merge(existing = [], incoming) {
                                 return unionBy(existing, incoming, '__ref');
+                            },
+                        },
+                    },
+                },
+                Query: {
+                    fields: {
+                        tree: {
+                            read() {
+                                return treeVar();
                             },
                         },
                     },

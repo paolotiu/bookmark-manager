@@ -1,3 +1,4 @@
+import { useReactiveVar } from '@apollo/client';
 import { Bookmark } from '@entity/Bookmark';
 import { FOLDER } from '@graphql/folder/folderQuery';
 import {
@@ -6,15 +7,14 @@ import {
     useMoveFolderMutation,
     useUpdateFolderMutation,
 } from '@graphql/generated/graphql';
+import { treeVar } from '@lib/apolloClient';
 import { useDebouncedCallback } from '@lib/useDebouncedCallback';
 import { KremeProvider, Tree as KremeTree } from 'kreme';
 import { TreeDataType } from 'kreme/build/Tree/types';
-import { cloneDeep } from 'lodash';
 import { useRouter } from 'next/dist/client/router';
 import React, { useRef } from 'react';
 
 interface Props {
-    struct: TreeDataType[];
     setActionClickLocation: React.Dispatch<
         React.SetStateAction<{
             x: number;
@@ -24,10 +24,9 @@ interface Props {
 
     setActionFolderId: React.Dispatch<React.SetStateAction<number>>;
     setWillShowActions: React.Dispatch<React.SetStateAction<boolean>>;
-    setStruct: React.Dispatch<React.SetStateAction<TreeDataType[]>>;
 }
 
-const Tree = ({ struct, setActionClickLocation, setActionFolderId, setWillShowActions, setStruct }: Props) => {
+const Tree = ({ setActionClickLocation, setActionFolderId, setWillShowActions }: Props) => {
     const folderIdRef = useRef(-1);
     const prevFolderIdRef = useRef(-1);
     const [changeFolderOrder] = useChangeFolderOrderMutation();
@@ -51,30 +50,31 @@ const Tree = ({ struct, setActionClickLocation, setActionFolderId, setWillShowAc
         },
         refetchQueries: [{ query: FOLDER, variables: { id: folderIdRef.current } }],
     });
+    const localTree = useReactiveVar(treeVar);
 
     const [updateFolder] = useUpdateFolderMutation();
     const debouncedUpdateFolder = useDebouncedCallback(updateFolder, 5000);
     return (
         <KremeProvider>
             <KremeTree
-                onInputSubmit={(id, name) => {
-                    // Update server state
-                    updateFolder({ variables: { data: { name, id: Number(id) } } });
-                    // Update tree state
-                    setStruct((prev) => {
-                        const clone = cloneDeep(prev);
-                        const updateData = (item: TreeDataType) => {
-                            if (item.id === id) {
-                                item.isInput = false;
-                                item.name = name;
-                                return item;
-                            }
-                            item.children = item.children?.map(updateData);
-                            return item;
-                        };
+                onInputSubmit={({ id, newName, oldName }) => {
+                    if (newName === oldName) return;
 
-                        return clone.map(updateData);
-                    });
+                    // Update server state
+                    updateFolder({ variables: { data: { name: newName, id: Number(id) } } });
+
+                    // Update tree state
+                    const updateData = (item: TreeDataType) => {
+                        if (item.id === id) {
+                            item.isInput = false;
+                            item.name = newName;
+                            return item;
+                        }
+                        item.children = item.children?.map(updateData);
+                        return item;
+                    };
+
+                    treeVar(treeVar().map(updateData));
                 }}
                 onItemToggle={(id, isOpen) => {
                     debouncedUpdateFolder({ variables: { data: { id: Number(id), isOpen } } });
@@ -96,7 +96,7 @@ const Tree = ({ struct, setActionClickLocation, setActionFolderId, setWillShowAc
                 hoverColor="#5138ED40"
                 hoverBarColor="#5138ED80"
                 spaceLeft="1rem"
-                data={struct}
+                data={localTree}
                 onFolderClick={(id) => {
                     router.push('/home/' + id, undefined, {});
                 }}
@@ -124,6 +124,8 @@ const Tree = ({ struct, setActionClickLocation, setActionFolderId, setWillShowAc
                             },
                         });
                     }
+
+                    treeVar(data.newTree);
                 }}
                 draggable
             />

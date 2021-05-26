@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useGetTreeQuery, useUserNameQuery } from '@graphql/generated/graphql';
 import { isBaseError } from '@graphql/helpers';
-import { TreeDataType } from 'kreme/build/Tree/types';
 import { BiUser } from 'react-icons/bi';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { FiBookmark, FiSettings, FiTrash, FiMenu } from 'react-icons/fi';
@@ -9,7 +8,7 @@ import dynamic from 'next/dynamic';
 import AddFolderForm from './AddFolderForm/AddFolderForm';
 import Tree from './Tree/Tree';
 import { useRouter } from 'next/dist/client/router';
-import { cloneDeep } from 'lodash';
+import { treeVar } from '@lib/apolloClient';
 
 interface SidebarItemProps {
     icon?: any;
@@ -55,29 +54,12 @@ const Sidebar = () => {
     const [actionClickLocation, setActionClickLocation] = useState({ x: 0, y: 0 });
     const [actionFolderId, setActionFolderId] = useState(0);
     const { data: userNameData } = useUserNameQuery();
-    const [struct, setStruct] = useState<TreeDataType[]>([]);
 
     useEffect(() => {
         if (!loading && data?.getTree.__typename === 'Tree') {
-            setStruct(JSON.parse(data.getTree.tree || '[]'));
+            treeVar(JSON.parse(data.getTree.tree || '[]'));
         }
     }, [data, loading]);
-
-    const renameFolder = (id: number) => {
-        const updateStruct = (item: TreeDataType) => {
-            if (item.id === id) {
-                item.isInput = true;
-                return item;
-            }
-
-            item.children = item.children?.map(updateStruct);
-            return item;
-        };
-        setStruct((prev) => {
-            const clone = cloneDeep(prev);
-            return clone.map(updateStruct);
-        });
-    };
 
     if (!data || isBaseError(data?.getTree)) return null;
 
@@ -127,8 +109,6 @@ const Sidebar = () => {
                 </div>
                 <div className="pt-5">
                     <Tree
-                        setStruct={setStruct}
-                        struct={struct}
                         setActionClickLocation={setActionClickLocation}
                         setActionFolderId={setActionFolderId}
                         setWillShowActions={setWillShowActions}
@@ -147,7 +127,6 @@ const Sidebar = () => {
 
                 {willShowActions && (
                     <FolderActionsPopup
-                        renameFolder={renameFolder}
                         closePopup={() => setWillShowActions(false)}
                         folderId={Number(actionFolderId)}
                         style={{
