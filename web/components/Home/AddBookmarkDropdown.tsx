@@ -8,6 +8,7 @@ import { useForm } from '@lib/useForm';
 import React, { Fragment, useEffect, useState } from 'react';
 import * as yup from 'yup';
 import { cloneDeep } from 'lodash';
+import { isValidUrl } from '@lib/isValidUrl';
 const Spinner = dynamic(() => import('./Spinner/Spinner'));
 
 interface Props {
@@ -15,9 +16,13 @@ interface Props {
     isOpen: boolean;
     closeDropDown: () => void;
 }
-
 const createBookmarkSchema = yup.object().shape({
-    url: yup.string().url('Must be a valid URL').required(''),
+    url: yup
+        .string()
+        .test('is-url-valid', 'URL is not valid', (value) => {
+            return isValidUrl(value);
+        })
+        .required(''),
 });
 const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
     const { inputs, handleChange, errors, isError, resetForm } = useForm(
