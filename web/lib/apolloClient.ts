@@ -46,6 +46,8 @@ function createCookieString(cookies: { [key: string]: string }) {
 
 // Variables in local state
 export const treeVar = makeVar<TreeDataType[]>([]);
+export const importProgressVar = makeVar<number>(0);
+export const isImportingVar = makeVar<boolean>(false);
 
 function createApolloClient(context?: ResolverContext) {
     const uploadLink = createUploadLink({

@@ -4,6 +4,8 @@ import { useCreateFolderWithBookmarksMutation } from '@graphql/generated/graphql
 import React, { useState } from 'react';
 import { series } from 'async';
 import SettingsLayout from './SettingsLayout';
+import { useReactiveVar } from '@apollo/client';
+import { importProgressVar, isImportingVar } from '@lib/apolloClient';
 
 const getCategory = (a: Element) => {
     return a.closest('DL')?.previousElementSibling?.textContent || '';
@@ -64,14 +66,14 @@ const Import = () => {
         refetchQueries: [{ query: TREE_QUERY }],
     });
 
-    const [isImporting, setIsImporting] = useState(false);
-    const [progress, setProgress] = useState(0);
+    const isImporting = useReactiveVar(isImportingVar);
+    const progress = useReactiveVar(importProgressVar);
     const [file, setFile] = useState<File>();
     const [folders, setFolders] = useState<Folders>({});
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        setProgress(0);
-        setIsImporting(false);
+        importProgressVar(0);
+        isImportingVar(false);
         if (!e.target.files) return;
 
         const map: { [key: string]: { title: string; url: string }[] } = {};
@@ -108,7 +110,8 @@ const Import = () => {
     };
 
     const startImport = async () => {
-        setIsImporting(true);
+        // Show progress bar
+        isImportingVar(true);
 
         const totalFolders = Object.keys(folders).length;
 
@@ -116,7 +119,7 @@ const Import = () => {
             Object.entries(folders).map(([key, bookmarks]) => {
                 return async (cb: any) => {
                     await createFolderWithBookmarks({ variables: { bookmarks, folderName: key } });
-                    setProgress((prev) => Math.min(100, prev + 100 / totalFolders));
+                    importProgressVar(Math.min(100, importProgressVar() + 100 / totalFolders));
                     cb(null);
                 };
             }),
