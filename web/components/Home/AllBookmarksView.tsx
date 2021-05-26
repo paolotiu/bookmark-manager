@@ -3,10 +3,10 @@ import { useAllBookmarksQuery } from '@graphql/generated/graphql';
 import BookmarkCard from './BookmarkCard';
 import AddBookmarkDropdown from './AddBookmarkDropdown';
 import Button from '@components/Button/Button';
-import { bookmarkDateSort, bookmarkTitleSort } from '@lib/sortFuncs';
+import { bookmarkDateSort } from '@lib/sortFuncs';
 
 const AllBookmarksView = () => {
-    const { data, refetch } = useAllBookmarksQuery({});
+    const { data } = useAllBookmarksQuery({});
     const [isOpen, setIsOpen] = useState(false);
     const closeDropdown = useCallback(() => setIsOpen(false), []);
     if (!data || data.bookmarks.__typename !== 'Bookmarks') return null;
@@ -32,12 +32,7 @@ const AllBookmarksView = () => {
                     >
                         <span>Add +</span>
                     </Button>
-                    <AddBookmarkDropdown
-                        folderId={null}
-                        isOpen={isOpen}
-                        onSubmit={refetch}
-                        closeDropDown={closeDropdown}
-                    />
+                    <AddBookmarkDropdown folderId={null} isOpen={isOpen} closeDropDown={closeDropdown} />
                 </div>
             </div>
             <div>
