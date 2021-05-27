@@ -1,4 +1,7 @@
+const plugin = require('tailwindcss/plugin');
+
 module.exports = {
+    mode: 'jit',
     purge: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
     darkMode: false, // or 'media' or 'class'
     theme: {
@@ -22,6 +25,9 @@ module.exports = {
                 chevron: '#9E9E9E',
                 inactiveSidebar: '#8B8B8B',
                 altBg: '#F9F9F9',
+                borderActive: '#b7b7b7',
+                inputGrayBg: 'hsla(0,0%,77%,0.18)',
+                inputGrayText: 'hsla(0,0%,67%,1)',
             },
             screens: {
                 '3xl': '1600px',
@@ -56,8 +62,37 @@ module.exports = {
             },
         },
     },
-    variants: {
-        extend: {},
-    },
-    plugins: [require('@tailwindcss/line-clamp')],
+    plugins: [
+        require('@tailwindcss/line-clamp'),
+        plugin(function ({ addUtilities, theme, e }) {
+            const colors = theme('colors');
+
+            const shadowBorderUtilities = Object.keys(colors).reduce((acc, key) => {
+                if (typeof colors[key] === 'string') {
+                    return {
+                        ...acc,
+                        [`.shadow-border-b-${e(key)}`]: {
+                            'box-shadow': `0 1px 0 ${colors[key]}`,
+                        },
+                    };
+                }
+
+                const colorShades = Object.keys(colors[key]);
+
+                return {
+                    ...acc,
+                    ...colorShades.reduce(
+                        (a, shade) => ({
+                            ...a,
+                            [`.shadow-border-b-${e(key)}-${shade}`]: {
+                                'box-shadow': `0 1px 0 ${colors[key][shade]}`,
+                            },
+                        }),
+                        {},
+                    ),
+                };
+            }, {});
+            addUtilities(shadowBorderUtilities, ['responsive', 'hover', 'focus-within']);
+        }),
+    ],
 };
