@@ -396,6 +396,19 @@ export type AllBookmarksQuery = (
   ) }
 );
 
+export type UpdateBookmarkMutationVariables = Exact<{
+  data: UpdateBookmarkInput;
+}>;
+
+
+export type UpdateBookmarkMutation = (
+  { __typename?: 'Mutation' }
+  & { updateBookmark: { __typename?: 'BaseError' } | (
+    { __typename?: 'Bookmark' }
+    & BookmarkFragment
+  ) | { __typename?: 'InputValidationError' } }
+);
+
 export type FolderBookmarksQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -596,7 +609,7 @@ export type UserNameQuery = (
   { __typename?: 'Query' }
   & { me?: Maybe<{ __typename?: 'BaseError' } | (
     { __typename?: 'User' }
-    & Pick<User, 'name'>
+    & Pick<User, 'id' | 'name'>
   )> }
 );
 
@@ -1263,6 +1276,39 @@ export function useAllBookmarksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type AllBookmarksQueryHookResult = ReturnType<typeof useAllBookmarksQuery>;
 export type AllBookmarksLazyQueryHookResult = ReturnType<typeof useAllBookmarksLazyQuery>;
 export type AllBookmarksQueryResult = Apollo.QueryResult<AllBookmarksQuery, AllBookmarksQueryVariables>;
+export const UpdateBookmarkDocument = gql`
+    mutation updateBookmark($data: UpdateBookmarkInput!) {
+  updateBookmark(data: $data) {
+    ...Bookmark
+  }
+}
+    ${BookmarkFragmentDoc}`;
+export type UpdateBookmarkMutationFn = Apollo.MutationFunction<UpdateBookmarkMutation, UpdateBookmarkMutationVariables>;
+
+/**
+ * __useUpdateBookmarkMutation__
+ *
+ * To run a mutation, you first call `useUpdateBookmarkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateBookmarkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateBookmarkMutation, { data, loading, error }] = useUpdateBookmarkMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateBookmarkMutation(baseOptions?: Apollo.MutationHookOptions<UpdateBookmarkMutation, UpdateBookmarkMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateBookmarkMutation, UpdateBookmarkMutationVariables>(UpdateBookmarkDocument, options);
+      }
+export type UpdateBookmarkMutationHookResult = ReturnType<typeof useUpdateBookmarkMutation>;
+export type UpdateBookmarkMutationResult = Apollo.MutationResult<UpdateBookmarkMutation>;
+export type UpdateBookmarkMutationOptions = Apollo.BaseMutationOptions<UpdateBookmarkMutation, UpdateBookmarkMutationVariables>;
 export const FolderBookmarksDocument = gql`
     query folderBookmarks($id: Int!) {
   folder(id: $id) {
@@ -1596,6 +1642,7 @@ export const UserNameDocument = gql`
     query userName {
   me {
     ... on User {
+      id
       name
     }
   }
