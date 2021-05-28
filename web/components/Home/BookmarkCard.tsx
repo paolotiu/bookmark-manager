@@ -1,12 +1,25 @@
 import React from 'react';
 import { ApolloCache } from '@apollo/client';
-import { cloneDeep } from 'lodash';
-import { Bookmark, useHardDeleteBookmarkMutation, useSoftDeleteBookmarkMutation } from '@graphql/generated/graphql';
+import {
+    Bookmark,
+    useHardDeleteBookmarkMutation,
+    useSoftDeleteBookmarkMutation,
+    useUpdateBookmarkMutation,
+} from '@graphql/generated/graphql';
 import { decode } from 'html-entities';
 import { useDrag } from 'react-dnd';
 import { FaPen, FaTrash } from 'react-icons/fa';
 import ActionButton from './ActionButton/ActionButton';
 import { useDetectDevice } from '@lib/useDetectDevice';
+import Button from '@components/Button/Button';
+import {
+    addBookmarksToAll,
+    addBookmarksToTrash,
+    addBookmarkToFolder,
+    removeBookmarkFromFolder,
+    removeBookmarksFromAll,
+    removeBookmarksFromTrash,
+} from './cacheUpdates';
 
 interface Props {
     bookmark: Bookmark;
@@ -14,32 +27,17 @@ interface Props {
     // For cache updates
     folderId: number | null;
     triggerEditing: (id: number) => void;
+    isDeleted?: boolean;
 }
 
-const bookmarkSoftDeletionCacheUpdate = (cache: ApolloCache<any>, bookmarkId: number, folderId: number | null) => {
-    cache.modify({
-        id: cache.identify({ __typename: 'Folder', id: folderId }),
-        fields: {
-            bookmarks(existingBookmarksRef = [], { readField }) {
-                return existingBookmarksRef.filter((bookmarkRef: any) => bookmarkId !== readField('id', bookmarkRef));
-            },
-        },
-    });
-    cache.modify({
-        id: 'ROOT_QUERY',
-        fields: {
-            bookmarks(existingBookmarks, { readField }) {
-                const clone = cloneDeep(existingBookmarks);
-                clone.bookmarks = existingBookmarks.bookmarks.filter(
-                    (bookmarkRef: any) => bookmarkId !== readField('id', bookmarkRef),
-                );
-                return clone;
-            },
-        },
-        broadcast: true,
-    });
+const bookmarkSoftDeletionCacheUpdate = (cache: ApolloCache<any>, bookmark: Bookmark, folderId: number | null) => {
+    if (folderId) {
+        removeBookmarkFromFolder(cache, { bookmarkIds: [bookmark.id], folderId });
+    }
+    removeBookmarksFromAll(cache, { bookmarkIds: [bookmark.id] });
+    addBookmarksToTrash(cache, { bookmarks: [bookmark] });
 };
-const BookmarkCard = ({ bookmark, hardDelete = false, folderId, triggerEditing }: Props) => {
+const BookmarkCard = ({ bookmark, hardDelete = false, folderId, triggerEditing, isDeleted }: Props) => {
     const [, drag] = useDrag(() => ({
         type: 'Bookmark',
         item: bookmark,
@@ -48,12 +46,30 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId, triggerEditing }
     const device = useDetectDevice();
     const [softDeleteBookmark] = useSoftDeleteBookmarkMutation({
         update(cache) {
-            bookmarkSoftDeletionCacheUpdate(cache, bookmark.id, folderId);
+            bookmarkSoftDeletionCacheUpdate(cache, bookmark, folderId);
         },
     });
     const [hardDeleteBookmark] = useHardDeleteBookmarkMutation({
         update(cache) {
             cache.evict({ id: cache.identify({ __typename: 'Bookmark', id: bookmark.id }) });
+        },
+    });
+    const [restoreBookmark] = useUpdateBookmarkMutation({
+        variables: { data: { id: bookmark.id, restore: true } },
+        update(cache, { data }) {
+            console.log('up');
+            // Update folder where bookmark will get restored
+            if (data?.updateBookmark.__typename === 'Bookmark' && data.updateBookmark.folderId) {
+                addBookmarkToFolder(cache, {
+                    bookmarks: [data.updateBookmark],
+                    folderId: data.updateBookmark.folderId,
+                });
+            }
+
+            // Update trash
+            removeBookmarksFromTrash(cache, { bookmarkIds: [bookmark.id] });
+            // Update All Page
+            addBookmarksToAll(cache, { bookmarks: [bookmark] });
         },
     });
 
@@ -84,10 +100,25 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId, triggerEditing }
                     </h3>
 
                     <div
-                        className={`absolute items-start justify-around hidden p-3 bg-white shadow-md sm:bg-transparent sm:shadow-none sm:p-0 sm:static group-hover:flex  sm:flex right-3`}
+                        className={`absolute items-stretch justify-around hidden p-3 space-x-4 sm:space-x-1 bg-white shadow-md sm:bg-transparent sm:shadow-none sm:p-0 sm:static group-hover:flex  sm:flex right-3`}
                     >
-                        <ActionButton onClick={handleDelete} icon={<FaTrash />} />
-                        <ActionButton onClick={handleEdit} icon={<FaPen />} />
+                        {isDeleted ? (
+                            <Button
+                                isSecondary
+                                className="border-none text-inputGrayText"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    restoreBookmark();
+                                }}
+                            >
+                                Restore
+                            </Button>
+                        ) : (
+                            <>
+                                <ActionButton onClick={handleDelete} icon={<FaTrash />} />
+                                <ActionButton onClick={handleEdit} icon={<FaPen />} />
+                            </>
+                        )}
                     </div>
                 </div>
                 <p className="text-sm leading-5 line-clamp-3">{decode(bookmark.description)}</p>

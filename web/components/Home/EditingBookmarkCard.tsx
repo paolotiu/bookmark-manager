@@ -1,11 +1,10 @@
 import { gql, useApolloClient, useReactiveVar } from '@apollo/client';
 import Button from '@components/Button/Button';
-import { FOLDER } from '@graphql/folder/folderQuery';
-import { Bookmark, Folder, FolderResult, useUpdateBookmarkMutation } from '@graphql/generated/graphql';
+import { Bookmark, Folder, useUpdateBookmarkMutation } from '@graphql/generated/graphql';
 import { treeVar } from '@lib/apolloClient';
 import { useForm } from '@lib/useForm';
 import { KremeProvider, Tree } from 'kreme';
-import { cloneDeep } from 'lodash';
+import { addBookmarkToFolder, removeBookmarkFromFolder } from './cacheUpdates';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 interface Props {
@@ -34,41 +33,19 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
 
     const [updateBookmark] = useUpdateBookmarkMutation({
         update(cache, { data }) {
-            if (data?.updateBookmark.__typename === 'Bookmark') {
-                // Update target folder cache
-                const targetFolder = cache.readQuery({
-                    query: FOLDER,
-                    variables: { id: data.updateBookmark.folderId },
-                }) as { folder: FolderResult } | null;
-
-                if (targetFolder?.folder.__typename === 'Folder' && targetFolder.folder.bookmarks) {
-                    cache.writeQuery({
-                        query: FOLDER,
-                        data: {
-                            folder: {
-                                ...targetFolder.folder,
-
-                                bookmarks: [...cloneDeep(targetFolder.folder.bookmarks), data.updateBookmark],
-                            },
-                        },
-                        variables: {
-                            id: data.updateBookmark.folderId,
-                        },
-                    });
-                }
+            if (data?.updateBookmark.__typename === 'Bookmark' && data.updateBookmark.folderId) {
+                addBookmarkToFolder(cache, {
+                    bookmarks: [data.updateBookmark],
+                    folderId: data.updateBookmark.folderId || 0,
+                });
 
                 // Prevent cache filtering if folders dont change
-                if (bookmark.folderId === data.updateBookmark.folderId) return;
+                if (bookmark.folderId === data.updateBookmark.folderId || !bookmark.folderId) return;
+
                 // Evict from this folder
-                cache.modify({
-                    id: cache.identify({ __typename: 'Folder', id: bookmark.folderId }),
-                    fields: {
-                        bookmarks(existingBookmarksRef = [], { readField }) {
-                            return existingBookmarksRef.filter(
-                                (bookmarkRef: any) => bookmark.id !== readField('id', bookmarkRef),
-                            );
-                        },
-                    },
+                removeBookmarkFromFolder(cache, {
+                    bookmarkIds: [bookmark.id],
+                    folderId: bookmark.folderId,
                 });
             }
         },
@@ -240,8 +217,11 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
                     </div>
                 </div>
             </div>
-            <div className="pt-3 ">
+            <div className="flex pt-3 space-x-1">
                 <Button type="submit">Save</Button>
+                <Button type="button" isSecondary className="font-normal border-none text-header" onClick={stopEditing}>
+                    Cancel
+                </Button>
             </div>
         </form>
     );

@@ -1,14 +1,13 @@
 import Button from '@components/Button/Button';
 import dynamic from 'next/dynamic';
 import ErrorMessage from '@components/General/ErrorMessage';
-import { BookmarkFragments } from '@graphql/fragments';
-import { Bookmark, useCreateBookmarkMutation } from '@graphql/generated/graphql';
+import { useCreateBookmarkMutation } from '@graphql/generated/graphql';
 import { Transition } from '@headlessui/react';
 import { useForm } from '@lib/useForm';
 import React, { Fragment, useEffect, useState } from 'react';
 import * as yup from 'yup';
-import { cloneDeep } from 'lodash';
 import { isValidUrl } from '@lib/isValidUrl';
+import { addBookmarksToAll, addBookmarkToFolder } from './cacheUpdates';
 const Spinner = dynamic(() => import('./Spinner/Spinner'));
 
 interface Props {
@@ -45,40 +44,14 @@ const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
     const [createBookmark] = useCreateBookmarkMutation({
         update(cache, { data }) {
             if (data && data.createBookmark.__typename === 'Bookmark') {
-                cache.modify({
-                    id: cache.identify({ __typename: 'Folder', id: folderId }),
-                    fields: {
-                        bookmarks(existingBookmarksRef = [], { readField }) {
-                            const newBookmarkRef = cache.writeFragment({
-                                data: data.createBookmark,
-                                fragment: BookmarkFragments.bookmark,
-                            });
+                if (folderId) {
+                    addBookmarkToFolder(cache, {
+                        bookmarks: [data.createBookmark],
+                        folderId: Number(folderId),
+                    });
+                }
 
-                            // Quick safety check - if the new comment is already
-                            // present in the cache, we don't need to add it again.
-                            if (
-                                existingBookmarksRef.some(
-                                    (ref: any) => readField('id', ref) === (data.createBookmark as Bookmark).id,
-                                )
-                            ) {
-                                return existingBookmarksRef;
-                            }
-                            return [...existingBookmarksRef, newBookmarkRef];
-                        },
-                    },
-                });
-
-                // Add to all bookmarks
-                cache.modify({
-                    id: 'ROOT_QUERY',
-                    fields: {
-                        bookmarks(existingBookmarks) {
-                            const clone = cloneDeep(existingBookmarks);
-                            clone.bookmarks.push(data.createBookmark);
-                            return clone;
-                        },
-                    },
-                });
+                addBookmarksToAll(cache, { bookmarks: [data.createBookmark] });
             }
         },
     });
