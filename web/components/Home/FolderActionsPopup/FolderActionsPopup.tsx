@@ -1,6 +1,7 @@
 import { useDeleteFolderMutation } from '@graphql/generated/graphql';
 import { treeVar } from '@lib/apolloClient';
 import { TreeDataType } from 'kreme/build/Tree/types';
+import { cloneDeep } from 'lodash';
 import React, { CSSProperties, useEffect } from 'react';
 import { IconType } from 'react-icons';
 import { BiTrash } from 'react-icons/bi';
@@ -53,7 +54,8 @@ const FolderActionsPopup = ({ folderId, style, closePopup, onDelete }: Props) =>
             return item;
         };
 
-        treeVar(treeVar().map(updateTree));
+        const cloned = cloneDeep(treeVar());
+        treeVar(cloned.map(updateTree));
     };
 
     const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
