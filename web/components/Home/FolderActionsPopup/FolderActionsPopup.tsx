@@ -6,6 +6,7 @@ import React, { CSSProperties, useEffect } from 'react';
 import { IconType } from 'react-icons';
 import { BiTrash } from 'react-icons/bi';
 import { BsPencilSquare } from 'react-icons/bs';
+import { removeFolderFromCache } from '../cacheUpdates';
 
 interface Props {
     folderId: number;
@@ -35,6 +36,9 @@ const FolderActionsPopup = ({ folderId, style, closePopup, onDelete }: Props) =>
     const [deleteFolder] = useDeleteFolderMutation({
         awaitRefetchQueries: true,
         refetchQueries: ['getTree'],
+        update(cache) {
+            removeFolderFromCache(cache, { folderId });
+        },
     });
 
     useEffect(() => {

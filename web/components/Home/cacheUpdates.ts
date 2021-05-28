@@ -141,3 +141,13 @@ export const removeBookmarksFromTrash = <CacheType>(
         });
     }
 };
+
+interface RemoveFolderFromCacheOptions {
+    folderId: number;
+}
+export const removeFolderFromCache = <CacheType>(
+    cache: ApolloCache<CacheType>,
+    { folderId }: RemoveFolderFromCacheOptions,
+) => {
+    cache.evict({ id: cache.identify({ __typename: 'Folder', id: folderId }) });
+};
