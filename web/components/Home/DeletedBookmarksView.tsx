@@ -41,6 +41,7 @@ const DeletedBookmarksView = () => {
                     return (
                         bookmark && (
                             <BookmarkCard
+                                isDeleted
                                 triggerEditing={triggerEditing}
                                 folderId={1}
                                 hardDelete
