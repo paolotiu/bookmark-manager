@@ -1,10 +1,12 @@
 import Button from '@components/Button/Button';
 import { useDeletedBookmarksQuery, useHardDeleteBookmarksMutation } from '@graphql/generated/graphql';
+import { useEditing } from '@lib/useEditing';
 import React from 'react';
 import BookmarkCard from './BookmarkCard';
+import EditingBookmarkCard from './EditingBookmarkCard';
 
 const DeletedBookmarksView = () => {
-    const { data } = useDeletedBookmarksQuery({ fetchPolicy: 'cache-and-network' });
+    const { data } = useDeletedBookmarksQuery();
     const [hardDeleteBookmarks] = useHardDeleteBookmarksMutation({
         update(cache, { data }) {
             if (data?.hardDeleteBookmarks.__typename === 'Bookmarks') {
@@ -14,6 +16,7 @@ const DeletedBookmarksView = () => {
             }
         },
     });
+    const { currentEditingBookmark, stopEditing, triggerEditing } = useEditing();
 
     if (!data || data.bookmarks.__typename !== 'Bookmarks') return null;
 
@@ -33,7 +36,19 @@ const DeletedBookmarksView = () => {
             </div>
             <div>
                 {bookmarks.map((bookmark) => {
-                    return bookmark && <BookmarkCard folderId={1} hardDelete bookmark={bookmark} key={bookmark?.id} />;
+                    if (bookmark?.id === currentEditingBookmark)
+                        return <EditingBookmarkCard bookmark={bookmark} stopEditing={stopEditing} key={bookmark.id} />;
+                    return (
+                        bookmark && (
+                            <BookmarkCard
+                                triggerEditing={triggerEditing}
+                                folderId={1}
+                                hardDelete
+                                bookmark={bookmark}
+                                key={bookmark?.id}
+                            />
+                        )
+                    );
                 })}
             </div>
         </div>

@@ -3,19 +3,23 @@ import { useAllBookmarksQuery } from '@graphql/generated/graphql';
 import BookmarkCard from './BookmarkCard';
 import AddBookmarkDropdown from './AddBookmarkDropdown';
 import Button from '@components/Button/Button';
-import { bookmarkDateSort } from '@lib/sortFuncs';
+import { bookmarkTitleSort } from '@lib/sortFuncs';
+import EditingBookmarkCard from './EditingBookmarkCard';
+import { useEditing } from '@lib/useEditing';
 
 const AllBookmarksView = () => {
     const { data } = useAllBookmarksQuery({});
     const [isOpen, setIsOpen] = useState(false);
     const closeDropdown = useCallback(() => setIsOpen(false), []);
+    const { currentEditingBookmark, stopEditing, triggerEditing } = useEditing();
     if (!data || data.bookmarks.__typename !== 'Bookmarks') return null;
 
     const { bookmarks } = data.bookmarks;
     const sorted = [...bookmarks].sort((a, b) => {
         if (!a || !b) return 0;
-        return bookmarkDateSort(a, b);
+        return bookmarkTitleSort(a, b);
     });
+
     return (
         <div>
             <div className="relative flex items-center justify-between p-3 pb-10">
@@ -37,9 +41,16 @@ const AllBookmarksView = () => {
             </div>
             <div>
                 {sorted.map((bookmark) => {
+                    if (bookmark?.id === currentEditingBookmark)
+                        return <EditingBookmarkCard key={bookmark.id} bookmark={bookmark} stopEditing={stopEditing} />;
                     return (
                         bookmark && (
-                            <BookmarkCard folderId={bookmark.folderId || 0} bookmark={bookmark} key={bookmark?.id} />
+                            <BookmarkCard
+                                triggerEditing={triggerEditing}
+                                folderId={bookmark.folderId || 0}
+                                bookmark={bookmark}
+                                key={bookmark?.id}
+                            />
                         )
                     );
                 })}

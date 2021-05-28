@@ -1,9 +1,10 @@
+import React from 'react';
 import { ApolloCache } from '@apollo/client';
 import { cloneDeep } from 'lodash';
 import { Bookmark, useHardDeleteBookmarkMutation, useSoftDeleteBookmarkMutation } from '@graphql/generated/graphql';
 import { decode } from 'html-entities';
 import { useDrag } from 'react-dnd';
-import { FaTrash } from 'react-icons/fa';
+import { FaPen, FaTrash } from 'react-icons/fa';
 import ActionButton from './ActionButton/ActionButton';
 import { useDetectDevice } from '@lib/useDetectDevice';
 
@@ -12,6 +13,7 @@ interface Props {
     hardDelete?: boolean;
     // For cache updates
     folderId: number | null;
+    triggerEditing: (id: number) => void;
 }
 
 const bookmarkSoftDeletionCacheUpdate = (cache: ApolloCache<any>, bookmarkId: number, folderId: number | null) => {
@@ -34,13 +36,15 @@ const bookmarkSoftDeletionCacheUpdate = (cache: ApolloCache<any>, bookmarkId: nu
                 return clone;
             },
         },
+        broadcast: true,
     });
 };
-const BookmarkCard = ({ bookmark, hardDelete = false, folderId }: Props) => {
+const BookmarkCard = ({ bookmark, hardDelete = false, folderId, triggerEditing }: Props) => {
     const [, drag] = useDrag(() => ({
         type: 'Bookmark',
         item: bookmark,
     }));
+
     const device = useDetectDevice();
     const [softDeleteBookmark] = useSoftDeleteBookmarkMutation({
         update(cache) {
@@ -60,6 +64,11 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId }: Props) => {
         }
         await softDeleteBookmark({ variables: { id: bookmark.id } });
     };
+
+    const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        triggerEditing(bookmark.id);
+    };
     return (
         <a
             href={bookmark.url}
@@ -74,8 +83,11 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId }: Props) => {
                         {decode(bookmark.title)}
                     </h3>
 
-                    <div className="absolute items-start justify-around hidden p-3 bg-white shadow-md sm:bg-transparent sm:shadow-none sm:p-0 sm:static hover:flex sm:flex right-3">
+                    <div
+                        className={`absolute items-start justify-around hidden p-3 bg-white shadow-md sm:bg-transparent sm:shadow-none sm:p-0 sm:static group-hover:flex  sm:flex right-3`}
+                    >
                         <ActionButton onClick={handleDelete} icon={<FaTrash />} />
+                        <ActionButton onClick={handleEdit} icon={<FaPen />} />
                     </div>
                 </div>
                 <p className="text-sm leading-5 line-clamp-3">{decode(bookmark.description)}</p>

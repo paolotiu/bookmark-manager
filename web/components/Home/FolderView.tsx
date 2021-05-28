@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 import BookmarkCard from './BookmarkCard';
 import { cloneDeep } from 'lodash';
 import { bookmarkDateSort } from '@lib/sortFuncs';
+import EditingBookmarkCard from './EditingBookmarkCard';
+import { useEditing } from '@lib/useEditing';
 
 const AddBookmarkDropdown = dynamic(() => import('./AddBookmarkDropdown'));
 interface Props {
@@ -20,6 +22,7 @@ const FolderView = ({ folderId }: Props) => {
     });
 
     const [isOpen, setIsOpen] = useState(false);
+    const { currentEditingBookmark, stopEditing, triggerEditing } = useEditing();
 
     if (!data || isBaseError(data.folder)) return null;
     const { name, bookmarks } = data.folder;
@@ -29,6 +32,7 @@ const FolderView = ({ folderId }: Props) => {
         }
         return bookmarkDateSort(prev, curr);
     });
+
     return (
         <div>
             <div className="relative flex items-center justify-between p-3 pb-10">
@@ -50,7 +54,18 @@ const FolderView = ({ folderId }: Props) => {
             </div>
             <div>
                 {sorted.map((bookmark) => {
-                    return bookmark && <BookmarkCard folderId={folderId} bookmark={bookmark} key={bookmark?.id} />;
+                    if (currentEditingBookmark === bookmark?.id)
+                        return <EditingBookmarkCard key={bookmark.id} bookmark={bookmark} stopEditing={stopEditing} />;
+                    return (
+                        bookmark && (
+                            <BookmarkCard
+                                triggerEditing={triggerEditing}
+                                folderId={folderId}
+                                bookmark={bookmark}
+                                key={bookmark?.id}
+                            />
+                        )
+                    );
                 })}
             </div>
         </div>
