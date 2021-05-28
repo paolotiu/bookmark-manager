@@ -1,6 +1,5 @@
 import { gql, useApolloClient, useReactiveVar } from '@apollo/client';
 import { Bookmark } from '@entity/Bookmark';
-import { FOLDER } from '@graphql/folder/folderQuery';
 import {
     Folder,
     useChangeFolderOrderMutation,
