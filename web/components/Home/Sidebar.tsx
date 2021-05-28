@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useGetTreeQuery, useUserNameQuery } from '@graphql/generated/graphql';
-import { isBaseError } from '@graphql/helpers';
+import React, { useState } from 'react';
+import { useUserNameQuery } from '@graphql/generated/graphql';
 import { BiUser } from 'react-icons/bi';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { FiBookmark, FiSettings, FiTrash, FiMenu } from 'react-icons/fi';
@@ -8,7 +7,6 @@ import dynamic from 'next/dynamic';
 import AddFolderForm from './AddFolderForm/AddFolderForm';
 import Tree from './Tree/Tree';
 import { useRouter } from 'next/dist/client/router';
-import { treeVar } from '@lib/apolloClient';
 
 interface SidebarItemProps {
     icon?: any;
@@ -47,21 +45,12 @@ const FolderActionsPopup = dynamic(() => import('./FolderActionsPopup/FolderActi
 
 const Sidebar = () => {
     const router = useRouter();
-    const { data, loading } = useGetTreeQuery();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [willShowNewFolderInput, setWillShowNewFolderInput] = useState(false);
     const [willShowActions, setWillShowActions] = useState(false);
     const [actionClickLocation, setActionClickLocation] = useState({ x: 0, y: 0 });
     const [actionFolderId, setActionFolderId] = useState(0);
     const { data: userNameData } = useUserNameQuery();
-
-    useEffect(() => {
-        if (!loading && data?.getTree.__typename === 'Tree') {
-            treeVar(JSON.parse(data.getTree.tree || '[]'));
-        }
-    }, [data, loading]);
-
-    if (!data || isBaseError(data?.getTree)) return null;
 
     return (
         <>
