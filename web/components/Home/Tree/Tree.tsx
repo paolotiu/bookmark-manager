@@ -1,8 +1,10 @@
-import { useReactiveVar } from '@apollo/client';
+import { gql, useApolloClient, useReactiveVar } from '@apollo/client';
 import { Bookmark } from '@entity/Bookmark';
 import { FOLDER } from '@graphql/folder/folderQuery';
 import {
+    Folder,
     useChangeFolderOrderMutation,
+    useGetTreeQuery,
     useMoveBookmarkMutation,
     useMoveFolderMutation,
     useUpdateFolderMutation,
@@ -13,6 +15,7 @@ import { KremeProvider, Tree as KremeTree } from 'kreme';
 import { TreeDataType } from 'kreme/build/Tree/types';
 import { useRouter } from 'next/dist/client/router';
 import React, { useRef } from 'react';
+import { addBookmarksToFolder, removeBookmarkFromFolder } from '../cacheUpdates';
 
 interface Props {
     setActionClickLocation: React.Dispatch<
@@ -36,24 +39,48 @@ const Tree = ({ setActionClickLocation, setActionFolderId, setWillShowActions }:
         update(cache, { data }) {
             if (data?.updateBookmark.__typename === 'Bookmark') {
                 const { id } = data.updateBookmark;
-                cache.modify({
-                    id: cache.identify({ __typename: 'Folder', id: prevFolderIdRef.current }),
-                    fields: {
-                        bookmarks(existingBookmarksRef = [], { readField }) {
-                            return existingBookmarksRef.filter(
-                                (bookmarkRef: any) => id !== readField('id', bookmarkRef),
-                            );
-                        },
-                    },
-                });
+                removeBookmarkFromFolder(cache, { bookmarkIds: [id], folderId: prevFolderIdRef.current });
+                addBookmarksToFolder(cache, { bookmarks: [data.updateBookmark], folderId: folderIdRef.current });
             }
         },
-        refetchQueries: [{ query: FOLDER, variables: { id: folderIdRef.current } }],
     });
     const localTree = useReactiveVar(treeVar);
-
+    const client = useApolloClient();
     const [updateFolder] = useUpdateFolderMutation();
+    useGetTreeQuery({
+        onCompleted(data) {
+            if (data.getTree.__typename === 'Tree') {
+                const tree = data.getTree.tree as unknown as Folder[] | undefined;
+                const writeToCache = (folder: Folder) => {
+                    client.writeFragment({
+                        id: 'Folder:' + folder.id,
+                        fragment: gql`
+                            fragment MyFolder on Folder {
+                                name
+                                id
+                            }
+                        `,
+                        data: {
+                            __typename: 'Folder',
+                            name: folder.name,
+                            id: folder.id,
+                        },
+                    });
+
+                    if (folder.children.length) {
+                        folder.children.forEach((folder) => {
+                            if (folder) {
+                                writeToCache(folder);
+                            }
+                        });
+                    }
+                };
+                tree?.forEach(writeToCache);
+            }
+        },
+    });
     const debouncedUpdateFolder = useDebouncedCallback(updateFolder, 5000);
+
     return (
         <KremeProvider>
             <KremeTree

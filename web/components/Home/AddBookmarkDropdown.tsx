@@ -7,7 +7,7 @@ import { useForm } from '@lib/useForm';
 import React, { Fragment, useEffect, useState } from 'react';
 import * as yup from 'yup';
 import { isValidUrl } from '@lib/isValidUrl';
-import { addBookmarksToAll, addBookmarkToFolder } from './cacheUpdates';
+import { addBookmarksToAll, addBookmarksToFolder } from './cacheUpdates';
 const Spinner = dynamic(() => import('./Spinner/Spinner'));
 
 interface Props {
@@ -45,7 +45,7 @@ const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
         update(cache, { data }) {
             if (data && data.createBookmark.__typename === 'Bookmark') {
                 if (folderId) {
-                    addBookmarkToFolder(cache, {
+                    addBookmarksToFolder(cache, {
                         bookmarks: [data.createBookmark],
                         folderId: Number(folderId),
                     });

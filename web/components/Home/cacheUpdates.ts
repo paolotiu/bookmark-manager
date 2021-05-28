@@ -2,13 +2,12 @@ import { ApolloCache } from '@apollo/client';
 import { ALL_BOOKMARKS_QUERY, DELETED_BOOMARKS } from '@graphql/bookmark/operations';
 import { FOLDER } from '@graphql/folder/folderQuery';
 import { Bookmark, BookmarksResult, FolderResult } from '@graphql/generated/graphql';
-import { cloneDeep } from 'lodash';
 
 interface AddBookmarkToFolderOptions {
     folderId: number;
     bookmarks: Bookmark[];
 }
-export const addBookmarkToFolder = <CacheType>(
+export const addBookmarksToFolder = <CacheType>(
     cache: ApolloCache<CacheType>,
     { folderId, bookmarks }: AddBookmarkToFolderOptions,
 ) => {
@@ -64,7 +63,6 @@ export const addBookmarksToAll = <CacheType>(
     cache: ApolloCache<CacheType>,
     { bookmarks }: AddBookmarksToAllOptions,
 ) => {
-
     const all = cache.readQuery({ query: ALL_BOOKMARKS_QUERY }) as { bookmarks: BookmarksResult } | null;
     if (all?.bookmarks.__typename === 'Bookmarks') {
         cache.writeQuery({
@@ -72,7 +70,7 @@ export const addBookmarksToAll = <CacheType>(
             data: {
                 bookmarks: {
                     ...all.bookmarks,
-                    bookmarks: [...all.bookmarks.bookmarks, ...bookmarks ]
+                    bookmarks: [...all.bookmarks.bookmarks, ...bookmarks],
                 },
             },
         });

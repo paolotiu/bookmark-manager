@@ -15,7 +15,7 @@ import Button from '@components/Button/Button';
 import {
     addBookmarksToAll,
     addBookmarksToTrash,
-    addBookmarkToFolder,
+    addBookmarksToFolder,
     removeBookmarkFromFolder,
     removeBookmarksFromAll,
     removeBookmarksFromTrash,
@@ -60,7 +60,7 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId, triggerEditing, 
             console.log('up');
             // Update folder where bookmark will get restored
             if (data?.updateBookmark.__typename === 'Bookmark' && data.updateBookmark.folderId) {
-                addBookmarkToFolder(cache, {
+                addBookmarksToFolder(cache, {
                     bookmarks: [data.updateBookmark],
                     folderId: data.updateBookmark.folderId,
                 });

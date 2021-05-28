@@ -4,7 +4,7 @@ import { Bookmark, Folder, useUpdateBookmarkMutation } from '@graphql/generated/
 import { treeVar } from '@lib/apolloClient';
 import { useForm } from '@lib/useForm';
 import { KremeProvider, Tree } from 'kreme';
-import { addBookmarkToFolder, removeBookmarkFromFolder } from './cacheUpdates';
+import { addBookmarksToFolder, removeBookmarkFromFolder } from './cacheUpdates';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 interface Props {
@@ -34,7 +34,7 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
     const [updateBookmark] = useUpdateBookmarkMutation({
         update(cache, { data }) {
             if (data?.updateBookmark.__typename === 'Bookmark' && data.updateBookmark.folderId) {
-                addBookmarkToFolder(cache, {
+                addBookmarksToFolder(cache, {
                     bookmarks: [data.updateBookmark],
                     folderId: data.updateBookmark.folderId || 0,
                 });
