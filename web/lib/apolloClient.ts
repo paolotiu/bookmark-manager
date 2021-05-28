@@ -96,6 +96,18 @@ function createApolloClient(context?: ResolverContext) {
                                 return treeVar();
                             },
                         },
+                        getTree: {
+                            merge(existing = [], incoming) {
+                                if (typeof incoming.tree === 'string') {
+                                    const newIncoming = { ...incoming };
+                                    const tree = JSON.parse(incoming.tree) as TreeDataType[];
+                                    treeVar(tree);
+                                    newIncoming.tree = tree;
+                                    return newIncoming;
+                                }
+                                return incoming || existing;
+                            },
+                        },
                     },
                 },
             },
