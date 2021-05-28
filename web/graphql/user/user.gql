@@ -3,8 +3,8 @@ type User {
     id: ID!
     email: String!
     name: String!
-    bookmarks: [Bookmark]!
-    folders: [Folder]!
+    bookmarks: [Bookmark!]!
+    folders: [Folder!]!
 }
 
 type Query {
