@@ -229,18 +229,25 @@ export const folderResolvers: Resolvers = {
                 [parentPath, folder.path, folder.id],
             );
 
+            const folderChildrenSqlArr = `{${folder.childrenOrder.join(',')}}`;
             // Update parent order
             if (folder.parentId) {
                 await Folder.createQueryBuilder()
                     .update()
-                    .set({ childrenOrder: () => `array_remove("childrenOrder", ${folder.id})` })
+                    .set({
+                        childrenOrder: () =>
+                            `array_remove("childrenOrder"[:(array_position("childrenOrder", ${folder.id}) - 1)] || '${folderChildrenSqlArr}'::integer[] || "childrenOrder"[(array_position("childrenOrder", ${folder.id}) + 1):], null)`,
+                    })
                     .where('userId = :userId', { userId })
                     .andWhere('id = :id', { id: folder.parentId })
                     .execute();
             } else {
                 await User.createQueryBuilder()
                     .update()
-                    .set({ rootOrder: () => `array_remove("rootOrder", ${folder.id})` })
+                    .set({
+                        rootOrder: () =>
+                            `array_remove("rootOrder"[:(array_position("rootOrder", ${folder.id}) - 1)] || '${folderChildrenSqlArr}'::integer[] || "rootOrder"[(array_position("rootOrder", ${folder.id}) + 1):], null)`,
+                    })
                     .where('id = :id', { id: userId })
                     .execute();
             }
