@@ -6,6 +6,7 @@ import HTML5toTouch from 'react-dnd-multi-backend/dist/cjs/HTML5toTouch'; // or 
 import AllBookmarksView from './AllBookmarksView';
 import DeletedBookmarksView from './DeletedBookmarksView';
 import FolderView from './FolderView';
+import NotFoundView from './NotFoundView';
 import Sidebar from './Sidebar';
 
 const Home = () => {
@@ -33,7 +34,9 @@ const Home = () => {
                             ) : (
                                 <FolderView folderId={Number(folderId)} />
                             )
-                        ) : null}
+                        ) : (
+                            <NotFoundView />
+                        )}
                     </div>
                 </main>
             </div>

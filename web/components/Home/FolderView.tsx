@@ -8,6 +8,7 @@ import { cloneDeep } from 'lodash';
 import { bookmarkDateSort } from '@lib/sortFuncs';
 import EditingBookmarkCard from './EditingBookmarkCard';
 import { useEditing } from '@lib/useEditing';
+import NotFoundView from './NotFoundView';
 
 const AddBookmarkDropdown = dynamic(() => import('./AddBookmarkDropdown'));
 interface Props {
@@ -15,7 +16,7 @@ interface Props {
 }
 
 const FolderView = ({ folderId }: Props) => {
-    const { data } = useFolderQuery({
+    const { data, loading } = useFolderQuery({
         variables: {
             id: Number(folderId),
         },
@@ -24,7 +25,9 @@ const FolderView = ({ folderId }: Props) => {
     const [isOpen, setIsOpen] = useState(false);
     const { currentEditingBookmark, stopEditing, triggerEditing } = useEditing();
 
-    if (!data || isBaseError(data.folder)) return null;
+    if (loading) return null;
+    if (!data || isBaseError(data.folder)) return <NotFoundView />;
+
     const { name, bookmarks } = data.folder;
     const sorted = cloneDeep(bookmarks).sort((prev, curr) => {
         if (!prev || !curr) {
