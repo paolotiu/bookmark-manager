@@ -74,3 +74,16 @@ export const UPDATE_FOLDER = gql`
         }
     }
 `;
+
+export const ALL_FOLDER_NAMES = gql`
+    query allFolderNames {
+        me {
+            ... on User {
+                folders {
+                    id
+                    name
+                }
+            }
+        }
+    }
+`;
