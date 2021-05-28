@@ -37,7 +37,7 @@ export const HARD_DELETE_BOOKMARKS = gql`
     ${BookmarkFragments.bookmark}
 `;
 
-export const DELTED_BOOMARKS = gql`
+export const DELETED_BOOMARKS = gql`
     query deletedBookmarks {
         bookmarks(deleted: true) {
             ...Bookmarks
@@ -67,4 +67,14 @@ export const ALL_BOOKMARKS_QUERY = gql`
     }
 
     ${BookmarkFragments.bookmarks}
+`;
+
+export const UPDATE_BOOKMARK = gql`
+mutation updateBookmark($data: UpdateBookmarkInput!){
+    updateBookmark(data: $data){
+        ...Bookmark 
+    }
+
+    ${BookmarkFragments.bookmark}
+}
 `;
