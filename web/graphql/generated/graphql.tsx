@@ -251,6 +251,7 @@ export type UpdateBookmarkInput = {
   description?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['String']>;
   folderId?: Maybe<Scalars['Int']>;
+  restore?: Maybe<Scalars['Boolean']>;
 };
 
 export type UpdateFolderInput = {
@@ -266,8 +267,8 @@ export type User = {
   id: Scalars['ID'];
   email: Scalars['String'];
   name: Scalars['String'];
-  bookmarks: Array<Maybe<Bookmark>>;
-  folders: Array<Maybe<Folder>>;
+  bookmarks: Array<Bookmark>;
+  folders: Array<Folder>;
 };
 
 export type UserResult = BaseError | User;
@@ -526,6 +527,20 @@ export type UpdateFolderMutation = (
     { __typename?: 'Folder' }
     & Pick<Folder, 'id' | 'name'>
   ) }
+);
+
+export type AllFolderNamesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AllFolderNamesQuery = (
+  { __typename?: 'Query' }
+  & { me?: Maybe<{ __typename?: 'BaseError' } | (
+    { __typename?: 'User' }
+    & { folders: Array<(
+      { __typename?: 'Folder' }
+      & Pick<Folder, 'id' | 'name'>
+    )> }
+  )> }
 );
 
 export type GetTreeQueryVariables = Exact<{ [key: string]: never; }>;
@@ -874,8 +889,8 @@ export type UserResolvers<ContextType = MyContext, ParentType extends ResolversP
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  bookmarks?: Resolver<Array<Maybe<ResolversTypes['Bookmark']>>, ParentType, ContextType>;
-  folders?: Resolver<Array<Maybe<ResolversTypes['Folder']>>, ParentType, ContextType>;
+  bookmarks?: Resolver<Array<ResolversTypes['Bookmark']>, ParentType, ContextType>;
+  folders?: Resolver<Array<ResolversTypes['Folder']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1602,6 +1617,45 @@ export function useUpdateFolderMutation(baseOptions?: Apollo.MutationHookOptions
 export type UpdateFolderMutationHookResult = ReturnType<typeof useUpdateFolderMutation>;
 export type UpdateFolderMutationResult = Apollo.MutationResult<UpdateFolderMutation>;
 export type UpdateFolderMutationOptions = Apollo.BaseMutationOptions<UpdateFolderMutation, UpdateFolderMutationVariables>;
+export const AllFolderNamesDocument = gql`
+    query allFolderNames {
+  me {
+    ... on User {
+      folders {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useAllFolderNamesQuery__
+ *
+ * To run a query within a React component, call `useAllFolderNamesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllFolderNamesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAllFolderNamesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAllFolderNamesQuery(baseOptions?: Apollo.QueryHookOptions<AllFolderNamesQuery, AllFolderNamesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AllFolderNamesQuery, AllFolderNamesQueryVariables>(AllFolderNamesDocument, options);
+      }
+export function useAllFolderNamesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllFolderNamesQuery, AllFolderNamesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AllFolderNamesQuery, AllFolderNamesQueryVariables>(AllFolderNamesDocument, options);
+        }
+export type AllFolderNamesQueryHookResult = ReturnType<typeof useAllFolderNamesQuery>;
+export type AllFolderNamesLazyQueryHookResult = ReturnType<typeof useAllFolderNamesLazyQuery>;
+export type AllFolderNamesQueryResult = Apollo.QueryResult<AllFolderNamesQuery, AllFolderNamesQueryVariables>;
 export const GetTreeDocument = gql`
     query getTree {
   getTree {

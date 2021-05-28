@@ -23,6 +23,7 @@ input UpdateBookmarkInput {
     description: String
     url: String
     folderId: Int
+    restore: Boolean
 }
 
 union BookmarkResultWithInput = BaseError | Bookmark | InputValidationError

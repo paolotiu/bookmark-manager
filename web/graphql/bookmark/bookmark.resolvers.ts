@@ -89,17 +89,21 @@ export const bookmarkResolvers: Resolvers = {
             }
         },
 
-        updateBookmark: async (_, { data: { id, description, title, url, folderId } }, { userId }) => {
+        updateBookmark: async (_, { data: { id, description, title, url, folderId, restore } }, { userId }) => {
             // Get unullified object
             const updateObj: {
                 [key: string]: string | number | Date | null;
             } = unNullifyObj({ description, title, url });
 
             // Find bookmark
-            const bookmark = await Bookmark.findOne(id, { where: { userId } });
+            const bookmark = await Bookmark.findOne(id, { where: { userId }, withDeleted: true });
 
             // No bookmark found
             if (!bookmark) return createEntityIdNotFoundError('updateBookmark', 'bookmark');
+
+            if (restore) {
+                updateObj.deletedDate = null;
+            }
 
             // Client requested to change folders
             if (typeof folderId !== 'undefined') {
