@@ -1,4 +1,5 @@
 const plugin = require('tailwindcss/plugin');
+const themeSwapper = require('tailwindcss-theme-swapper');
 
 module.exports = {
     mode: 'jit',
@@ -11,24 +12,6 @@ module.exports = {
         },
 
         extend: {
-            colors: {
-                primary: {
-                    DEFAULT: '#5138ED',
-                    dark: '#4833D4',
-                },
-                header: '#212121',
-                sidebar: '#F4F4F1',
-                iconActive: '#A1A1A1',
-                iconPassive: '#CBCBCB',
-                hoverColor: 'rgba(55, 53, 47, 0.08)',
-                sidebarIcon: '#B0B0B0',
-                chevron: '#9E9E9E',
-                inactiveSidebar: '#8B8B8B',
-                altBg: '#F9F9F9',
-                borderActive: '#b7b7b7',
-                inputGrayBg: 'hsla(0,0%,77%,0.18)',
-                inputGrayText: 'hsla(0,0%,67%,1)',
-            },
             screens: {
                 '3xl': '1600px',
                 '4xl': '2000px',
@@ -37,32 +20,47 @@ module.exports = {
             margin: {
                 'sidebar-width': '300px',
             },
-            keyframes: {
-                dropdown: {
-                    '0%': {
-                        transform: 'scale(0)',
-                    },
-                    '100%': {
-                        transform: 'scale(1)',
-                    },
-                },
-                'dropdown-reverse': {
-                    '0%': {
-                        transform: 'scale(0)',
-                    },
-                    '100%': {
-                        transform: 'scale(0)',
-                        opacity: '0',
-                    },
-                },
-            },
-            animation: {
-                dropdown: 'dropdown .2s ease-in',
-                'dropdown-reverse': 'dropdown-reverse .2s ease-in',
-            },
         },
     },
     plugins: [
+        themeSwapper({
+            themes: [
+                {
+                    name: 'base',
+                    selectors: [':root'],
+                    theme: {
+                        colors: {
+                            white: '#FFF',
+                            primary: {
+                                DEFAULT: '#5138ED',
+                                dark: '#4833D4',
+                            },
+                            header: '#212121',
+                            sidebar: '#F4F4F1',
+                            iconActive: '#A1A1A1',
+                            iconPassive: '#CBCBCB',
+                            hoverColor: 'rgba(55, 53, 47, 0.08)',
+                            sidebarIcon: '#B0B0B0',
+                            chevron: '#9E9E9E',
+                            inactiveSidebar: '#8B8B8B',
+                            altBg: '#F9F9F9',
+                            borderActive: '#b7b7b7',
+                            inputGrayBg: 'hsla(0,0%,77%,0.18)',
+                            inputGrayText: 'hsla(0,0%,67%,1)',
+                        },
+                    },
+                },
+                {
+                    name: 'dark',
+                    selectors: ['[data-theme="dark"]'],
+                    theme: {
+                        colors: {
+                            white: '#FFF',
+                        },
+                    },
+                },
+            ],
+        }),
         require('@tailwindcss/line-clamp'),
         plugin(function ({ addUtilities, theme, e }) {
             const colors = theme('colors');
