@@ -1,6 +1,6 @@
 import { gql, useApolloClient, useReactiveVar } from '@apollo/client';
-import { Bookmark } from '@entity/Bookmark';
 import {
+    Bookmark,
     Folder,
     useChangeFolderOrderMutation,
     useGetTreeQuery,
@@ -31,6 +31,7 @@ interface Props {
 const Tree = ({ setActionClickLocation, setActionFolderId, setWillShowActions }: Props) => {
     const folderIdRef = useRef(-1);
     const prevFolderIdRef = useRef(-1);
+    const bookmarkRef = useRef<Bookmark>();
     const [changeFolderOrder] = useChangeFolderOrderMutation();
     const router = useRouter();
     const [moveFolder] = useMoveFolderMutation();
@@ -41,6 +42,12 @@ const Tree = ({ setActionClickLocation, setActionFolderId, setWillShowActions }:
                 removeBookmarkFromFolder(cache, { bookmarkIds: [id], folderId: prevFolderIdRef.current });
                 addBookmarksToFolder(cache, { bookmarks: [data.updateBookmark], folderId: folderIdRef.current });
             }
+        },
+        optimisticResponse: {
+            updateBookmark: {
+                ...(bookmarkRef.current as Bookmark),
+                folderId: folderIdRef.current,
+            },
         },
     });
     const localTree = useReactiveVar(treeVar);
@@ -111,7 +118,7 @@ const Tree = ({ setActionClickLocation, setActionFolderId, setWillShowActions }:
                     Bookmark: async (item: Bookmark, folder) => {
                         prevFolderIdRef.current = item.folderId || 0;
                         folderIdRef.current = Number(folder.id);
-
+                        bookmarkRef.current = item;
                         if (item.folderId === folder.id) {
                             return;
                         }
