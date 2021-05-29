@@ -1,7 +1,8 @@
-import { ApolloCache } from '@apollo/client';
+import { ApolloCache, gql, useApolloClient } from '@apollo/client';
 import { ALL_BOOKMARKS_QUERY, DELETED_BOOMARKS } from '@graphql/bookmark/operations';
 import { FOLDER } from '@graphql/folder/folderQuery';
-import { Bookmark, BookmarksResult, FolderResult } from '@graphql/generated/graphql';
+import { Bookmark, BookmarksResult, FolderFragment, FolderResult } from '@graphql/generated/graphql';
+import { useCallback, useEffect, useState } from 'react';
 
 interface AddBookmarkToFolderOptions {
     folderId: number;
@@ -150,4 +151,34 @@ export const removeFolderFromCache = <CacheType>(
     { folderId }: RemoveFolderFromCacheOptions,
 ) => {
     cache.evict({ id: cache.identify({ __typename: 'Folder', id: folderId }) });
+};
+
+export const useFolderCache = (id: number) => {
+    const client = useApolloClient();
+    const [folder, setFolder] = useState<{ id: number; name: string }>();
+
+    const getFolder = useCallback(
+        (id) => {
+            const folderFragment = client.readFragment({
+                id: 'Folder:' + id,
+                fragment: gql`
+                    fragment ReadFolder on Folder {
+                        id
+                        name
+                    }
+                `,
+            }) as FolderFragment;
+            return folderFragment;
+        },
+        [client],
+    );
+    useEffect(() => {
+        setFolder(getFolder(id));
+    }, [client, getFolder, id]);
+
+    const updateFolder = (id: number) => {
+        setFolder(getFolder(id));
+    };
+
+    return { folder, updateFolder };
 };

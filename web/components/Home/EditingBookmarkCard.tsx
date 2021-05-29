@@ -1,11 +1,11 @@
-import { gql, useApolloClient, useReactiveVar } from '@apollo/client';
+import { useApolloClient, useReactiveVar } from '@apollo/client';
 import Button from '@components/Button/Button';
-import { Bookmark, Folder, useUpdateBookmarkMutation } from '@graphql/generated/graphql';
+import { Bookmark, useUpdateBookmarkMutation } from '@graphql/generated/graphql';
 import { treeVar } from '@lib/apolloClient';
 import { useForm } from '@lib/useForm';
 import { KremeProvider, Tree } from 'kreme';
-import { addBookmarksToFolder, removeBookmarkFromFolder } from './cacheUpdates';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { addBookmarksToFolder, removeBookmarkFromFolder, useFolderCache } from './cacheUpdates';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 interface Props {
     bookmark: Bookmark;
@@ -20,17 +20,17 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
     });
 
     const client = useApolloClient();
-    const [currentFolder, setCurrentFolder] = useState<Pick<Folder, 'name' | 'id'> | null>(null);
     const [willShowFoldersDropdown, setWillShowFoldersDropdown] = useState(false);
     const [isDropdownOnTop, setIsDropdownOnTop] = useState(false);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
-    const autoResize = () => {
+    const autoResize = useCallback(() => {
         if (textAreaRef.current) {
             const { current: textArea } = textAreaRef;
             textArea.style.height = textArea.scrollHeight + 'px';
         }
-    };
+    }, []);
 
+    const { folder, updateFolder } = useFolderCache(bookmark.folderId || 0);
     const [updateBookmark] = useUpdateBookmarkMutation({
         update(cache, { data }) {
             if (data?.updateBookmark.__typename === 'Bookmark' && data.updateBookmark.folderId) {
@@ -57,7 +57,7 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
                 url: inputs.url,
                 __typename: 'Bookmark',
                 description: inputs.description,
-                folderId: currentFolder?.id,
+                folderId: folder?.id,
             },
         },
     });
@@ -67,19 +67,7 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
     useEffect(() => {
         // Resize on first render
         autoResize();
-        if (bookmark.folderId) {
-            const folder = client.cache.readFragment({
-                id: 'Folder:' + bookmark.folderId,
-                fragment: gql`
-                    fragment EditingFolder on Folder {
-                        id
-                        name
-                    }
-                `,
-            }) as Folder;
-            setCurrentFolder({ id: folder.id, name: folder.name });
-        }
-    }, [bookmark.folderId, client.cache]);
+    }, [autoResize, bookmark.folderId, client.cache]);
 
     useEffect(() => {
         const closeDropdown = () => {
@@ -104,7 +92,8 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
                 if (!prev) {
                     return isOnTop(buffer);
                 }
-                buffer = 100 + height;
+                // Times 1.1 to account for position 110%
+                buffer += height * 1.1;
                 return isOnTop(buffer);
             });
         }
@@ -119,7 +108,7 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
                     description: inputs.description,
                     title: inputs.title,
                     url: inputs.url,
-                    folderId: currentFolder?.id,
+                    folderId: folder?.id,
                 },
             },
         });
@@ -173,7 +162,7 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
                                         setWillShowFoldersDropdown(true);
                                     }}
                                 >
-                                    <span>{currentFolder?.name}</span>
+                                    <span>{folder?.name || '<No-Folder>'}</span>
                                 </div>
                                 <KremeProvider>
                                     <div
@@ -194,16 +183,7 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
                                                     data={tree}
                                                     withActionButton={false}
                                                     onFolderClick={(id) => {
-                                                        const x = client.readFragment({
-                                                            id: 'Folder:' + id,
-                                                            fragment: gql`
-                                                                fragment ReadFolder on Folder {
-                                                                    id
-                                                                    name
-                                                                }
-                                                            `,
-                                                        });
-                                                        setCurrentFolder(x);
+                                                        updateFolder(Number(id));
                                                         setWillShowFoldersDropdown(false);
                                                     }}
                                                     noDropOnEmpty

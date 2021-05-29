@@ -19,6 +19,7 @@ import {
     removeBookmarkFromFolder,
     removeBookmarksFromAll,
     removeBookmarksFromTrash,
+    useFolderCache,
 } from './cacheUpdates';
 
 interface Props {
@@ -54,10 +55,12 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId, triggerEditing, 
             cache.evict({ id: cache.identify({ __typename: 'Bookmark', id: bookmark.id }) });
         },
     });
+
+    const { folder } = useFolderCache(bookmark.folderId || 0);
+
     const [restoreBookmark] = useUpdateBookmarkMutation({
         variables: { data: { id: bookmark.id, restore: true } },
         update(cache, { data }) {
-            console.log('up');
             // Update folder where bookmark will get restored
             if (data?.updateBookmark.__typename === 'Bookmark' && data.updateBookmark.folderId) {
                 addBookmarksToFolder(cache, {
@@ -85,6 +88,7 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId, triggerEditing, 
         e.preventDefault();
         triggerEditing(bookmark.id);
     };
+
     return (
         <a
             href={bookmark.url}
@@ -122,14 +126,13 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId, triggerEditing, 
                     </div>
                 </div>
                 <p className="text-sm leading-5 line-clamp-3">{decode(bookmark.description)}</p>
-                <div className="flex flex-wrap w-full ">
-                    <span className="w-full pr-1 text-xs text-gray-400 line-clamp-1" style={{ wordBreak: 'break-all' }}>
+                <div className="flex flex-wrap w-full text-xs text-gray-400">
+                    <span>{folder?.name || '<No-Folder>'}</span>
+                    <span className="w-full pr-1 line-clamp-1" style={{ wordBreak: 'break-all' }}>
                         {bookmark.url}
                     </span>
 
-                    <span className="text-xs text-gray-400 whitespace-nowrap">
-                        {new Date(bookmark.createdDate).toDateString()}
-                    </span>
+                    <span className="whitespace-nowrap">{new Date(bookmark.createdDate).toDateString()}</span>
                 </div>
             </div>
         </a>
