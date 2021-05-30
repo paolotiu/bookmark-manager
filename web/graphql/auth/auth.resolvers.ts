@@ -1,12 +1,14 @@
 import { setCookie } from 'nookies';
 import bcrypt from 'bcryptjs';
+import { v4 as uuid } from 'uuid';
 import { User } from '@entity/User';
-import { createBaseError, createUnexpectedError } from '@graphql/shared/errorMessages';
+import { createBaseError, createUnexpectedError, isBaseError } from '@graphql/shared/errorMessages';
 import { NextApiResponse } from 'next';
 import { CookieSerializeOptions } from 'cookie';
 import { createTokens } from '@lib/server/createTokens';
 import { BaseError, Resolvers } from '@graphql/generated/graphql';
 import { registerSchema } from './yupSchemas';
+import { sendEmail } from '@lib/server/sendEmail';
 
 const loginError: BaseError = {
     path: 'login',
@@ -14,6 +16,10 @@ const loginError: BaseError = {
 };
 
 export const authResolvers: Resolvers = {
+    BooleanOrError: {
+        __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Success'),
+    },
+
     Mutation: {
         register: async (_, { email, password, name }) => {
             // Hash the password
@@ -46,6 +52,40 @@ export const authResolvers: Resolvers = {
 
             return user;
         },
+        sendForgotPassword: async (_, { email }) => {
+            const user = await User.findOne({ where: { email } });
+
+            if (!user) return false;
+
+            const token = uuid();
+            // 1 day expiry
+            const expiry = new Date();
+            expiry.setDate(new Date().getDate() + 1);
+            user.resetPasswordExpiry = expiry;
+            user.resetPasswordToken = token;
+            await user.save();
+            sendEmail({ to: 'gizauqwjshmuzgpyjr@upived.online', text: 'HEYYYY' });
+            return true;
+        },
+        resetPassword: async (_, { email, password, resetToken }, { res }) => {
+            const user = await User.findOne({ where: { resetPasswordToken: resetToken, email } });
+            if (!user) return createBaseError('resetPassword', 'Token not found');
+            if (new Date(user.resetPasswordExpiry as Date).getTime() < Date.now())
+                return createBaseError('resetPassword', 'Token expired');
+
+            // Hash the password
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            user.resetPasswordExpiry = null;
+            user.resetPasswordToken = null;
+            user.password = hashedPassword;
+            user.count += 1;
+            removeCookies(res);
+            await user.save();
+
+            return { success: true };
+        },
+
         invalidateTokens: async (_, _a, { userId }) => {
             if (!userId) return false;
 
@@ -79,4 +119,9 @@ export function setTokenCookies(
 ): void {
     setCookie({ res }, 'refresh-token', refreshToken, getCookieOptions(1000 * 60 * 60 * 24 * 7)); // 7 days
     setCookie({ res }, 'access-token', accessToken, getCookieOptions(1000 * 60 * 15)); //15 minutes
+}
+
+export function removeCookies(res: NextApiResponse) {
+    setCookie({ res }, 'refresh-token', 'asd', { maxAge: 1 });
+    setCookie({ res }, 'access-token', 'asd', { maxAge: 1 });
 }
