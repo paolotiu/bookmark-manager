@@ -21,6 +21,7 @@ import {
     removeBookmarksFromTrash,
     useFolderCache,
 } from './cacheUpdates';
+import { fromUrl, parseDomain } from 'parse-domain';
 
 interface Props {
     bookmark: Bookmark;
@@ -29,6 +30,7 @@ interface Props {
     folderId: number | null;
     triggerEditing: (id: number) => void;
     isDeleted?: boolean;
+    withFolder?: boolean;
 }
 
 const bookmarkSoftDeletionCacheUpdate = (cache: ApolloCache<any>, bookmark: Bookmark, folderId: number | null) => {
@@ -38,7 +40,14 @@ const bookmarkSoftDeletionCacheUpdate = (cache: ApolloCache<any>, bookmark: Book
     removeBookmarksFromAll(cache, { bookmarkIds: [bookmark.id] });
     addBookmarksToTrash(cache, { bookmarks: [bookmark] });
 };
-const BookmarkCard = ({ bookmark, hardDelete = false, folderId, triggerEditing, isDeleted }: Props) => {
+const BookmarkCard = ({
+    bookmark,
+    hardDelete = false,
+    folderId,
+    triggerEditing,
+    isDeleted,
+    withFolder = false,
+}: Props) => {
     const [, drag] = useDrag(() => ({
         type: 'Bookmark',
         item: bookmark,
@@ -126,13 +135,18 @@ const BookmarkCard = ({ bookmark, hardDelete = false, folderId, triggerEditing, 
                     </div>
                 </div>
                 <p className="text-sm leading-5 line-clamp-3">{decode(bookmark.description)}</p>
-                <div className="flex flex-wrap w-full text-xs text-gray-400">
-                    <span>{folder?.name || '<No-Folder>'}</span>
-                    <span className="w-full pr-1 line-clamp-1" style={{ wordBreak: 'break-all' }}>
-                        {bookmark.url}
+                <div className="flex w-full space-x-2 text-xs text-gray-400">
+                    {withFolder ? (
+                        <>
+                            <span>{folder?.name || '<No-Folder>'} </span>
+                            <span>-</span>
+                        </>
+                    ) : null}
+                    <span className="line-clamp-1" style={{ wordBreak: 'break-all' }}>
+                        {parseDomain(fromUrl(bookmark.url)).hostname}
                     </span>
-
-                    <span className="whitespace-nowrap">{new Date(bookmark.createdDate).toDateString()}</span>
+                    <span>-</span>
+                    <span className="whitespace-nowrap">{new Date(bookmark.createdDate).toDateString()} </span>
                 </div>
             </div>
         </a>

@@ -14,7 +14,7 @@ const Home = () => {
     const router = useRouter();
 
     useEffect(() => {
-        if (data?.me?.__typename === 'BaseError' || !data) {
+        if (data?.me?.__typename === 'BaseError') {
             router.push('/login');
         }
     }, [data, router]);

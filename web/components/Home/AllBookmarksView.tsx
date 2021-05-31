@@ -46,6 +46,7 @@ const AllBookmarksView = () => {
                     return (
                         bookmark && (
                             <BookmarkCard
+                                withFolder
                                 triggerEditing={triggerEditing}
                                 folderId={bookmark.folderId || 0}
                                 bookmark={bookmark}
