@@ -7,6 +7,7 @@ import {
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 import { User } from './User';
 import { Folder } from './Folder';
@@ -45,5 +46,8 @@ export class Bookmark extends BaseEntity implements IBookmark {
 
     @DeleteDateColumn()
     deletedDate: Date;
+
+    @UpdateDateColumn()
+    updatedDate: Date;
 }
 export type BookmarkModel = Bookmark;
