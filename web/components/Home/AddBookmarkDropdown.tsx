@@ -35,6 +35,8 @@ const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
         // Close dropdown on outside click
         window.addEventListener('mousedown', closeDropDown);
         return () => {
+            console.log('hey');
+            setWillShowErrors(false);
             window.removeEventListener('mousedown', closeDropDown);
         };
     }, [closeDropDown]);
@@ -110,13 +112,30 @@ const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
                                 name="url"
                             />
                             {willShowErrors && errors.url.message && (
-                                <ErrorMessage size="small" text={errors.url.message} />
+                                <ErrorMessage size="small" className="pl-1" text={errors.url.message} />
                             )}
                         </div>
-                        <Button className={`relative w-min justify-self-end no-outline`} disabled={isSaving || isError}>
-                            <p className={`${isSaving && 'invisible'}`}>Save</p>
-                            <Spinner showSpinner={isSaving} />
-                        </Button>
+                        {willShowErrors ? (
+                            <Button
+                                className={`relative w-min justify-self-end no-outline`}
+                                disabled={isSaving || isError}
+                                onMouseDown={() => setWillShowErrors(true)}
+                            >
+                                <p className={`${isSaving && 'invisible'}`}>Save</p>
+                                <Spinner showSpinner={isSaving} />
+                            </Button>
+                        ) : (
+                            <div onClick={() => setWillShowErrors(true)} className={` justify-self-end`}>
+                                <Button
+                                    className={`relative w-min justify-self-end no-outline`}
+                                    disabled={isSaving || isError}
+                                    onMouseDown={() => setWillShowErrors(true)}
+                                >
+                                    <p className={`${isSaving && 'invisible'}`}>Save</p>
+                                    <Spinner showSpinner={isSaving} />
+                                </Button>
+                            </div>
+                        )}
                     </form>
                 </div>
             </div>
