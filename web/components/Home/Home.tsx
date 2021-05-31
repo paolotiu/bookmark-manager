@@ -10,14 +10,16 @@ import NotFoundView from './NotFoundView';
 import Sidebar from './Sidebar';
 
 const Home = () => {
-    const { data } = useUserNameQuery();
+    const { data, loading } = useUserNameQuery();
     const router = useRouter();
 
     useEffect(() => {
-        if (data?.me?.__typename === 'BaseError') {
+        if (data?.me?.__typename === 'BaseError' || !data) {
             router.push('/login');
         }
     }, [data, router]);
+
+    if (loading || !data || data.me?.__typename === 'BaseError') return null;
     const { id: folderId } = router.query as { id: string | undefined };
 
     return (
@@ -25,7 +27,7 @@ const Home = () => {
             <div className="h-full">
                 <Sidebar />
                 <main className="flex justify-center p-2 sm:p-10 md:ml-sidebar-width">
-                    <div className="w-full h-full max-w-screen-lg">
+                    <div className="w-full h-full max-w-screen-xl">
                         {folderId ? (
                             folderId === 'deleted' ? (
                                 <DeletedBookmarksView />
