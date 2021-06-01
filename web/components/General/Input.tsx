@@ -9,15 +9,15 @@ interface InputProps extends React.ComponentPropsWithoutRef<'input'> {
 
 const Input = ({ label, type, name, placeholder = '', className, ...p }: InputProps) => {
     return (
-        <div className='grid gap-3'>
-            <label className='text-lg font-medium' htmlFor={name}>
+        <div className="grid gap-2">
+            <label className="font-medium" htmlFor={name}>
                 {label}
             </label>
             <input
                 type={type}
                 placeholder={placeholder}
                 name={name}
-                className={`w-full px-5 py-2 border focus:ring-1 ring-primary  outline-none border-gray-300 rounded-full md:py-3 ${className}`}
+                className={`w-full px-3 py-2 border focus:ring-1 ring-primary  outline-none border-gray-300 rounded-sm  ${className}`}
                 {...p}
             />
         </div>
