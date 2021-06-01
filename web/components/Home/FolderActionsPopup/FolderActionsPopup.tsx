@@ -1,3 +1,4 @@
+import Popup from '@components/Popup/Popup';
 import { useDeleteFolderMutation } from '@graphql/generated/graphql';
 import { treeVar } from '@lib/apolloClient';
 import { TreeDataType } from 'kreme/build/Tree/types';
@@ -72,15 +73,9 @@ const FolderActionsPopup = ({ folderId, style, closePopup, onDelete }: Props) =>
     };
 
     return (
-        <div
-            className="fixed top-0 left-0 z-50 py-2 bg-white rounded-sm shadow-lg min-w-[200px] max-w-[90vw]"
-            style={style}
-            onMouseDown={(e) => {
-                e.stopPropagation();
-            }}
-        >
-            <FolderAction onClick={handleDelete} label="Delete" Icon={BiTrash} />
-            <FolderAction
+        <Popup style={style}>
+            <Popup.Item onClick={handleDelete} label="Delete" Icon={BiTrash} />
+            <Popup.Item
                 onClick={() => {
                     initiateFolderRename(folderId);
                     closePopup();
@@ -89,7 +84,7 @@ const FolderActionsPopup = ({ folderId, style, closePopup, onDelete }: Props) =>
                 Icon={BsPencilSquare}
                 iconSize="18px"
             />
-        </div>
+        </Popup>
     );
 };
 
