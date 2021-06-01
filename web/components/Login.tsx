@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import Google from '@assets/google.svg';
-import Input from '@components/General/Input';
+import Input from '@components/Form/Input';
 import { useForm } from '@lib/useForm';
+import { Divider } from 'kreme';
 import { useLoginMutation } from '@graphql/generated/graphql';
 import Link from 'next/link';
-import ErrorMessage from './General/ErrorMessage';
+import ErrorMessage from './Form/ErrorMessage';
 import { checkObjEqual } from '@lib/checks';
 import * as yup from 'yup';
 import { useRouter } from 'next/dist/client/router';
@@ -35,6 +36,7 @@ const Login = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setIsShowError(true);
         setIsSubmitting(true);
         // To prevent multiple server calls
         if (checkObjEqual(lastInputs, inputs)) {
@@ -68,8 +70,8 @@ const Login = () => {
                     <Google className="h-5" />
                     <span className="px-4">Log in with Google</span>
                 </button>
-                <div className="font-medium py-7">
-                    {/* <Divider text='or Sign in with Email' lineColor='rgba(0,0,0,.2)' textColor='rgba(0,0,0,.4)' /> */}
+                <div className="pb-4 font-medium pt-7">
+                    <Divider text="OR" lineColor="rgba(0,0,0,.2)" textColor="rgba(0,0,0,.4)" />
                 </div>
                 <form onSubmit={handleSubmit} className="grid gap-6">
                     <div className="grid gap-8">
@@ -116,7 +118,7 @@ const Login = () => {
                             className="w-full py-2 transition-all duration-200 transform hover:bg-primary-dark disabled:opacity-50 "
                         >
                             <Spinner showSpinner={isSubmitting} />
-                            <span className={clsx(isSubmitting && 'invisible')}>Login</span>
+                            <span className={clsx(isSubmitting && 'invisible')}>Log in</span>
                         </Button>
                     </div>
                     <span className="text-xs ">
