@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client';
+import { ErrorFragments } from '@graphql/fragments';
 
 export const LOGOUT = gql`
     mutation logout {
@@ -13,5 +14,25 @@ export const REGISTER = gql`
                 message
             }
         }
+    }
+`;
+
+export const LOGIN = gql`
+    mutation Login($email: String!, $password: String!) {
+        login(email: $email, password: $password) {
+            ... on User {
+                __typename
+                id
+            }
+            ...BaseError
+        }
+    }
+
+    ${ErrorFragments.base}
+`;
+
+export const REQUEST_FORGOT = gql`
+    mutation requestForgot($email: String!) {
+        sendForgotPassword(email: $email)
     }
 `;

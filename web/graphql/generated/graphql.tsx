@@ -335,6 +335,16 @@ export type LoginMutation = (
   ) }
 );
 
+export type RequestForgotMutationVariables = Exact<{
+  email: Scalars['String'];
+}>;
+
+
+export type RequestForgotMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'sendForgotPassword'>
+);
+
 export type CreateBookmarkMutationVariables = Exact<{
   url: Scalars['String'];
   folderId?: Maybe<Scalars['Int']>;
@@ -1174,6 +1184,37 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const RequestForgotDocument = gql`
+    mutation requestForgot($email: String!) {
+  sendForgotPassword(email: $email)
+}
+    `;
+export type RequestForgotMutationFn = Apollo.MutationFunction<RequestForgotMutation, RequestForgotMutationVariables>;
+
+/**
+ * __useRequestForgotMutation__
+ *
+ * To run a mutation, you first call `useRequestForgotMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRequestForgotMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [requestForgotMutation, { data, loading, error }] = useRequestForgotMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useRequestForgotMutation(baseOptions?: Apollo.MutationHookOptions<RequestForgotMutation, RequestForgotMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RequestForgotMutation, RequestForgotMutationVariables>(RequestForgotDocument, options);
+      }
+export type RequestForgotMutationHookResult = ReturnType<typeof useRequestForgotMutation>;
+export type RequestForgotMutationResult = Apollo.MutationResult<RequestForgotMutation>;
+export type RequestForgotMutationOptions = Apollo.BaseMutationOptions<RequestForgotMutation, RequestForgotMutationVariables>;
 export const CreateBookmarkDocument = gql`
     mutation createBookmark($url: String!, $folderId: Int) {
   createBookmark(data: {url: $url, folderId: $folderId}) {

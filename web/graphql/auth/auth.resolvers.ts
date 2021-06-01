@@ -64,7 +64,7 @@ export const authResolvers: Resolvers = {
             user.resetPasswordExpiry = expiry;
             user.resetPasswordToken = token;
             await user.save();
-            sendEmail({ to: 'gizauqwjshmuzgpyjr@upived.online', text: 'HEYYYY' });
+            sendEmail({ to: email, text: `http://localhost:3000/forgot/${token}` });
             return true;
         },
         resetPassword: async (_, { email, password, resetToken }, { res }) => {
