@@ -8,7 +8,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import * as yup from 'yup';
 import { isValidUrl } from '@lib/isValidUrl';
 import { addBookmarksToAll, addBookmarksToFolder } from './cacheUpdates';
-const Spinner = dynamic(() => import('./Spinner/Spinner'));
+const Spinner = dynamic(() => import('@components/Spinner/Spinner'));
 
 interface Props {
     folderId: number | string | null;
