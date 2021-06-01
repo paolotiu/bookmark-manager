@@ -5,5 +5,6 @@ type Obj = Record<string, unknown>;
 export const checkObjEqual = (a: Obj, b: Obj) => JSON.stringify(a) === JSON.stringify(b);
 
 export const checkWordInSentence = (str: string | undefined, word: string) => {
-    return str?.split(' ').includes(word);
+    const regex = new RegExp(`\\s*${word}`);
+    return regex.test(str || '');
 };
