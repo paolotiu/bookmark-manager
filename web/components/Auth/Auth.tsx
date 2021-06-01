@@ -6,11 +6,12 @@ import Button, { ButtonProps } from '@components/Button/Button';
 import { Divider as KremeDivider } from 'kreme';
 import Spinner from '@components/Spinner/Spinner';
 import clsx from 'clsx';
+import { checkWordInSentence } from '@lib/checks';
 
 const Wrapper = ({ children }: { children?: React.ReactNode }) => {
     return (
-        <div className="flex items-start justify-center min-h-screen sm:bg-gray-50 sm:pt-7">
-            <div className={`p-8 pt-3   w-full sm:w-[460px] bg-white sm:border `}>{children}</div>{' '}
+        <div className="flex items-start justify-center min-h-screen sm:bg-gray-50 sm:pt-10 ">
+            <div className={`p-8 pt-3 w-full sm:w-[460px] bg-white sm:border rounded-md`}>{children}</div>{' '}
         </div>
     );
 };
@@ -24,13 +25,10 @@ const SocialButton = ({ Icon, label }: { Icon?: React.ReactNode; label?: string 
     );
 };
 
-interface FormProps {
-    handleSubmit: React.FormEventHandler;
-    children?: React.ReactNode;
-}
-
-const FormInputs = ({ children }: { children?: React.ReactNode }) => {
-    return <div className="grid gap-8">{children}</div>;
+const FormInputs = ({ children, className }: { children?: React.ReactNode; className?: string }) => {
+    return (
+        <div className={clsx('grid', { 'gap-8': !checkWordInSentence(className, 'gap') }, className)}>{children}</div>
+    );
 };
 
 const Input = ({
@@ -51,8 +49,8 @@ const Input = ({
 };
 
 interface SubmitProps extends ButtonProps {
-    showSpinner: boolean;
-    disabledClick: () => void;
+    showSpinner?: boolean;
+    disabledClick?: () => void;
     isSubmitting: boolean;
     label: string;
 }
@@ -65,16 +63,23 @@ const Submit = ({ disabled, showSpinner, disabledClick, isSubmitting, label }: S
                 className="w-full py-2 transition-all duration-200 transform hover:bg-primary-dark disabled:opacity-50 "
                 disabled={disabled}
             >
-                <Spinner showSpinner={showSpinner} />
+                <Spinner showSpinner={typeof showSpinner === 'undefined' ? isSubmitting : showSpinner} />
                 <span className={clsx(isSubmitting && 'invisible')}>{label}</span>
             </Button>
         </div>
     );
 };
-const Form = ({ handleSubmit, children }: FormProps) => {
+
+interface FormProps {
+    handleSubmit: React.FormEventHandler;
+    children?: React.ReactNode;
+    className?: string;
+    inputsClassName?: string;
+}
+const Form = ({ handleSubmit, children, className, inputsClassName }: FormProps) => {
     return (
-        <form onSubmit={handleSubmit} className="grid gap-6">
-            <FormInputs>{children}</FormInputs>
+        <form onSubmit={handleSubmit} className={clsx('grid', { 'gap-6': !checkWordInSentence(className, 'gap') })}>
+            <FormInputs className={inputsClassName}>{children}</FormInputs>
         </form>
     );
 };

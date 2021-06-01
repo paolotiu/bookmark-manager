@@ -80,7 +80,7 @@ const Login = () => {
                         value={inputs.password}
                     />
 
-                    <Link href="/">
+                    <Link href="/forgot">
                         <a className="self-end pt-2 text-xs font-medium transition-colors duration-200 justify-self-end hover:underline text-primary hover:text-primary-dark hover:cursor-pointer">
                             Forgot password?
                         </a>
