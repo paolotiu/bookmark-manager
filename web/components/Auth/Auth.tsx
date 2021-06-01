@@ -19,7 +19,7 @@ const SocialButton = ({ Icon, label }: { Icon?: React.ReactNode; label?: string 
     return (
         <button className="flex items-center justify-center w-full px-4 py-2 border rounded-sm no-outline">
             {Icon}
-            <span className="mt-[2px]">{label}</span>
+            <span className="mt-[2px] pl-3">{label}</span>
         </button>
     );
 };
@@ -54,9 +54,10 @@ interface SubmitProps extends ButtonProps {
     showSpinner: boolean;
     disabledClick: () => void;
     isSubmitting: boolean;
+    label: string;
 }
 
-const Submit = ({ disabled, showSpinner, disabledClick, isSubmitting }: SubmitProps) => {
+const Submit = ({ disabled, showSpinner, disabledClick, isSubmitting, label }: SubmitProps) => {
     return (
         <div className="relative">
             <div className={`absolute z-10 w-full h-full ${!disabled ? 'hidden' : ''}`} onClick={disabledClick}></div>
@@ -65,7 +66,7 @@ const Submit = ({ disabled, showSpinner, disabledClick, isSubmitting }: SubmitPr
                 disabled={disabled}
             >
                 <Spinner showSpinner={showSpinner} />
-                <span className={clsx(isSubmitting && 'invisible')}>Log in</span>
+                <span className={clsx(isSubmitting && 'invisible')}>{label}</span>
             </Button>
         </div>
     );

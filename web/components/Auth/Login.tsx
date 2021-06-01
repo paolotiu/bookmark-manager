@@ -58,7 +58,7 @@ const Login = () => {
 
     return (
         <Auth title="Log in" subtitle="Start collection bookmarks now!">
-            <Auth.SocialButton Icon={<FcGoogle size="16px" className="mr-3" />} label={'Log in with Google'} />
+            <Auth.SocialButton Icon={<FcGoogle size="16px" />} label={'Log in with Google'} />
 
             <Auth.Divider />
             <Auth.Form handleSubmit={handleSubmit}>
@@ -87,20 +87,23 @@ const Login = () => {
                     </Link>
                 </div>
 
-                <Auth.Submit
-                    isSubmitting={isSubmitting}
-                    showSpinner={isSubmitting}
-                    disabled={isEmpty || isError || isSubmitting}
-                    disabledClick={() => setWillShowErrors(true)}
-                />
-                <span className="text-xs ">
-                    Don&apos;t have an account?{' '}
-                    <Link href="/register">
-                        <a className="font-medium transition-colors duration-200 text-primary hover:underline hover:cursor-pointer hover:text-primary-dark">
-                            Register
-                        </a>
-                    </Link>
-                </span>
+                <div className="space-y-2">
+                    <Auth.Submit
+                        label={'Log in'}
+                        isSubmitting={isSubmitting}
+                        showSpinner={isSubmitting}
+                        disabled={isEmpty || isError || isSubmitting}
+                        disabledClick={() => setWillShowErrors(true)}
+                    />
+                    <div className="text-xs">
+                        Don&apos;t have an account?{' '}
+                        <Link href="/register">
+                            <a className="font-medium transition-colors duration-200 text-primary hover:underline hover:cursor-pointer hover:text-primary-dark">
+                                Register
+                            </a>
+                        </Link>
+                    </div>
+                </div>
             </Auth.Form>
         </Auth>
     );
