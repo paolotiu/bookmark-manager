@@ -5,14 +5,13 @@ import { useRouter } from 'next/dist/client/router';
 import { useLogoutMutation } from '@graphql/generated/graphql';
 
 interface Props {
-    style: React.CSSProperties;
+    closePopup: () => void;
 }
-
-const AccountPopup = ({ style }: Props) => {
+const AccountPopup = ({ closePopup }: Props) => {
     const router = useRouter();
     const [logout] = useLogoutMutation();
     return (
-        <Popup style={style}>
+        <Popup className="absolute top-[110%] left-4" closePopup={closePopup}>
             <Popup.Item
                 label="Log out"
                 Icon={FiLogOut}

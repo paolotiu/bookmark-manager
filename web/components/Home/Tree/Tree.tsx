@@ -18,11 +18,11 @@ import { addBookmarksToFolder, removeBookmarkFromFolder } from '../cacheUpdates'
 import { SidebarItem } from '../Sidebar';
 
 interface Props {
-        setActionFolderId: React.Dispatch<React.SetStateAction<number>>;
-        handleItemClick: (e: React.MouseEvent<any>, item: SidebarItem) => void;
+    setActionFolderId: React.Dispatch<React.SetStateAction<number>>;
+    handleItemClick: (e: React.MouseEvent<any>, item: SidebarItem) => void;
 }
 
-const Tree = ({ setActionFolderId , handleItemClick}: Props) => {
+const Tree = ({ setActionFolderId, handleItemClick }: Props) => {
     const folderIdRef = useRef(-1);
     const prevFolderIdRef = useRef(-1);
     const bookmarkRef = useRef<Bookmark>();
@@ -130,7 +130,7 @@ const Tree = ({ setActionFolderId , handleItemClick}: Props) => {
                 onFolderActionClick={async (e, id) => {
                     e.stopPropagation();
                     setActionFolderId(Number(id));
-                    handleItemClick(e, 'folder')
+                    handleItemClick(e, 'folder');
                 }}
                 onFolderDrop={(data) => {
                     const orderVars = {

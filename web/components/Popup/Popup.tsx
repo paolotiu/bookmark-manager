@@ -1,4 +1,6 @@
-import React from 'react';
+import { checkWordInSentence } from '@lib/checks';
+import clsx from 'clsx';
+import React, { useEffect } from 'react';
 import { IconType } from 'react-icons';
 
 interface PopupItemProps {
@@ -21,12 +23,27 @@ const Item = ({ onClick, Icon, label, iconSize }: PopupItemProps) => {
 interface PopupProps {
     style?: React.CSSProperties;
     children?: React.ReactNode;
+    className?: string;
+    closePopup: () => void;
 }
+const Popup = ({ style, children, className, closePopup }: PopupProps) => {
+    useEffect(() => {
+        window.addEventListener('mousedown', closePopup);
 
-const Popup = ({ style, children }: PopupProps) => {
+        return () => window.removeEventListener('mousedown', closePopup);
+    }, [closePopup]);
+
     return (
         <div
-            className="fixed top-0 left-0 z-50 py-2 bg-white rounded-sm shadow-lg min-w-[200px] max-w-[90vw]"
+            className={clsx(
+                'z-50 py-2 bg-white rounded-sm shadow-lg min-w-[200px] max-w-[90vw]',
+                {
+                    'top-0': !checkWordInSentence(className, 'top'),
+                    'left-0': !checkWordInSentence(className, 'left'),
+                    fixed: !checkWordInSentence(className, 'absolute'),
+                },
+                className,
+            )}
             style={style}
             onMouseDown={(e) => {
                 e.stopPropagation();

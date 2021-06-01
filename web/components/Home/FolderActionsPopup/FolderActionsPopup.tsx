@@ -4,7 +4,6 @@ import { treeVar } from '@lib/apolloClient';
 import { TreeDataType } from 'kreme/build/Tree/types';
 import { cloneDeep } from 'lodash';
 import React, { CSSProperties, useEffect } from 'react';
-import { IconType } from 'react-icons';
 import { BiTrash } from 'react-icons/bi';
 import { BsPencilSquare } from 'react-icons/bs';
 import { removeFolderFromCache } from '../cacheUpdates';
@@ -16,23 +15,6 @@ interface Props {
     onDelete?: () => void;
 }
 
-interface FolderActionProps {
-    onClick?: React.MouseEventHandler<HTMLButtonElement>;
-    Icon?: IconType;
-    label: string;
-    iconSize?: string;
-}
-const FolderAction = ({ onClick, Icon, label, iconSize }: FolderActionProps) => {
-    return (
-        <button
-            className="relative w-full grid items-center grid-flow-col gap-2 px-2 py-1 grid-cols-[20px,min-content] text-sm hover:bg-hoverColor"
-            onClick={onClick}
-        >
-            {Icon && <Icon className="text-iconPassive" size={iconSize || '20px'} />}
-            <span className="pt-[3px] whitespace-nowrap">{label}</span>
-        </button>
-    );
-};
 const FolderActionsPopup = ({ folderId, style, closePopup, onDelete }: Props) => {
     const [deleteFolder] = useDeleteFolderMutation({
         awaitRefetchQueries: true,
@@ -41,12 +23,6 @@ const FolderActionsPopup = ({ folderId, style, closePopup, onDelete }: Props) =>
             removeFolderFromCache(cache, { folderId });
         },
     });
-
-    useEffect(() => {
-        window.addEventListener('mousedown', closePopup);
-
-        return () => window.removeEventListener('mousedown', closePopup);
-    }, [closePopup]);
 
     const initiateFolderRename = (id: number) => {
         const updateTree = (item: TreeDataType) => {
@@ -73,7 +49,7 @@ const FolderActionsPopup = ({ folderId, style, closePopup, onDelete }: Props) =>
     };
 
     return (
-        <Popup style={style}>
+        <Popup style={style} closePopup={closePopup}>
             <Popup.Item onClick={handleDelete} label="Delete" Icon={BiTrash} />
             <Popup.Item
                 onClick={() => {
