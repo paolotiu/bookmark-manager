@@ -43,6 +43,7 @@ const SidebarItem = ({ icon, label, onClick }: SidebarItemProps) => {
     );
 };
 const FolderActionsPopup = dynamic(() => import('./FolderActionsPopup/FolderActionsPopup'));
+
 export type SidebarItem = 'folder' | 'account';
 const Sidebar = () => {
     const router = useRouter();
@@ -52,8 +53,10 @@ const Sidebar = () => {
     const [actionClickLocation, setActionClickLocation] = useState({ x: 0, y: 0 });
     const [actionFolderId, setActionFolderId] = useState(0);
     const { data: userNameData } = useUserNameQuery();
+    const closePopup = ( ) => setWillShowActions(false)
 
     const handleSidebarItemClick = (e: React.MouseEvent<any>, item: SidebarItem) => {
+        e.preventDefault();
         setActionClickLocation({ x: e.clientX, y: e.clientY });
         setWillShowActions(item);
     };
@@ -73,13 +76,16 @@ const Sidebar = () => {
                     isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
                 }`}
             >
-                <SidebarItem
-                    icon={<BiUser size="20px" />}
-                    label={userNameData?.me?.__typename === 'User' ? userNameData.me.name : ''}
-                    onClick={(e) => {
-                        handleSidebarItemClick(e, 'account');
-                    }}
-                />
+                <div className="relative">
+                    <SidebarItem
+                        icon={<BiUser size="20px" />}
+                        label={userNameData?.me?.__typename === 'User' ? userNameData.me.name : ''}
+                        onClick={(e) => {
+                            handleSidebarItemClick(e, 'account');
+                        }}
+                    />
+                    {willShowActions === 'account' && <AccountPopup closePopup={closePopup}/>}
+                </div>
                 <div className="pt-4">
                     <SidebarItem
                         label="All Bookmarks"
@@ -120,17 +126,8 @@ const Sidebar = () => {
 
                 {willShowActions === 'folder' && (
                     <FolderActionsPopup
-                        closePopup={() => setWillShowActions(false)}
+                    closePopup={closePopup}
                         folderId={Number(actionFolderId)}
-                        style={{
-                            top: Math.min(actionClickLocation.y + 4, window.innerHeight - 220),
-                            left: Math.min(actionClickLocation.x + 2, window.innerWidth - 220),
-                        }}
-                    />
-                )}
-
-                {willShowActions === 'account' && (
-                    <AccountPopup
                         style={{
                             top: Math.min(actionClickLocation.y + 4, window.innerHeight - 220),
                             left: Math.min(actionClickLocation.x + 2, window.innerWidth - 220),
