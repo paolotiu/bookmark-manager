@@ -2,12 +2,13 @@ import { checkWordInSentence } from '@lib/checks';
 import clsx from 'clsx';
 import React from 'react';
 
-interface Props extends React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
+export interface ButtonProps
+    extends React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
     label?: string;
     isSecondary?: boolean;
 }
 
-const Button = ({ label, children, className, isSecondary, ...props }: Props) => {
+const Button = ({ label, children, className, isSecondary, ...props }: ButtonProps) => {
     clsx({
         'px-3': !className?.includes('px'),
     });
