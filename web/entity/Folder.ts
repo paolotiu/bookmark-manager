@@ -67,6 +67,7 @@ export class Folder extends BaseEntity implements IFolder {
         this.type = 'folder';
     }
 
+    // Get descendants of a folder
     getDescendants(): Promise<Folder[]> {
         return Folder.createQueryBuilder()
             .select('*')
@@ -113,6 +114,8 @@ export class Folder extends BaseEntity implements IFolder {
         );
     }
 }
+
+// END OF FOLDER CLASS
 
 export const getFolderStructure = async (userId: number): Promise<Folder[]> => {
     const foldersArr = await Folder.find({ where: { userId }, order: { path: 'ASC' } });
