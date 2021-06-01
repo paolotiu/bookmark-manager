@@ -5,3 +5,13 @@ export const LOGOUT = gql`
         logout
     }
 `;
+
+export const REGISTER = gql`
+    mutation register($email: String!, $password: String!, $name: String!) {
+        register(email: $email, password: $password, name: $name) {
+            ... on BaseError {
+                message
+            }
+        }
+    }
+`;
