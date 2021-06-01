@@ -30,7 +30,9 @@ export class User extends BaseEntity implements IUser {
     @Column('int', { array: true, default: [] })
     rootOrder: number[];
 
-    @Column({ nullable: true, default: null })
+    // We have to specify the types here to not cause a typeorm issue
+    // https://stackoverflow.com/a/64644807/14242400
+    @Column('text', { nullable: true, default: null })
     resetPasswordToken?: string | null;
 
     @Column('date', { nullable: true, default: null })
