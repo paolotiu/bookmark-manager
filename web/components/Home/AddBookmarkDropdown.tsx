@@ -1,6 +1,6 @@
 import Button from '@components/Button/Button';
 import dynamic from 'next/dynamic';
-import ErrorMessage from '@components/General/ErrorMessage';
+import ErrorMessage from '@components/Form/ErrorMessage';
 import { useCreateBookmarkMutation } from '@graphql/generated/graphql';
 import { Transition } from '@headlessui/react';
 import { useForm } from '@lib/useForm';
@@ -35,7 +35,6 @@ const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
         // Close dropdown on outside click
         window.addEventListener('mousedown', closeDropDown);
         return () => {
-            console.log('hey');
             setWillShowErrors(false);
             window.removeEventListener('mousedown', closeDropDown);
         };
