@@ -15,20 +15,14 @@ import { TreeDataType } from 'kreme/build/Tree/types';
 import { useRouter } from 'next/dist/client/router';
 import React, { useRef } from 'react';
 import { addBookmarksToFolder, removeBookmarkFromFolder } from '../cacheUpdates';
+import { SidebarItem } from '../Sidebar';
 
 interface Props {
-    setActionClickLocation: React.Dispatch<
-        React.SetStateAction<{
-            x: number;
-            y: number;
-        }>
-    >;
-
-    setActionFolderId: React.Dispatch<React.SetStateAction<number>>;
-    setWillShowActions: React.Dispatch<React.SetStateAction<boolean>>;
+        setActionFolderId: React.Dispatch<React.SetStateAction<number>>;
+        handleItemClick: (e: React.MouseEvent<any>, item: SidebarItem) => void;
 }
 
-const Tree = ({ setActionClickLocation, setActionFolderId, setWillShowActions }: Props) => {
+const Tree = ({ setActionFolderId , handleItemClick}: Props) => {
     const folderIdRef = useRef(-1);
     const prevFolderIdRef = useRef(-1);
     const bookmarkRef = useRef<Bookmark>();
@@ -135,9 +129,8 @@ const Tree = ({ setActionClickLocation, setActionFolderId, setWillShowActions }:
                 }}
                 onFolderActionClick={async (e, id) => {
                     e.stopPropagation();
-                    setActionClickLocation({ x: e.clientX, y: e.clientY });
                     setActionFolderId(Number(id));
-                    setWillShowActions(true);
+                    handleItemClick(e, 'folder')
                 }}
                 onFolderDrop={(data) => {
                     const orderVars = {

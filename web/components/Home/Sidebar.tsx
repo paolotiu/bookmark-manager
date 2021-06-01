@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import AddFolderForm from './AddFolderForm/AddFolderForm';
 import Tree from './Tree/Tree';
 import { useRouter } from 'next/dist/client/router';
+import AccountPopup from './AccountPopup';
 
 interface SidebarItemProps {
     icon?: any;
@@ -42,16 +43,20 @@ const SidebarItem = ({ icon, label, onClick }: SidebarItemProps) => {
     );
 };
 const FolderActionsPopup = dynamic(() => import('./FolderActionsPopup/FolderActionsPopup'));
-
+export type SidebarItem = 'folder' | 'account';
 const Sidebar = () => {
     const router = useRouter();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [willShowNewFolderInput, setWillShowNewFolderInput] = useState(false);
-    const [willShowActions, setWillShowActions] = useState(false);
+    const [willShowActions, setWillShowActions] = useState<false | SidebarItem>(false);
     const [actionClickLocation, setActionClickLocation] = useState({ x: 0, y: 0 });
     const [actionFolderId, setActionFolderId] = useState(0);
     const { data: userNameData } = useUserNameQuery();
 
+    const handleSidebarItemClick = (e: React.MouseEvent<any>, item: SidebarItem) => {
+        setActionClickLocation({ x: e.clientX, y: e.clientY });
+        setWillShowActions(item);
+    };
     return (
         <>
             <div className="flex p-3 border-b item-center md:hidden">
@@ -71,6 +76,9 @@ const Sidebar = () => {
                 <SidebarItem
                     icon={<BiUser size="20px" />}
                     label={userNameData?.me?.__typename === 'User' ? userNameData.me.name : ''}
+                    onClick={(e) => {
+                        handleSidebarItemClick(e, 'account');
+                    }}
                 />
                 <div className="pt-4">
                     <SidebarItem
@@ -97,11 +105,7 @@ const Sidebar = () => {
                     />
                 </div>
                 <div className="pt-5">
-                    <Tree
-                        setActionClickLocation={setActionClickLocation}
-                        setActionFolderId={setActionFolderId}
-                        setWillShowActions={setWillShowActions}
-                    />
+                    <Tree handleItemClick={handleSidebarItemClick} setActionFolderId={setActionFolderId} />
                 </div>
                 {willShowNewFolderInput && <AddFolderForm closeForm={() => setWillShowNewFolderInput(false)} />}
                 {!willShowNewFolderInput && (
@@ -114,10 +118,19 @@ const Sidebar = () => {
                     />
                 )}
 
-                {willShowActions && (
+                {willShowActions === 'folder' && (
                     <FolderActionsPopup
                         closePopup={() => setWillShowActions(false)}
                         folderId={Number(actionFolderId)}
+                        style={{
+                            top: Math.min(actionClickLocation.y + 4, window.innerHeight - 220),
+                            left: Math.min(actionClickLocation.x + 2, window.innerWidth - 220),
+                        }}
+                    />
+                )}
+
+                {willShowActions === 'account' && (
+                    <AccountPopup
                         style={{
                             top: Math.min(actionClickLocation.y + 4, window.innerHeight - 220),
                             left: Math.min(actionClickLocation.x + 2, window.innerWidth - 220),
