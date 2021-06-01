@@ -95,6 +95,11 @@ module.exports = {
                 };
             }, {});
             addUtilities(shadowBorderUtilities, ['responsive', 'hover', 'focus-within']);
+            addUtilities({
+                'outline-default': {
+                    outline: '2px solid black',
+                },
+            });
         }),
     ],
 };
