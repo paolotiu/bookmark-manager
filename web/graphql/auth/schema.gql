@@ -12,4 +12,5 @@ type Mutation {
     sendForgotPassword(email: String!): Boolean!
     resetPassword(email: String!, password: String!, resetToken: String!): BooleanOrError!
     invalidateTokens: Boolean!
+    logout: Boolean!
 }

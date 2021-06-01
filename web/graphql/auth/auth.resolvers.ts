@@ -85,6 +85,10 @@ export const authResolvers: Resolvers = {
 
             return { success: true };
         },
+        logout: (_, __, { res }) => {
+            removeCookies(res);
+            return true;
+        },
 
         invalidateTokens: async (_, _a, { userId }) => {
             if (!userId) return false;
