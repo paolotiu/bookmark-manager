@@ -6,6 +6,10 @@ module.exports = {
     purge: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
     darkMode: false, // or 'media' or 'class'
     theme: {
+        borderColor: (theme) => ({
+            ...theme('colors'),
+            DEFAULT: '#D1D5DB',
+        }),
         fontFamily: {
             sans: ['"Heebo"', 'Helvetica', 'Arial', 'sans-serif'],
             body: ['"Heebo"', 'Helvetica', 'Arial', 'sans-serif'],

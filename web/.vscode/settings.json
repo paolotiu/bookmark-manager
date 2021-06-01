@@ -5,5 +5,10 @@
     "files.associations": {
         "*.xml": "html",
         "*.svg": "html"
-    }
+    },
+    "tailwindCSS.experimental.classRegex": [
+        "(?:enter|leave)(?:From|To)?=\\s*(?:\"|')([^(?:\"|')]*)",
+
+        ["clsx\\(([^)]*)\\)", "'([^']*)'"]
+    ]
 }
