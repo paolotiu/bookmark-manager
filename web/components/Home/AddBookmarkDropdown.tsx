@@ -8,6 +8,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import * as yup from 'yup';
 import { isValidUrl } from '@lib/isValidUrl';
 import { addBookmarksToAll, addBookmarksToFolder } from './cacheUpdates';
+import clsx from 'clsx';
 const Spinner = dynamic(() => import('@components/Spinner/Spinner'));
 
 interface Props {
@@ -114,27 +115,18 @@ const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
                                 <ErrorMessage size="small" className="pl-1" text={errors.url.message} />
                             )}
                         </div>
-                        {willShowErrors ? (
-                            <Button
-                                className={`relative w-min justify-self-end no-outline`}
-                                disabled={isSaving || isError}
-                                onMouseDown={() => setWillShowErrors(true)}
-                            >
-                                <p className={`${isSaving && 'invisible'}`}>Save</p>
-                                <Spinner showSpinner={isSaving} />
-                            </Button>
-                        ) : (
-                            <div onClick={() => setWillShowErrors(true)} className={` justify-self-end`}>
-                                <Button
-                                    className={`relative w-min justify-self-end no-outline`}
-                                    disabled={isSaving || isError}
-                                    onMouseDown={() => setWillShowErrors(true)}
-                                >
-                                    <p className={`${isSaving && 'invisible'}`}>Save</p>
-                                    <Spinner showSpinner={isSaving} />
-                                </Button>
-                            </div>
-                        )}
+                        <Button
+                            className={`relative w-min justify-self-end no-outline`}
+                            type="submit"
+                            disabled={isSaving || isError}
+                        >
+                            <div
+                                className={clsx('absolute w-full h-full', willShowErrors && 'hidden')}
+                                onClick={() => setWillShowErrors(true)}
+                            ></div>
+                            <p className={`${isSaving && 'invisible'}`}>Save</p>
+                            <Spinner showSpinner={isSaving} />
+                        </Button>
                     </form>
                 </div>
             </div>
