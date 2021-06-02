@@ -1,12 +1,13 @@
 import Popup from '@components/Popup/Popup';
-import { useDeleteFolderMutation } from '@graphql/generated/graphql';
+import { FOLDER_BOOKMARKS } from '@graphql/folder/folderBookmarksQuery';
+import { Bookmark, FolderBookmarksFragment, useDeleteFolderMutation } from '@graphql/generated/graphql';
 import { treeVar } from '@lib/apolloClient';
 import { TreeDataType } from 'kreme/build/Tree/types';
 import { cloneDeep } from 'lodash';
-import React, { CSSProperties, useEffect } from 'react';
+import React, { CSSProperties } from 'react';
 import { BiTrash } from 'react-icons/bi';
 import { BsPencilSquare } from 'react-icons/bs';
-import { removeFolderFromCache } from '../cacheUpdates';
+import { addBookmarksToTrash, removeFolderFromCache } from '../cacheUpdates';
 
 interface Props {
     folderId: number;
@@ -20,6 +21,18 @@ const FolderActionsPopup = ({ folderId, style, closePopup, onDelete }: Props) =>
         awaitRefetchQueries: true,
         refetchQueries: ['getTree'],
         update(cache) {
+            const folder = cache.readQuery({
+                query: FOLDER_BOOKMARKS,
+                variables: {
+                    id: folderId,
+                },
+            }) as { folder: FolderBookmarksFragment } | null;
+
+            if (folder) {
+                addBookmarksToTrash(cache, {
+                    bookmarks: (folder.folder.bookmarks as Bookmark[]) || [],
+                });
+            }
             removeFolderFromCache(cache, { folderId });
         },
     });
