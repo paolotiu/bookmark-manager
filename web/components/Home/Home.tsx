@@ -3,10 +3,10 @@ import { useRouter } from 'next/dist/client/router';
 import React, { useEffect } from 'react';
 import { DndProvider } from 'react-dnd-multi-backend';
 import HTML5toTouch from 'react-dnd-multi-backend/dist/cjs/HTML5toTouch'; // or any other pipeline
-import AllBookmarksView from './AllBookmarksView';
-import DeletedBookmarksView from './DeletedBookmarksView';
-import FolderView from './FolderView';
-import NotFoundView from './NotFoundView';
+import AllBookmarksView from './View/AllBookmarksView';
+import DeletedBookmarksView from './View/DeletedBookmarksView';
+import FolderView from './View/FolderView';
+import NotFoundView from './View/NotFoundView';
 import Sidebar from './Sidebar';
 
 const Home = () => {
