@@ -9,11 +9,13 @@ interface Props {
     children?: React.ReactNode;
     withAddBookmarkDropdown?: boolean;
     isAddDropdownOpen?: boolean;
+    folderId?: null | number;
 }
 
 interface WithAddBookmarkDropdownProps extends Props {
     withAddBookmarkDropdown: true;
     closeDropdown: () => void;
+    folderId: null | number;
 }
 interface NoAddBookmarkDropdownProps extends Props {
     withAddBookmarkDropdown?: false;
@@ -28,6 +30,7 @@ const View = ({
     closeDropdown,
     isAddDropdownOpen = false,
     withAddBookmarkDropdown = false,
+    folderId,
 }: WithAddBookmarkDropdownProps | NoAddBookmarkDropdownProps) => {
     return (
         <div>
@@ -45,7 +48,7 @@ const View = ({
                     </Button>
                     {withAddBookmarkDropdown ? (
                         <AddBookmarkDropdown
-                            folderId={null}
+                            folderId={folderId || null}
                             isOpen={isAddDropdownOpen}
                             closeDropDown={
                                 closeDropdown ||

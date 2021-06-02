@@ -1,8 +1,6 @@
-import dynamic from 'next/dynamic';
-import Button from '@components/Button/Button';
 import { useFolderQuery } from '@graphql/generated/graphql';
 import { isBaseError } from '@graphql/helpers';
-import React, { useState } from 'react';
+import React from 'react';
 import BookmarkCard from '../BookmarkCard';
 import { cloneDeep } from 'lodash';
 import { bookmarkDateSort } from '@lib/sortFuncs';
@@ -39,6 +37,7 @@ const FolderView = ({ folderId }: Props) => {
 
     return (
         <View
+            folderId={folderId}
             buttonLabel="Add +"
             buttonOnClick={openDropdown}
             title={name}

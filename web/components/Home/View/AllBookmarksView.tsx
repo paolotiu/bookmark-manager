@@ -27,6 +27,7 @@ const AllBookmarksView = () => {
             withAddBookmarkDropdown
             closeDropdown={closeDropdown}
             isAddDropdownOpen={isDropdownOpen}
+            folderId={null}
         >
             {sorted.map((bookmark) => {
                 if (bookmark?.id === currentEditingBookmark)
