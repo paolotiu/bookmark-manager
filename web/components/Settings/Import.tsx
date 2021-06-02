@@ -7,10 +7,6 @@ import SettingsLayout from './SettingsLayout';
 import { useReactiveVar } from '@apollo/client';
 import { importProgressVar, isImportingVar } from '@lib/apolloClient';
 
-const getCategory = (a: Element) => {
-    return a.closest('DL')?.previousElementSibling?.textContent || '';
-};
-
 const UploadFileButton = ({
     handleUpload,
     label,
@@ -60,6 +56,9 @@ interface Folders {
     [key: string]: { title: string; url: string }[];
 }
 
+const getCategory = (a: Element) => {
+    return a.closest('DL')?.previousElementSibling?.textContent || false;
+};
 const Import = () => {
     const [createFolderWithBookmarks] = useCreateFolderWithBookmarksMutation({
         awaitRefetchQueries: true,
@@ -96,6 +95,8 @@ const Import = () => {
                 const title = anchor.text;
                 const url = anchor.getAttribute('href') || '';
                 const category = getCategory(anchor);
+                if (!category) return;
+
                 if (map[category]) {
                     map[category].push({ title, url });
                     return;
@@ -126,6 +127,7 @@ const Import = () => {
         );
     };
 
+    const hasFolders = !!Object.keys(folders).length;
     return (
         <>
             <SettingsLayout>
@@ -133,13 +135,19 @@ const Import = () => {
                     <div className="col-span-full">
                         <span className="mr-2 ">File: </span>
                         {file ? (
-                            <>
-                                <span className="font-medium">{file.name}</span>
-                                <div className="text-sm text-inactiveSidebar">
-                                    Folders: {Object.keys(folders).length}, Bookmarks:{' '}
-                                    {Object.values(folders).reduce((acc, curr) => acc + curr.length, 0)}
-                                </div>
-                            </>
+                            hasFolders ? (
+                                <>
+                                    <span className="font-medium">{file.name}</span>
+                                    <div className="text-sm text-inactiveSidebar">
+                                        Folders: {Object.keys(folders).length}, Bookmarks:{' '}
+                                        {Object.values(folders).reduce((acc, curr) => acc + curr.length, 0)}
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="font-medium text-red-500">No bookmarks</span>
+                                </>
+                            )
                         ) : (
                             <span className="text-inactiveSidebar">No file uploaded</span>
                         )}
@@ -159,9 +167,11 @@ const Import = () => {
                         <div className="pt-5">
                             {file ? (
                                 <div className="box-border flex items-stretch col-span-full">
-                                    <Button className="h-auto mr-5 " onClick={startImport}>
-                                        Import
-                                    </Button>
+                                    {hasFolders ? (
+                                        <Button className="h-auto mr-5 " onClick={startImport}>
+                                            Import
+                                        </Button>
+                                    ) : null}
                                     <UploadFileButton handleUpload={handleUpload}>
                                         <Button
                                             isSecondary
