@@ -50,8 +50,9 @@ export const importProgressVar = makeVar<number>(0);
 export const isImportingVar = makeVar<boolean>(false);
 
 function createApolloClient(context?: ResolverContext) {
+    console.log(process.env.NEXT_PUBLIC_VERCEL_URL);
     const uploadLink = createUploadLink({
-        uri: process.env.VERCEL_URL ? process.env.VERCEL_URL + '/api/graphql' : 'http://localhost:3000/api/graphql', // Server URL (must be absolute)
+        uri: '/api/graphql',
         credentials: 'include', // Additional fetch() options like `credentials` or `headers`
     });
 
