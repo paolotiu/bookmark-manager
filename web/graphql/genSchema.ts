@@ -13,7 +13,7 @@ import { sharedResolvers } from './shared/shared.resolvers';
 import { userResolvers } from './user/user.resolvers';
 import { Resolvers } from './generated/graphql';
 export const genSchema = (): GraphQLSchema => {
-    const typesArray = loadFilesSync(path.join(process.cwd(), '.'), { recursive: true, extensions: ['gql'] });
+    const typesArray = loadFilesSync(path.join(process.cwd(), '**/*.gql'), { recursive: true, extensions: ['gql'] });
     const resolversArray: Resolvers[] = [
         folderResolvers,
         authResolvers,
