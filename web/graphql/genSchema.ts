@@ -12,8 +12,18 @@ import { AuthDirective } from './shared/authDirective';
 import { sharedResolvers } from './shared/shared.resolvers';
 import { userResolvers } from './user/user.resolvers';
 import { Resolvers } from './generated/graphql';
+import authSchema from './auth/auth.gql';
+import bookmarkSchema from './bookmark/bookmark.gql';
+import folderSchema from './folder/folder.gql';
+import sharedSchema from './shared/shared.gql';
+import userSchema from './user/user.gql';
 export const genSchema = (): GraphQLSchema => {
-    const typesArray = loadFilesSync(path.join(process.cwd(), '**/*.gql'), { recursive: true, extensions: ['gql'] });
+    // Cant use this in prod
+    // Related issue: https://github.com/vercel/next.js/issues/8251
+    // const typesArray = loadFilesSync(path.join(process.cwd(), '**/*.gql'), { recursive: true, extensions: ['gql'] });
+
+    const typesArray = [authSchema, bookmarkSchema, folderSchema, sharedSchema, userSchema];
+
     const resolversArray: Resolvers[] = [
         folderResolvers,
         authResolvers,

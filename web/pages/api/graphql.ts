@@ -71,7 +71,6 @@ export const config = {
 };
 
 export default cors(async (req, res) => {
-    console.log(schema);
     if (req.method === 'OPTIONS') {
         res.end();
         return false;
