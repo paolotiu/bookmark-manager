@@ -30,7 +30,7 @@ const getApolloServerHandler = async (req: NextApiRequest, res: NextApiResponse)
             context: ({ req, res }) => {
                 return { req, res, userId: userId || undefined };
             },
-            tracing: true,
+            tracing: process.env.NODE_ENV === 'development',
             uploads: false,
         }).createHandler({ path: '/api/graphql' });
 
@@ -72,6 +72,8 @@ export const config = {
 };
 
 export default cors(async (req, res) => {
+
+    console.log(schema);
     if (req.method === 'OPTIONS') {
         res.end();
         return false;

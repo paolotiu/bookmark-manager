@@ -16,7 +16,7 @@ const options: any = {
         database: process.env.DB_DATABASE,
         url: process.env.DB_URL,
         synchronize: process.env.NODE_ENV === 'development',
-        logging: true,
+        logging: process.env.NODE_ENV === 'development',
         entities: [User, Bookmark, Folder],
         extra: {
             ssl: {
