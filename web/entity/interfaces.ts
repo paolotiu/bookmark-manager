@@ -20,6 +20,8 @@ export interface IBookmark extends BaseEntity {
     createdDate: Date;
 
     deletedDate: Date;
+
+    updatedDate: Date;
 }
 export interface IUser {
     id: number;

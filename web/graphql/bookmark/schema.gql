@@ -4,6 +4,7 @@ type Bookmark {
     url: String!
     description: String
     createdDate: Date!
+    updatedDate: Date
     folderId: Int
 }
 

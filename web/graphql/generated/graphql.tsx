@@ -37,6 +37,7 @@ export type Bookmark = {
   url: Scalars['String'];
   description?: Maybe<Scalars['String']>;
   createdDate: Scalars['Date'];
+  updatedDate?: Maybe<Scalars['Date']>;
   folderId?: Maybe<Scalars['Int']>;
 };
 
@@ -844,6 +845,7 @@ export type BookmarkResolvers<ContextType = MyContext, ParentType extends Resolv
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdDate?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  updatedDate?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
   folderId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
