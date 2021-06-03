@@ -36,3 +36,5 @@ export const genSchema = (): GraphQLSchema => {
         },
     });
 };
+
+export const schema = genSchema();

@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import microCors from 'micro-cors';
 import { ApolloServer } from 'apollo-server-micro';
-import { genSchema } from '@graphql/genSchema';
+import { schema } from '@graphql/genSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import jwt from 'jsonwebtoken';
 import { User } from 'entity/User';
@@ -21,7 +21,6 @@ interface RefreshTokenPayload extends AccessTokenPayload {
     count: number;
 }
 
-const schema = genSchema();
 const getApolloServerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     await ensureConnection();
     const server = (userId?: number) =>
@@ -72,7 +71,6 @@ export const config = {
 };
 
 export default cors(async (req, res) => {
-
     console.log(schema);
     if (req.method === 'OPTIONS') {
         res.end();
