@@ -6,7 +6,7 @@ import { useLoginMutation } from '@graphql/generated/graphql';
 import Link from 'next/link';
 import { checkObjEqual } from '@lib/checks';
 import * as yup from 'yup';
-import { useRouter } from 'next/dist/client/router';
+import { useRouter } from 'next/router';
 import Auth from './Auth';
 
 // Inital form state
