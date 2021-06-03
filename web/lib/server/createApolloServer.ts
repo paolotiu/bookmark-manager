@@ -1,8 +1,7 @@
 import { genSchema } from '@graphql/genSchema';
 import { ApolloServer } from 'apollo-server-express';
-import { Express } from 'express';
 
-export const createApolloServer = (app?: Express): ApolloServer => {
+export const createApolloServer = (app?: any): ApolloServer => {
     const schema = genSchema();
     const apolloServer = new ApolloServer({
         schema,

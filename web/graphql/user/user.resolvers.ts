@@ -16,7 +16,7 @@ export const userResolvers: Resolvers = {
         me: async (_, _a, { userId }) => {
             if (!userId) return createEntityIdNotFoundError('me', 'user');
             const user = await User.findOne(userId);
-            return user ? user : createEntityIdNotFoundError('me', 'user');
+            return user || createEntityIdNotFoundError('me', 'user');
         },
         ping: () => 'pong',
     },

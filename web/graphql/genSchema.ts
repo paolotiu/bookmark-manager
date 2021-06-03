@@ -1,12 +1,10 @@
-import { mergeResolvers } from '@graphql-tools/merge';
-import { mergeTypeDefs } from '@graphql-tools/merge';
-import { makeExecutableSchema } from 'apollo-server-express';
+import { mergeResolvers, mergeTypeDefs, makeExecutableSchema } from 'graphql-tools';
 import { GraphQLSchema } from 'graphql';
 import { GraphQLUpload } from 'graphql-upload';
 import { authResolvers } from './auth/auth.resolvers';
 import { bookmarkResolvers } from './bookmark/bookmark.resolvers';
 import { folderResolvers } from './folder/folder.resolvers';
-import { AuthDirective } from './shared/authDirective';
+import { authDirective } from './shared/authDirective';
 import { sharedResolvers } from './shared/shared.resolvers';
 import { userResolvers } from './user/user.resolvers';
 import { Resolvers } from './generated/graphql';
@@ -15,11 +13,12 @@ import bookmarkSchema from './bookmark/bookmark.gql';
 import folderSchema from './folder/folder.gql';
 import sharedSchema from './shared/shared.gql';
 import userSchema from './user/user.gql';
+
 export const genSchema = (): GraphQLSchema => {
     // Cant use this in prod
     // Related issue: https://github.com/vercel/next.js/issues/8251
     // const typesArray = loadFilesSync(path.join(process.cwd(), '**/*.gql'), { recursive: true, extensions: ['gql'] });
-
+    const { authDirectiveTransformer } = authDirective('auth');
     const typesArray = [authSchema, bookmarkSchema, folderSchema, sharedSchema, userSchema];
 
     const resolversArray: Resolvers[] = [
@@ -39,9 +38,7 @@ export const genSchema = (): GraphQLSchema => {
     return makeExecutableSchema({
         typeDefs,
         resolvers,
-        schemaDirectives: {
-            auth: AuthDirective,
-        },
+        schemaTransforms: [authDirectiveTransformer],
     });
 };
 

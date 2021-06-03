@@ -12,11 +12,11 @@ const nulledValidationError = {
 };
 
 export const useForm = <T extends Record<string, unknown>>(initialState: T, schema?: ObjectSchema<any>) => {
-    const emptyObject = <T extends Record<string, unknown>>(obj: T): { [K in keyof T]: '' } => {
+    const emptyObject = <Obj extends Record<string, unknown>>(obj: Obj): { [K in keyof Obj]: '' } => {
         return Object.fromEntries(Object.entries(obj).map(([key]) => [key, ''])) as any;
     };
 
-    const nullifyObject = <T extends Record<string, unknown>>(obj: T): { [K in keyof T]: ValidationError } => {
+    const nullifyObject = <Obj extends Record<string, unknown>>(obj: Obj): { [K in keyof Obj]: ValidationError } => {
         return Object.fromEntries(Object.entries(obj).map(([key]) => [key, nulledValidationError])) as any;
     };
 
@@ -25,7 +25,7 @@ export const useForm = <T extends Record<string, unknown>>(initialState: T, sche
     const [errors, setErrors] = useState<{ [K in keyof T]: ValidationError }>(nullifyObject(initialState));
     const [isError, setIsError] = useState(true);
 
-    const checkIfEmpty = <T extends Record<string, unknown>>(obj: T) => {
+    const checkIfEmpty = <Obj extends Record<string, unknown>>(obj: Obj) => {
         return Object.values(obj).every((val) => val === '');
     };
 

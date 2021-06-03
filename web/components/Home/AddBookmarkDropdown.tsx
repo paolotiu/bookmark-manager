@@ -7,8 +7,9 @@ import { useForm } from '@lib/useForm';
 import React, { Fragment, useEffect, useState } from 'react';
 import * as yup from 'yup';
 import { isValidUrl } from '@lib/isValidUrl';
-import { addBookmarksToAll, addBookmarksToFolder } from './cacheUpdates';
 import clsx from 'clsx';
+import { addBookmarksToAll, addBookmarksToFolder } from './cacheUpdates';
+
 const Spinner = dynamic(() => import('@components/Spinner/Spinner'));
 
 interface Props {
@@ -32,15 +33,6 @@ const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
         createBookmarkSchema,
     );
 
-    useEffect(() => {
-        // Close dropdown on outside click
-        window.addEventListener('mousedown', closeDropDown);
-        return () => {
-            setWillShowErrors(false);
-            window.removeEventListener('mousedown', closeDropDown);
-        };
-    }, [closeDropDown]);
-
     const [isSaving, setIsSaving] = useState(false);
     const [willShowErrors, setWillShowErrors] = useState(false);
     const [createBookmark] = useCreateBookmarkMutation({
@@ -58,6 +50,15 @@ const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
         },
     });
 
+    useEffect(() => {
+        // Close dropdown on outside click
+        window.addEventListener('mousedown', closeDropDown);
+        return () => {
+            setWillShowErrors(false);
+            window.removeEventListener('mousedown', closeDropDown);
+        };
+    }, [closeDropDown]);
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setWillShowErrors(true);
@@ -67,16 +68,12 @@ const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
         }
 
         setIsSaving(true);
-        const { data } = await createBookmark({
+        await createBookmark({
             variables: {
                 folderId: folderId ? Number(folderId) : null,
                 url: inputs.url,
             },
         });
-        if (data?.createBookmark.__typename === 'InputValidationError') {
-        }
-        if (data?.createBookmark.__typename === 'BaseError') {
-        }
 
         setIsSaving(false);
         resetForm();
@@ -92,6 +89,8 @@ const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95 translate-x-5 -translate-y-2"
         >
+            {/* The div is used to prevent bubbling */}
+            {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
             <div
                 className={`absolute right-0 z-10  bg-white text-black shadow-lg top-[110%] w-[400px] max-w-[90vw] `}
                 onMouseDown={(e) => {
@@ -101,26 +100,29 @@ const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
                 <div className="p-3 ">
                     <form action="#" className="grid gap-3" onSubmit={handleSubmit}>
                         <div className="grid gap-1">
-                            <label htmlFor="url">URL</label>
-                            <input
-                                type="text"
-                                className="px-2 py-1 text-sm border rounded-sm "
-                                value={inputs.url}
-                                onChange={handleChange}
-                                placeholder="https://example.com"
-                                autoComplete="off"
-                                name="url"
-                            />
+                            <label htmlFor="url">
+                                URL
+                                <input
+                                    type="text"
+                                    className="px-2 py-1 text-sm border rounded-sm "
+                                    value={inputs.url}
+                                    onChange={handleChange}
+                                    placeholder="https://example.com"
+                                    autoComplete="off"
+                                    name="url"
+                                />
+                            </label>
                             {willShowErrors && errors.url.message && (
                                 <ErrorMessage size="small" className="pl-1" text={errors.url.message} />
                             )}
                         </div>
                         <Button
-                            className={`relative w-min justify-self-end no-outline`}
+                            className="relative w-min justify-self-end no-outline"
                             type="submit"
                             disabled={isSaving || isError}
                         >
                             <div
+                                aria-hidden
                                 className={clsx('absolute w-full h-full', willShowErrors && 'hidden')}
                                 onClick={() => setWillShowErrors(true)}
                             ></div>

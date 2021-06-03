@@ -1,4 +1,3 @@
-import { Bookmark } from './Bookmark';
 import {
     Entity,
     PrimaryGeneratedColumn,
@@ -8,8 +7,10 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import { Bookmark } from './Bookmark';
 import { Folder } from './Folder';
 import { IBookmark, IFolder, IUser } from './interfaces';
+
 @Entity()
 export class User extends BaseEntity implements IUser {
     @PrimaryGeneratedColumn()

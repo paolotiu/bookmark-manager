@@ -50,12 +50,7 @@ const View = ({
                         <AddBookmarkDropdown
                             folderId={folderId || null}
                             isOpen={isAddDropdownOpen}
-                            closeDropDown={
-                                closeDropdown ||
-                                function () {
-                                    return;
-                                }
-                            }
+                            closeDropDown={closeDropdown || function any() {}}
                         />
                     ) : null}
                 </div>

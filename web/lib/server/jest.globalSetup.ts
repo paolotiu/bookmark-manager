@@ -1,4 +1,5 @@
 // The below can be used in a Jest global setup file or similar for your testing set-up
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { loadEnvConfig } from '@next/env';
 
 export default async () => {

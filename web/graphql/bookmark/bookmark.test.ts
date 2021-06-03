@@ -3,9 +3,9 @@ import { Bookmark } from '@entity/Bookmark';
 import { Folder } from '@entity/Folder';
 import { User } from '@entity/User';
 import { createApolloTestClient } from '@lib/server/createApolloTestClient';
-import { gql } from 'apollo-server-express';
 import { BaseErrorFragment, BookmarkFragments } from '@graphql/shared/test.fragments';
 import { BookmarkResult, CreateBookmarkInput, UpdateBookmarkInput } from '@graphql/generated/graphql';
+import { gql } from 'apollo-server-micro';
 
 jest.setTimeout(30000);
 

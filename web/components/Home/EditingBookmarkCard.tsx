@@ -4,8 +4,8 @@ import { Bookmark, useUpdateBookmarkMutation } from '@graphql/generated/graphql'
 import { treeVar } from '@lib/apolloClient';
 import { useForm } from '@lib/useForm';
 import { KremeProvider, Tree } from 'kreme';
-import { addBookmarksToFolder, removeBookmarkFromFolder, useFolderCache } from './cacheUpdates';
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { addBookmarksToFolder, removeBookmarkFromFolder, useFolderCache } from './cacheUpdates';
 
 interface Props {
     bookmark: Bookmark;
@@ -83,11 +83,11 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
     useLayoutEffect(() => {
         if (willShowFoldersDropdown && treeRef.current) {
             const bounding = treeRef.current.getBoundingClientRect();
-            const top = bounding.top;
-            const height = bounding.height;
+            const { top } = bounding;
+            const { height } = bounding;
             let buffer = 100;
 
-            const isOnTop = (buffer: number) => top + height + buffer > window.innerHeight;
+            const isOnTop = (b: number) => top + height + b > window.innerHeight;
             setIsDropdownOnTop((prev) => {
                 if (!prev) {
                     return isOnTop(buffer);
@@ -125,7 +125,6 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
                             name="title"
                             value={inputs.title}
                             onChange={handleChange}
-                            autoFocus
                             className="w-full font-medium outline-none focus-within:shadow-border-b-gray-300"
                         />
                         <textarea
@@ -142,14 +141,14 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
                             <div className="flex flex-1 p-2 space-x-1 text-sm border rounded-sm bg-inputGrayBg focus-within:border-gray-300">
                                 <label htmlFor="url" className="text-inputGrayText">
                                     URL:
+                                    <input
+                                        type="text"
+                                        name="url"
+                                        value={inputs.url}
+                                        onChange={handleChange}
+                                        className="flex-1 bg-transparent outline-none w-max"
+                                    />
                                 </label>
-                                <input
-                                    type="text"
-                                    name="url"
-                                    value={inputs.url}
-                                    onChange={handleChange}
-                                    className="flex-1 bg-transparent outline-none w-max"
-                                />
                             </div>
                             <div className="relative flex-1 text-sm ">
                                 <div
@@ -157,7 +156,12 @@ const EditingBookmarkCard = ({ bookmark, stopEditing }: Props) => {
                                     className={`relative flex-1 p-2 border rounded-sm bg-inputGrayBg ${
                                         willShowFoldersDropdown && 'border-gray-300'
                                     }`}
-                                    tabIndex={1}
+                                    onKeyPress={(e) => {
+                                        if (e.key === 'enter') {
+                                            setWillShowFoldersDropdown(true);
+                                        }
+                                    }}
+                                    tabIndex={0}
                                     onClick={() => {
                                         setWillShowFoldersDropdown(true);
                                     }}

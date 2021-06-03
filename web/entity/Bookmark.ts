@@ -9,7 +9,6 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { User } from './User';
 import { Folder } from './Folder';
 import { IBookmark, IFolder, IUser } from './interfaces';
 
@@ -33,7 +32,7 @@ export class Bookmark extends BaseEntity implements IBookmark {
     @Column({ type: 'int', nullable: true })
     folderId: number | null;
 
-    @ManyToOne(() => User, (user) => user.bookmarks)
+    @ManyToOne('User', 'bookmarks')
     @JoinColumn({ name: 'userId' })
     user: IUser;
 

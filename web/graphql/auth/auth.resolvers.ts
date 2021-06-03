@@ -7,8 +7,8 @@ import { NextApiResponse } from 'next';
 import { CookieSerializeOptions } from 'cookie';
 import { createTokens } from '@lib/server/createTokens';
 import { BaseError, Resolvers } from '@graphql/generated/graphql';
-import { registerSchema } from './yupSchemas';
 import { sendEmail } from '@lib/server/sendEmail';
+import { registerSchema } from './yupSchemas';
 
 const loginError: BaseError = {
     path: 'login',
@@ -34,8 +34,8 @@ export const authResolvers: Resolvers = {
             if (x.errors) return createBaseError('register', x.errors[0]);
 
             try {
-                const user = User.create({ email, name, password: hashedPassword }).save();
-                return user;
+                const newUser = User.create({ email, name, password: hashedPassword }).save();
+                return newUser;
             } catch (error) {
                 return createUnexpectedError('register');
             }
@@ -122,7 +122,7 @@ export function setTokenCookies(
     { refreshToken, accessToken }: { refreshToken: string; accessToken: string },
 ): void {
     setCookie({ res }, 'refresh-token', refreshToken, getCookieOptions(1000 * 60 * 60 * 24 * 7)); // 7 days
-    setCookie({ res }, 'access-token', accessToken, getCookieOptions(1000 * 60 * 15)); //15 minutes
+    setCookie({ res }, 'access-token', accessToken, getCookieOptions(1000 * 60 * 15)); // 15 minutes
 }
 
 export function removeCookies(res: NextApiResponse) {

@@ -4,9 +4,9 @@ import { Bookmark } from '@entity/Bookmark';
 import { Folder } from '@entity/Folder';
 import { User } from '@entity/User';
 import { createApolloTestClient } from '@lib/server/createApolloTestClient';
-import { gql } from 'apollo-server-express';
 import { BaseErrorFragment, FolderFragments } from '@graphql/shared/test.fragments';
 import { CreateFolderInput, FolderResult } from '@graphql/generated/graphql';
+import { gql } from 'apollo-server-micro';
 
 const testUser = { email: 'tommy@2bob.com', password: 'password', name: 'bob', id: 0 };
 const testClient = createApolloTestClient();
@@ -305,7 +305,7 @@ describe('Tree ', () => {
 
         const {
             data: {
-                getTree: { tree: tree },
+                getTree: { tree },
             },
         } = await treeQuery();
 
@@ -313,7 +313,9 @@ describe('Tree ', () => {
         parentFolder1.children = [child1 as Folder];
         parentFolder1.children?.push(child2 as Folder);
         child1.children = [grandChild1 as Folder];
-        folders.forEach((folder) => (folder.children = folder.children || []));
+        folders.forEach((folder) => {
+            folder.children = folder.children || [];
+        });
         const sampleTree = [parentFolder1, parentFolder2];
         expect(JSON.parse(tree)).toEqual(sampleTree);
     });

@@ -12,8 +12,9 @@ const NavItem = ({ href, label }: NavItemProps) => {
     const route = router.pathname;
     const isActive = route === href;
     return (
-        <Link href={href}>
+        <Link href={href} passHref>
             <a
+                href="navItem"
                 className={`md:p-2 px-4 py-2 rounded-sm w-1/3 md:w-full md:text-left md:block text-center hover:bg-white ${
                     isActive && 'bg-white'
                 }`}
@@ -36,8 +37,8 @@ const SettingsLayout = ({ children }: Props) => {
                     {/* <div className="flex items-center justify-between w-full max-w-[900px] px-4 py-4 text-xl max-w-screen "> */}
                     <span className="w-[250px] md:pl-8">Settings</span>
                     <div className="w-3/4 md:max-w-[704px]">
-                        <Link href="/home/all">
-                            <a className="flex items-center float-right py-2">
+                        <Link href="/home/all" passHref>
+                            <a className="flex items-center float-right py-2" href="all">
                                 <FiX size="1.25em" />
                             </a>
                         </Link>

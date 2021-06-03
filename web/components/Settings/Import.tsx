@@ -3,9 +3,9 @@ import { TREE_QUERY } from '@graphql/folder/treeQuery';
 import { useCreateFolderWithBookmarksMutation } from '@graphql/generated/graphql';
 import React, { useState } from 'react';
 import { series } from 'async';
-import SettingsLayout from './SettingsLayout';
 import { useReactiveVar } from '@apollo/client';
 import { importProgressVar, isImportingVar } from '@lib/apolloClient';
+import SettingsLayout from './SettingsLayout';
 
 const UploadFileButton = ({
     handleUpload,
@@ -17,7 +17,7 @@ const UploadFileButton = ({
     children?: React.ReactNode;
 }) => {
     return (
-        <label role="button" htmlFor="import">
+        <label htmlFor="import">
             {label}
             {children}
             <input
@@ -78,14 +78,13 @@ const Import = () => {
         const map: { [key: string]: { title: string; url: string }[] } = {};
         const reader = new FileReader();
 
-        reader.onload = (e) => {
-            if (e.target?.readyState !== 2) return;
-            if (e.target.error) {
-                alert('Error while reading file');
+        reader.onload = (event) => {
+            if (event.target?.readyState !== 2) return;
+            if (event.target.error) {
                 return;
             }
 
-            const html = e.target.result;
+            const html = event.target.result;
             if (typeof html !== 'string') return;
             const el = document.createElement('html');
             el.innerHTML = html;
@@ -121,6 +120,7 @@ const Import = () => {
                 return async (cb: any) => {
                     await createFolderWithBookmarks({ variables: { bookmarks, folderName: key } });
                     importProgressVar(Math.min(100, importProgressVar() + 100 / totalFolders));
+
                     cb(null);
                 };
             }),
@@ -134,23 +134,21 @@ const Import = () => {
                 <div className="grid grid-cols-2 gap-5 pt-0">
                     <div className="col-span-full">
                         <span className="mr-2 ">File: </span>
-                        {file ? (
-                            hasFolders ? (
-                                <>
-                                    <span className="font-medium">{file.name}</span>
-                                    <div className="text-sm text-inactiveSidebar">
-                                        Folders: {Object.keys(folders).length}, Bookmarks:{' '}
-                                        {Object.values(folders).reduce((acc, curr) => acc + curr.length, 0)}
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <span className="font-medium text-red-500">No bookmarks</span>
-                                </>
-                            )
-                        ) : (
-                            <span className="text-inactiveSidebar">No file uploaded</span>
-                        )}
+                        {file && hasFolders ? (
+                            <>
+                                <span className="font-medium">{file.name}</span>
+                                <div className="text-sm text-inactiveSidebar">
+                                    Folders: {Object.keys(folders).length}, Bookmarks:{' '}
+                                    {Object.values(folders).reduce((acc, curr) => acc + curr.length, 0)}
+                                </div>
+                            </>
+                        ) : null}
+                        {!file ? <span className="text-inactiveSidebar">No file uploaded</span> : null}
+                        {file && !hasFolders ? (
+                            <>
+                                <span className="font-medium text-red-500">No bookmarks</span>
+                            </>
+                        ) : null}
                     </div>
                     {isImporting ? (
                         <>

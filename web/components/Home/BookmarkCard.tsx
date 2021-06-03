@@ -9,9 +9,10 @@ import {
 import { decode } from 'html-entities';
 import { useDrag } from 'react-dnd';
 import { FaPen, FaTrash } from 'react-icons/fa';
-import ActionButton from './ActionButton/ActionButton';
 import { useDetectDevice } from '@lib/useDetectDevice';
 import Button from '@components/Button/Button';
+import { fromUrl, parseDomain } from 'parse-domain';
+import ActionButton from './ActionButton/ActionButton';
 import {
     addBookmarksToAll,
     addBookmarksToTrash,
@@ -21,7 +22,6 @@ import {
     removeBookmarksFromTrash,
     useFolderCache,
 } from './cacheUpdates';
-import { fromUrl, parseDomain } from 'parse-domain';
 
 interface Props {
     bookmark: Bookmark;
@@ -112,9 +112,7 @@ const BookmarkCard = ({
                         {decode(bookmark.title)}
                     </h3>
 
-                    <div
-                        className={`absolute items-stretch justify-around hidden p-3 space-x-4 sm:space-x-1 bg-white shadow-md sm:bg-transparent sm:shadow-none sm:p-0 sm:static group-hover:flex  sm:flex right-3`}
-                    >
+                    <div className="absolute items-stretch justify-around hidden p-3 space-x-4 bg-white shadow-md sm:space-x-1 sm:bg-transparent sm:shadow-none sm:p-0 sm:static group-hover:flex sm:flex right-3">
                         {isDeleted ? (
                             <Button
                                 isSecondary

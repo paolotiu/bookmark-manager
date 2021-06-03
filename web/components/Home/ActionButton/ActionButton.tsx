@@ -8,7 +8,7 @@ interface Props {
 
 const ActionButton = ({ onClick, icon }: Props) => {
     return (
-        <button onClick={onClick} className={'hidden group-hover:block'}>
+        <button onClick={onClick} className="hidden group-hover:block" type="button">
             <IconContext.Provider value={{ className: 'text-iconPassive hover:text-iconActive no-outline' }}>
                 {icon}
             </IconContext.Provider>

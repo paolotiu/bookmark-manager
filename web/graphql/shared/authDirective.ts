@@ -1,15 +1,24 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { SchemaDirectiveVisitor } from 'apollo-server-express';
-import { defaultFieldResolver, GraphQLField } from 'graphql';
+import { getDirectives, MapperKind, mapSchema } from 'graphql-tools';
+import { defaultFieldResolver, GraphQLSchema } from 'graphql';
 import { unauthorizedError } from './errorMessages';
 
-export class AuthDirective extends SchemaDirectiveVisitor {
-    visitFieldDefinition(field: GraphQLField<any, any>) {
-        const { resolve = defaultFieldResolver, name } = field;
-        field.resolve = async function (src, args, ctx, info) {
-            if (!ctx.userId) return unauthorizedError(name);
-            return await resolve(src, args, ctx, info);
-        };
-    }
-}
+export const authDirective = (name: string) => {
+    return {
+        authDirectiveTransformer: (schema: GraphQLSchema) =>
+            mapSchema(schema, {
+                [MapperKind.OBJECT_FIELD]: (fieldConfig) => {
+                    const directives = getDirectives(schema, fieldConfig);
+                    if (directives[name]) {
+                        const { resolve = defaultFieldResolver } = fieldConfig;
+
+                        // eslint-disable-next-line no-param-reassign
+                        fieldConfig.resolve = async function tester(src, args, ctx, info) {
+                            if (!ctx.userId) return unauthorizedError(name);
+                            return resolve(src, args, ctx, info);
+                        };
+                    }
+                    return fieldConfig;
+                },
+            }),
+    };
+};

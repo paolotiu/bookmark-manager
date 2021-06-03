@@ -8,7 +8,7 @@ import {
 } from '@graphql/shared/errorMessages';
 import { Resolvers } from '@graphql/generated/graphql';
 import { User } from '@entity/User';
-import { scrapeMetadata } from '@lib/server/scrapeMetadata';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 export const folderResolvers: Resolvers = {
     Folder: {
@@ -22,12 +22,12 @@ export const folderResolvers: Resolvers = {
 
             // POJO given
             if (!parent.getDescendantsTree) {
-                const _parent = await Folder.findOne(parent.id);
+                const newParent = await Folder.findOne(parent.id);
 
-                if (!_parent) {
+                if (!newParent) {
                     return [];
                 }
-                const tree = await _parent.getDescendantsTree();
+                const tree = await newParent.getDescendantsTree();
                 return tree.children;
             }
 
@@ -110,28 +110,34 @@ export const folderResolvers: Resolvers = {
             folder.path = String(folder.id);
 
             // Get metadata
-            const bookmarksWithMeta = await Promise.all(
-                bookmarks.map(async (b) => {
-                    const meta = await scrapeMetadata(b.url);
-                    const bookmark = Bookmark.create({
-                        url: b.url,
-                        description:
-                            b.description || meta?.ogDescription || meta?.twitterDescription || meta?.dcDescription,
-                        title: b.title || meta?.ogTitle || meta?.twitterTitle || meta?.dcTitle || b.url,
-                        folderId: folder.id,
-                        userId,
-                    });
-                    return bookmark;
-                }),
-            );
+
+            // -------------EXCEEDS 10s Vercel Execution Limit---------
+            // const bookmarksWithMeta = await Promise.all(
+            //     bookmarks.map(async (b) => {
+            //         const meta = await scrapeMetadata(b.url);
+            //         const bookmark = Bookmark.create({
+            //             url: b.url,
+            //             description:
+            //                 b.description || meta?.ogDescription || meta?.twitterDescription || meta?.dcDescription,
+            //             title: b.title || meta?.ogTitle || meta?.twitterTitle || meta?.dcTitle || b.url,
+            //             folderId: folder.id,
+            //             userId,
+            //         });
+            //         return bookmark;
+            //     }),
+            // );
+            const bookmarksWithMeta = bookmarks.map<QueryDeepPartialEntity<Bookmark>>((b) => ({
+                ...b,
+                title: b.title || b.url,
+                description: b.description || '',
+                userId,
+                folderId: folder.id,
+            }));
 
             // Parrallel saves/updates
             await Promise.all([
                 User.update({ id: userId }, { rootOrder: () => `"rootOrder" || '{${folder.id}}'` }),
-                Bookmark.createQueryBuilder()
-                    .insert()
-                    .values(bookmarksWithMeta as Bookmark[])
-                    .execute(),
+                Bookmark.createQueryBuilder().insert().values(bookmarksWithMeta).execute(),
                 folder.save(),
             ]);
 
@@ -172,7 +178,7 @@ export const folderResolvers: Resolvers = {
         },
         updateFolderName: async (_, { name, id }, { userId }) => {
             // Get folder
-            const folder = await Folder.findOne(id, { where: { userId: userId } });
+            const folder = await Folder.findOne(id, { where: { userId } });
 
             // No folder found
             if (!folder) return createEntityIdNotFoundError('updateFolderName', 'folder');

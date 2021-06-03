@@ -1,6 +1,6 @@
 import { ApolloProvider } from '@apollo/client';
-import { useApollo } from '../lib/apolloClient';
 import { AppProps } from 'next/app';
+import { useApollo } from '../lib/apolloClient';
 import 'styles/globals.css';
 
 export default function MyApp({ Component, pageProps }: AppProps) {

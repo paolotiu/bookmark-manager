@@ -6,7 +6,8 @@ import EditingBookmarkCard from '../EditingBookmarkCard';
 import View from './View';
 
 const DeletedBookmarksView = () => {
-    const { data } = useDeletedBookmarksQuery();
+    const { data: bookmarksData } = useDeletedBookmarksQuery();
+
     const [hardDeleteBookmarks] = useHardDeleteBookmarksMutation({
         update(cache, { data }) {
             if (data?.hardDeleteBookmarks.__typename === 'Bookmarks') {
@@ -18,9 +19,9 @@ const DeletedBookmarksView = () => {
     });
     const { currentEditingBookmark, stopEditing, triggerEditing } = useEditing();
 
-    if (!data || data.bookmarks.__typename !== 'Bookmarks') return null;
+    if (!bookmarksData || bookmarksData.bookmarks.__typename !== 'Bookmarks') return null;
 
-    const { bookmarks } = data.bookmarks;
+    const { bookmarks } = bookmarksData.bookmarks;
     const handleBatchDelete = async () => {
         await hardDeleteBookmarks({ variables: { ids: bookmarks.map((bookmark) => bookmark?.id || -1) } });
     };

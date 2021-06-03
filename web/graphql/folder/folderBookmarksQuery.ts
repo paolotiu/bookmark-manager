@@ -1,5 +1,5 @@
 import { ErrorFragments, FolderFragments } from '@graphql/fragments';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 export const FOLDER_BOOKMARKS = gql`
     query folderBookmarks($id: Int!) {

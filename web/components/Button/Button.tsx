@@ -14,6 +14,7 @@ const Button = ({ label, children, className, isSecondary, ...props }: ButtonPro
     });
     return (
         <button
+            type="button"
             className={clsx(
                 { 'px-3': !checkWordInSentence(className, 'px') },
                 { 'py-1': !checkWordInSentence(className, 'py') },

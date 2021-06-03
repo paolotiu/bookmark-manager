@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createApolloTestClient } from '@lib/server/createApolloTestClient';
-import { gql } from 'apollo-server-express';
+import { gql } from 'apollo-server-micro';
 
 // Get test client
 const testClient = createApolloTestClient();

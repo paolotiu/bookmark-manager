@@ -58,7 +58,7 @@ const Login = () => {
 
     return (
         <Auth title="Log in" subtitle="Start collection bookmarks now!">
-            <Auth.SocialButton Icon={<FcGoogle size="16px" />} label={'Log in with Google'} />
+            <Auth.SocialButton Icon={<FcGoogle size="16px" />} label="Log in with Google" />
 
             <Auth.Divider />
             <Auth.Form handleSubmit={handleSubmit}>
@@ -80,8 +80,11 @@ const Login = () => {
                         value={inputs.password}
                     />
 
-                    <Link href="/forgot">
-                        <a className="self-end pt-2 text-xs font-medium transition-colors duration-200 justify-self-end hover:underline text-primary hover:text-primary-dark hover:cursor-pointer">
+                    <Link href="/forgot" passHref>
+                        <a
+                            className="self-end pt-2 text-xs font-medium transition-colors duration-200 justify-self-end hover:underline text-primary hover:text-primary-dark hover:cursor-pointer"
+                            href="forgot"
+                        >
                             Forgot password?
                         </a>
                     </Link>
@@ -89,7 +92,7 @@ const Login = () => {
 
                 <div className="space-y-2">
                     <Auth.Submit
-                        label={'Log in'}
+                        label="Log in"
                         isSubmitting={isSubmitting}
                         showSpinner={isSubmitting}
                         disabled={isEmpty || isError || isSubmitting}
@@ -97,8 +100,11 @@ const Login = () => {
                     />
                     <div className="text-xs">
                         Don&apos;t have an account?{' '}
-                        <Link href="/register">
-                            <a className="font-medium transition-colors duration-200 text-primary hover:underline hover:cursor-pointer hover:text-primary-dark">
+                        <Link href="/register" passHref>
+                            <a
+                                className="font-medium transition-colors duration-200 text-primary hover:underline hover:cursor-pointer hover:text-primary-dark"
+                                href="register"
+                            >
                                 Register
                             </a>
                         </Link>

@@ -4,20 +4,25 @@ import { BiUser } from 'react-icons/bi';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { FiBookmark, FiSettings, FiTrash, FiMenu } from 'react-icons/fi';
 import dynamic from 'next/dynamic';
-import AddFolderForm from './AddFolderForm/AddFolderForm';
-import Tree from './Tree/Tree';
-import { useRouter } from 'next/dist/client/router';
-import AccountPopup from './AccountPopup';
+import { useRouter } from 'next/router';
+import AddFolderForm from '../AddFolderForm/AddFolderForm';
+import Tree from '../Tree/Tree';
+import AccountPopup from '../AccountPopup';
+import SidebarItem, { SidebarItemType } from './SidebarItem';
 
-interface SidebarItemProps {
-    icon?: any;
-    label: string;
-    onClick?: React.MouseEventHandler<HTMLDivElement>;
-}
+const FolderActionsPopup = dynamic(() => import('../FolderActionsPopup/FolderActionsPopup'));
 
 const Overlay = ({ isOpen, close }: { isOpen: boolean; close: () => void }) => {
     return (
         <div
+            role="button"
+            tabIndex={0}
+            onKeyPress={(e) => {
+                if (e.key === 'enter') {
+                    close();
+                }
+            }}
+            aria-label="Close Sidebar"
             className={`fixed top-0 left-0 z-10 w-screen h-screen  transition-all ease-in ${
                 isOpen ? 'opacity-40 bg-black' : 'opacity-0 pointer-events-none'
             }`}
@@ -28,34 +33,18 @@ const Overlay = ({ isOpen, close }: { isOpen: boolean; close: () => void }) => {
         ></div>
     );
 };
-const SidebarItem = ({ icon, label, onClick }: SidebarItemProps) => {
-    return (
-        <div
-            className="grid items-center justify-center px-2 py-1 pl-4 text-sm hover:bg-hoverColor"
-            role="button"
-            tabIndex={-1}
-            style={{ gridTemplateColumns: '20px 1fr' }}
-            onClick={onClick}
-        >
-            <div className="flex items-center justify-center text-inactiveSidebar"> {icon}</div>
-            <div className="ml-[10px] font-normal pt-[3px] text-inactiveSidebar">{label}</div>
-        </div>
-    );
-};
-const FolderActionsPopup = dynamic(() => import('./FolderActionsPopup/FolderActionsPopup'));
 
-export type SidebarItem = 'folder' | 'account';
 const Sidebar = () => {
     const router = useRouter();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [willShowNewFolderInput, setWillShowNewFolderInput] = useState(false);
-    const [willShowActions, setWillShowActions] = useState<false | SidebarItem>(false);
+    const [willShowActions, setWillShowActions] = useState<false | SidebarItemType>(false);
     const [actionClickLocation, setActionClickLocation] = useState({ x: 0, y: 0 });
     const [actionFolderId, setActionFolderId] = useState(0);
     const { data: userNameData } = useUserNameQuery();
-    const closePopup = ( ) => setWillShowActions(false)
+    const closePopup = () => setWillShowActions(false);
 
-    const handleSidebarItemClick = (e: React.MouseEvent<any>, item: SidebarItem) => {
+    const handleSidebarItemClick = (e: React.MouseEvent<any>, item: SidebarItemType) => {
         e.preventDefault();
         setActionClickLocation({ x: e.clientX, y: e.clientY });
         setWillShowActions(item);
@@ -64,6 +53,7 @@ const Sidebar = () => {
         <>
             <div className="flex p-3 border-b item-center md:hidden">
                 <button
+                    type="button"
                     onClick={() => {
                         setIsSidebarOpen(true);
                     }}
@@ -72,7 +62,7 @@ const Sidebar = () => {
                 </button>
             </div>
             <div
-                className={`fixed w-[300px] z-[1] pt-5 z-[11] top-0 left-0  h-screen bg-sidebar transition-transform transform  ${
+                className={`fixed w-[300px] z-10 pt-5 top-0 left-0  h-screen bg-sidebar transition-transform transform  ${
                     isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
                 }`}
             >
@@ -84,7 +74,7 @@ const Sidebar = () => {
                             handleSidebarItemClick(e, 'account');
                         }}
                     />
-                    {willShowActions === 'account' && <AccountPopup closePopup={closePopup}/>}
+                    {willShowActions === 'account' && <AccountPopup closePopup={closePopup} />}
                 </div>
                 <div className="pt-4">
                     <SidebarItem
@@ -126,7 +116,7 @@ const Sidebar = () => {
 
                 {willShowActions === 'folder' && (
                     <FolderActionsPopup
-                    closePopup={closePopup}
+                        closePopup={closePopup}
                         folderId={Number(actionFolderId)}
                         style={{
                             top: Math.min(actionClickLocation.y + 4, window.innerHeight - 220),

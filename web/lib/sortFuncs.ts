@@ -10,5 +10,13 @@ export const bookmarkDateSort = (prev: Bookmark, curr: Bookmark) => {
     const prevDate = prev.createdDate;
     const currDate = curr.createdDate;
 
-    return prevDate > currDate ? -1 : prevDate < currDate ? 1 : 0;
+    if (prevDate > currDate) {
+        return -1;
+    }
+
+    if (prevDate < currDate) {
+        return 1;
+    }
+
+    return 0;
 };

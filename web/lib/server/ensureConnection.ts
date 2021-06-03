@@ -68,5 +68,5 @@ export async function ensureConnection(name = 'default'): Promise<Connection> {
         return connection;
     }
 
-    return await connectionManager.create({ name, ...options[name] }).connect();
+    return connectionManager.create({ name, ...options[name] }).connect();
 }

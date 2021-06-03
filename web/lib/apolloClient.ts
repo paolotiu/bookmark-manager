@@ -38,9 +38,9 @@ function getRefreshAndAccessToken(req: IncomingMessage) {
 
 function createCookieString(cookies: { [key: string]: string }) {
     let str = '';
-    for (const [key, value] of Object.entries(cookies)) {
-        str += `${key}=${value};`;
-    }
+    Object.entries(cookies).forEach(([key, val]) => {
+        str += `${key}=${val};`;
+    });
     return str;
 }
 
@@ -59,11 +59,11 @@ function createApolloClient(context?: ResolverContext) {
         // get the tokens
         if (context?.req) {
             const tokens = getRefreshAndAccessToken(context?.req);
-            const cookie = createCookieString(tokens);
+            const cookieHeader = createCookieString(tokens);
             return {
                 headers: {
                     ...headers,
-                    cookie,
+                    cookie: cookieHeader,
                 },
             };
         }

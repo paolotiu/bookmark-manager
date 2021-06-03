@@ -1,10 +1,10 @@
 import { useForm } from '@lib/useForm';
 import React, { useState } from 'react';
 import { FcGoogle } from 'react-icons/fc';
-import Auth from './Auth';
 import * as yup from 'yup';
 import { useRegisterMutation } from '@graphql/generated/graphql';
 import Link from 'next/link';
+import Auth from './Auth';
 
 const schema = yup.object().shape({
     name: yup.string().min(1).required('Name is required'),
@@ -78,8 +78,11 @@ const Register = () => {
                     />
                     <div className="text-xs ">
                         Already have an account?{' '}
-                        <Link href="/login">
-                            <a className="font-medium transition-colors duration-200 text-primary hover:underline hover:cursor-pointer hover:text-primary-dark">
+                        <Link href="/login" passHref>
+                            <a
+                                className="font-medium transition-colors duration-200 text-primary hover:underline hover:cursor-pointer hover:text-primary-dark"
+                                href="login"
+                            >
                                 Log in
                             </a>
                         </Link>

@@ -2,12 +2,14 @@
     "parser": "@typescript-eslint/parser", // Specifies the ESLint parser
     "parserOptions": {
         "ecmaVersion": 2020, // Allows for the parsing of modern ECMAScript features
-        "sourceType": "module" // Allows for the use of imports
+        "sourceType": "module", // Allows for the use of imports
+        "project": "./tsconfig.json"
     },
     "extends": [
         "plugin:@typescript-eslint/recommended", // Uses the recommended rules from the @typescript-eslint/eslint-plugin
         "plugin:react/recommended",
         "plugin:react-hooks/recommended",
+        "airbnb-typescript",
         "prettier"
     ],
     "rules": {
@@ -15,7 +17,46 @@
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "react/react-in-jsx-scope": "off"
+        "react/react-in-jsx-scope": "off",
+        "arrow-body-style": "off",
+        "import/prefer-default-export": "off",
+        "no-underscore-dangle": "off",
+        "react/require-default-props": "off",
+        "prefer-template": "off",
+        "import/no-extraneous-dependencies": [
+            "error",
+            { "bundledDependencies": false, "optionalDependencies": false, "peerDependencies": false }
+        ],
+        "react/self-closing-comp": "off",
+        "@typescript-eslint/naming-convention": "off",
+        "no-param-reassign": "off",
+        "no-shadow": "off",
+        "@typescript-eslint/no-shadow": [
+            "error",
+            {
+                "allow": ["req", "res"]
+            }
+        ],
+        "no-empty": [
+            "error",
+            {
+                "allowEmptyCatch": true
+            }
+        ],
+        "react/jsx-props-no-spreading": "off",
+        "no-use-before-define": "off",
+        "@typescript-eslint/no-use-before-define": [
+            "error",
+            {
+                "functions": false
+            }
+        ],
+        "no-plusplus": [
+            "error",
+            {
+                "allowForLoopAfterthoughts": true
+            }
+        ]
     },
-    "ignorePatterns": ["types.ts", "*.js"]
+    "ignorePatterns": ["types.ts", "*.js", "**/generated/graphql.tsx"]
 }

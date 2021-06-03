@@ -1,6 +1,5 @@
 import { GetServerSideProps } from 'next';
-import gql from 'graphql-tag';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { addApolloState, initializeApollo } from '../lib/apolloClient';
 
 const PingQuery = gql`
@@ -15,7 +14,9 @@ const WithStaticProps = () => {
     return (
         <div>
             <p>{data.ping ? 'dsaoijd' : '...loading'}</p>
-            <button onClick={() => refetch()}>refetch</button>
+            <button type="button" onClick={() => refetch()}>
+                refetch
+            </button>
         </div>
     );
 };

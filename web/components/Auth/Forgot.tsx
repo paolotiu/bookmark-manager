@@ -47,8 +47,10 @@ const Forgot = () => {
             </div>
 
             <div className="text-center">
-                <Link href="/login">
-                    <a className="text-primary hover:underline">Login</a>
+                <Link href="/login" passHref>
+                    <a className="text-primary hover:underline" href="login">
+                        Login
+                    </a>
                 </Link>
             </div>
         </Auth>

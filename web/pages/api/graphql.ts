@@ -21,8 +21,10 @@ interface RefreshTokenPayload extends AccessTokenPayload {
     count: number;
 }
 
+process.setMaxListeners(0);
 const getApolloServerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     await ensureConnection();
+
     const server = (userId?: number) =>
         new ApolloServer({
             schema,
@@ -38,7 +40,7 @@ const getApolloServerHandler = async (req: NextApiRequest, res: NextApiResponse)
 
     try {
         const data = jwt.verify(accessToken, process.env.JWT_SECRET as string) as AccessTokenPayload;
-        const userId = data.userId;
+        const { userId } = data;
 
         return server(userId);
     } catch {}

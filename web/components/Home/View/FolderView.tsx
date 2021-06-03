@@ -1,11 +1,11 @@
 import { useFolderQuery } from '@graphql/generated/graphql';
 import { isBaseError } from '@graphql/helpers';
 import React from 'react';
-import BookmarkCard from '../BookmarkCard';
 import { cloneDeep } from 'lodash';
 import { bookmarkDateSort } from '@lib/sortFuncs';
-import EditingBookmarkCard from '../EditingBookmarkCard';
 import { useEditing } from '@lib/useEditing';
+import EditingBookmarkCard from '../EditingBookmarkCard';
+import BookmarkCard from '../BookmarkCard';
 import NotFoundView from './NotFoundView';
 import View from './View';
 import { useDropdown } from './useDropdown';

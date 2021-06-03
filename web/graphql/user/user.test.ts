@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { User } from '@entity/User';
 import { createApolloTestClient } from '@lib/server/createApolloTestClient';
-import { gql } from 'apollo-server-express';
+import { gql } from 'apollo-server-micro';
 
 const testUser = { email: 'bob@2bob.com', password: 'password', name: 'bob', id: 0 };
+const testClient = createApolloTestClient();
+const { query } = testClient;
 
 beforeAll(async () => {
     // Setup user
@@ -15,9 +17,6 @@ beforeAll(async () => {
         },
     });
 });
-
-const testClient = createApolloTestClient();
-const { query } = testClient;
 
 const ME_QUERY = gql`
     query ME_QUERY {

@@ -158,9 +158,9 @@ export const useFolderCache = (id: number) => {
     const [folder, setFolder] = useState<{ id: number; name: string }>();
 
     const getFolder = useCallback(
-        (id) => {
+        (folderId: string) => {
             const folderFragment = client.readFragment({
-                id: 'Folder:' + id,
+                id: 'Folder:' + folderId,
                 fragment: gql`
                     fragment ReadFolder on Folder {
                         id
@@ -173,11 +173,11 @@ export const useFolderCache = (id: number) => {
         [client],
     );
     useEffect(() => {
-        setFolder(getFolder(id));
+        setFolder(getFolder(String(id)));
     }, [client, getFolder, id]);
 
-    const updateFolder = (id: number) => {
-        setFolder(getFolder(id));
+    const updateFolder = (folderId: number) => {
+        setFolder(getFolder(String(folderId)));
     };
 
     return { folder, updateFolder };

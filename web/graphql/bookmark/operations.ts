@@ -1,5 +1,5 @@
 import { BookmarkFragments, ErrorFragments } from '@graphql/fragments';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 export const SOFT_DELETE_BOOKMARK = gql`
     mutation softDeleteBookmark($id: Int!) {

@@ -8,18 +8,22 @@ import {
     isValidationError,
 } from '@graphql/shared/errorMessages';
 import { Folder } from '@entity/Folder';
-import { bookmarkSchema } from './yupSchema';
 import { scrapeMetadata } from '@lib/server/scrapeMetadata';
 import { unNullifyObj } from '@lib/server/unNullifyObj';
 import { Resolvers } from '@graphql/generated/graphql';
+import { bookmarkSchema } from './yupSchema';
 
 export const bookmarkResolvers: Resolvers = {
     BookmarkResult: {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmark'),
     },
     BookmarkResultWithInput: {
-        __resolveType: (parent) =>
-            isBaseError(parent) ? 'BaseError' : isValidationError(parent) ? 'InputValidationError' : 'Bookmark',
+        __resolveType: (parent) => {
+            if (isBaseError(parent)) {
+                return 'BaseError';
+            }
+            return isValidationError(parent) ? 'InputValidationError' : 'Bookmark';
+        },
     },
     BookmarksResult: {
         __resolveType: (parent) => (isBaseError(parent) ? 'BaseError' : 'Bookmarks'),
@@ -110,8 +114,9 @@ export const bookmarkResolvers: Resolvers = {
                 if (folderId) {
                     // Check if folder exists then save
                     const folder = await Folder.findOne(folderId, { where: { userId } });
-
-                    folder ? (bookmark.folderId = folderId) : '';
+                    if (folder) {
+                        bookmark.folderId = folderId;
+                    }
                 } else {
                     // Bookmark to root
                     bookmark.folderId = null;

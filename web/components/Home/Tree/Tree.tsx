@@ -15,11 +15,11 @@ import { TreeDataType } from 'kreme/build/Tree/types';
 import { useRouter } from 'next/dist/client/router';
 import React, { useRef } from 'react';
 import { addBookmarksToFolder, removeBookmarkFromFolder } from '../cacheUpdates';
-import { SidebarItem } from '../Sidebar';
+import { SidebarItemType } from '../Sidebar/SidebarItem';
 
 interface Props {
     setActionFolderId: React.Dispatch<React.SetStateAction<number>>;
-    handleItemClick: (e: React.MouseEvent<any>, item: SidebarItem) => void;
+    handleItemClick: (e: React.MouseEvent<any>, item: SidebarItemType) => void;
 }
 
 const Tree = ({ setActionFolderId, handleItemClick }: Props) => {
@@ -68,9 +68,9 @@ const Tree = ({ setActionFolderId, handleItemClick }: Props) => {
                     });
 
                     if (folder.children.length) {
-                        folder.children.forEach((folder) => {
-                            if (folder) {
-                                writeToCache(folder);
+                        folder.children.forEach((childFolder) => {
+                            if (childFolder) {
+                                writeToCache(childFolder);
                             }
                         });
                     }

@@ -1,6 +1,5 @@
 import ErrorMessage from '@components/Form/ErrorMessage';
-import { InputProps } from '@components/Form/Input';
-import NormalInput from '@components/Form/Input';
+import NormalInput, { InputProps } from '@components/Form/Input';
 import React from 'react';
 import Button, { ButtonProps } from '@components/Button/Button';
 import { Divider as KremeDivider } from 'kreme';
@@ -11,14 +10,17 @@ import { checkWordInSentence } from '@lib/checks';
 const Wrapper = ({ children }: { children?: React.ReactNode }) => {
     return (
         <div className="flex items-start justify-center min-h-screen sm:bg-gray-50 sm:pt-10 ">
-            <div className={`p-8 pt-3 w-full sm:w-[460px] bg-white sm:border rounded-md`}>{children}</div>{' '}
+            <div className="p-8 pt-3 w-full sm:w-[460px] bg-white sm:border rounded-md">{children}</div>{' '}
         </div>
     );
 };
 
 const SocialButton = ({ Icon, label }: { Icon?: React.ReactNode; label?: string }) => {
     return (
-        <button className="flex items-center justify-center w-full px-4 py-2 border rounded-sm no-outline">
+        <button
+            type="button"
+            className="flex items-center justify-center w-full px-4 py-2 border rounded-sm no-outline"
+        >
             {Icon}
             <span className="mt-[2px] pl-3">{label}</span>
         </button>
@@ -58,8 +60,22 @@ interface SubmitProps extends ButtonProps {
 const Submit = ({ disabled, showSpinner, disabledClick, isSubmitting, label }: SubmitProps) => {
     return (
         <div className="relative">
-            <div className={`absolute z-10 w-full h-full ${!disabled ? 'hidden' : ''}`} onClick={disabledClick}></div>
+            <div
+                onKeyPress={(e) => {
+                    if (e.key === 'enter') {
+                        if (disabledClick) {
+                            disabledClick();
+                        }
+                    }
+                }}
+                tabIndex={0}
+                aria-label="Submit"
+                role="button"
+                className={`absolute z-10 w-full h-full ${!disabled ? 'hidden' : ''}`}
+                onClick={disabledClick}
+            ></div>
             <Button
+                type="submit"
                 className="w-full py-2 transition-all duration-200 transform hover:bg-primary-dark disabled:opacity-50 "
                 disabled={disabled}
             >
