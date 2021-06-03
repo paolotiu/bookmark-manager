@@ -1,9 +1,7 @@
-import { loadFilesSync } from '@graphql-tools/load-files';
 import { mergeResolvers } from '@graphql-tools/merge';
 import { mergeTypeDefs } from '@graphql-tools/merge';
 import { makeExecutableSchema } from 'apollo-server-express';
 import { GraphQLSchema } from 'graphql';
-import path from 'path';
 import { GraphQLUpload } from 'graphql-upload';
 import { authResolvers } from './auth/auth.resolvers';
 import { bookmarkResolvers } from './bookmark/bookmark.resolvers';
