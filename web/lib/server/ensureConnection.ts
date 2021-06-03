@@ -6,49 +6,24 @@ import { Folder } from 'entity/Folder';
 // Serverless typeorm workaround
 // https://github.com/typeorm/typeorm/issues/6241#issuecomment-643690383
 
-// const elephant = {
-//     default: {
-//         type: 'postgres',
-//         host: 'queenie.db.elephantsql.com',
-//         port: 5432,
-//         username: 'ffqgtisb',
-//         password: 'zDrKuT_qxlJv51ZeMFEjITIa7IoSOk2r',
-//         database: 'ffqgtisb',
-//         logging: true,
-
-//         synchronize: true,
-//         entities: [User, Bookmark, Folder],
-//         extra: {
-//             max: 4,
-//         },
-//     },
-// };
-
-// const heroku = {
-//     default: {
-//         type: 'postgres',
-//         logging: true,
-//         entities: [User, Bookmark, Folder],
-//         url: 'postgres://mmwrlibsayvgdy:ed6728c7234153b08a6944f76fe5896c60a928fc16c5747b6ecc540237c55ac1@ec2-52-23-45-36.compute-1.amazonaws.com:5432/dfis0k200gtceo',
-//         extra: {
-//             ssl: {
-//                 // https://github.com/typeorm/typeorm/issues/278#issuecomment-614345011
-//                 rejectUnauthorized: false,
-//             },
-//         },
-//     },
-// };
 const options: any = {
     default: {
         type: 'postgres',
-        host: 'localhost',
-        port: 5433,
-        username: 'postgres',
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT,
+        username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
-        database: 'bookmark',
+        database: process.env.DB_DATABASE,
+        url: process.env.DB_URL,
         synchronize: true,
         logging: true,
         entities: [User, Bookmark, Folder],
+        extra: {
+            ssl: {
+                // https://github.com/typeorm/typeorm/issues/278#issuecomment-614345011
+                rejectUnauthorized: false,
+            },
+        },
     },
 };
 function entitiesChanged(prevEntities: any[], newEntities: any[]): boolean {
