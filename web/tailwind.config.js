@@ -11,8 +11,7 @@ module.exports = {
             DEFAULT: '#D1D5DB',
         }),
         fontFamily: {
-            sans: ['"Heebo"', 'Helvetica', 'Arial', 'sans-serif'],
-            body: ['"Heebo"', 'Helvetica', 'Arial', 'sans-serif'],
+            sans: ['Segoe UI', '"Heebo"', 'Helvetica', 'Arial', 'sans-serif'],
         },
 
         extend: {
