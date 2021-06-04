@@ -8,4 +8,7 @@ module.exports = {
     moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>' }),
     setupFilesAfterEnv: ['<rootDir>/lib/server/jest.setup.ts'],
     globalSetup: '<rootDir>/lib/server/jest.globalSetup.ts',
+    transform: {
+        '\\.(gql|graphql)$': 'jest-transform-graphql',
+    },
 };
