@@ -100,8 +100,8 @@ const AddBookmarkDropdown = ({ folderId, isOpen, closeDropDown }: Props) => {
                 <div className="p-3 ">
                     <form action="#" className="grid gap-3" onSubmit={handleSubmit}>
                         <div className="grid gap-1">
-                            <label htmlFor="url">
-                                URL
+                            <label htmlFor="url" className="grid gap-[3px]">
+                                <p className="text-sm font-medium text-header">URL</p>
                                 <input
                                     type="text"
                                     className="px-2 py-1 text-sm border rounded-sm "

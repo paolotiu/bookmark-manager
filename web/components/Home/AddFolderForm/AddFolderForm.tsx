@@ -39,7 +39,10 @@ const AddFolderForm = ({ closeForm }: Props) => {
             }}
             className="text-sm"
         >
-            <div className="grid grid-flow-col gap-1 pl-4 pr-2" style={{ gridTemplateColumns: '20px 1fr' }}>
+            <div
+                className="grid items-center grid-flow-col gap-1 pl-4 pr-2"
+                style={{ gridTemplateColumns: '20px 1fr' }}
+            >
                 <button type="submit" className="flex items-center justify-center" disabled={isSubmitting}>
                     <AiOutlinePlus className="opacity-50" />
                 </button>
