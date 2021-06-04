@@ -42,9 +42,8 @@ const Forgot = () => {
                     <Auth.Submit label="Reset Password" isSubmitting={isSubmitting} />
                 </Auth.Form>
             )}
-            <div className="py-6">
-                <hr />
-            </div>
+
+            <Auth.Divider lineOnly />
 
             <div className="text-center">
                 <Link href="/login" passHref>
