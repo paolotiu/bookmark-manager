@@ -50,6 +50,7 @@ module.exports = {
                             borderActive: '#b7b7b7',
                             inputGrayBg: 'hsla(0,0%,77%,0.18)',
                             inputGrayText: 'hsla(0,0%,67%,1)',
+                            success: '#6EE7B7',
                         },
                     },
                 },
