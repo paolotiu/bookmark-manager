@@ -1,6 +1,7 @@
 import { setCookie } from 'nookies';
 import bcrypt from 'bcryptjs';
 import { v4 as uuid } from 'uuid';
+import jwt from 'jsonwebtoken';
 import { User } from '@entity/User';
 import { createBaseError, createUnexpectedError, isBaseError } from '@graphql/shared/errorMessages';
 import { NextApiResponse } from 'next';
@@ -63,11 +64,15 @@ export const authResolvers: Resolvers = {
             expiry.setDate(new Date().getDate() + 1);
             user.resetPasswordExpiry = expiry;
             user.resetPasswordToken = token;
+
+            const jwtToken = jwt.sign({ email: user.email, token }, process.env.JWT_SECRET as string, {
+                expiresIn: '1d',
+            });
             await user.save();
-            sendEmail({ to: email, text: `http://localhost:3000/forgot/${token}` });
+            sendEmail({ to: email, text: `http://localhost:3000/forgot/${jwtToken}` });
             return true;
         },
-        resetPassword: async (_, { email, password, resetToken }, { res }) => {
+        changePassword: async (_, { email, password, resetToken }, { res }) => {
             const user = await User.findOne({ where: { resetPasswordToken: resetToken, email } });
             if (!user) return createBaseError('resetPassword', 'Token not found');
             if (new Date(user.resetPasswordExpiry as Date).getTime() < Date.now())

@@ -100,7 +100,16 @@ const Form = ({ handleSubmit, children, className, inputsClassName }: FormProps)
     );
 };
 
-const Divider = ({ ...props }: Partial<React.ComponentProps<typeof KremeDivider>>) => {
+const Divider = ({
+    lineOnly,
+    ...props
+}: Partial<React.ComponentProps<typeof KremeDivider>> & { lineOnly?: boolean }) => {
+    if (lineOnly)
+        return (
+            <div className="py-6">
+                <hr />
+            </div>
+        );
     return (
         <div className="pb-4 font-medium pt-7">
             <KremeDivider text="OR" lineColor="rgba(0,0,0,.2)" textColor="rgba(0,0,0,.4)" {...props} />
@@ -112,15 +121,18 @@ interface AuthLayoutProps {
     title?: string;
     subtitle?: string;
     children: React.ReactNode;
+    noTitle?: boolean;
 }
 
-const AuthLayout = ({ title, subtitle, children }: AuthLayoutProps) => {
+const AuthLayout = ({ title, subtitle, children, noTitle }: AuthLayoutProps) => {
     return (
         <Wrapper>
-            <div className="py-5">
-                <h1 className="pb-1 text-3xl font-bold ">{title}</h1>
-                <p className="text-sm text-gray-500 ">{subtitle}</p>
-            </div>
+            {noTitle ? null : (
+                <div className="py-5">
+                    <h1 className="pb-1 text-3xl font-bold ">{title}</h1>
+                    <p className="text-sm text-gray-500 ">{subtitle}</p>
+                </div>
+            )}
 
             <div className="pt-5 text-sm">{children}</div>
         </Wrapper>
