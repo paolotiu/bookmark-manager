@@ -14,7 +14,7 @@ jobs:
           cmd: install # will run `yarn install` command
       - name: Install dependencies
         run: npm install
-        working-directory: ./web
+        working-directory: ./packages/web
       - name: Run tests
         run: npm test
-        working-directory: ./web
+        working-directory: ./packages/web
