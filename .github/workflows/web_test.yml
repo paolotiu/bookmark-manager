@@ -5,18 +5,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: borales/actions-yarn@v2.0.0
-        with:
-          cmd: install # will run `yarn install` command
-
-      - name: Node 12
+      - name: Node 14
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
-
+          node-version: '14.x'
+      - uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: install # will run `yarn install` command
       - name: Install dependencies
         run: npm install
-        working-directory: ./web
+        working-directory: ./packages/web
       - name: Run tests
         run: npm test
-        working-directory: ./web
+        working-directory: ./packages/web
