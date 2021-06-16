@@ -32,8 +32,9 @@ const getApolloServerHandler = async (req: NextApiRequest, res: NextApiResponse)
                 return { req, res, userId: userId || undefined };
             },
             tracing: process.env.NODE_ENV === 'development',
+            introspection: true,
+            playground: true,
             uploads: false,
-            introspection: true
         }).createHandler({ path: '/api/graphql' });
 
     const accessToken = req.cookies['access-token'];
