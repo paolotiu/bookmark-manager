@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ApolloCache } from '@apollo/client';
 import {
     Bookmark,
@@ -12,6 +12,8 @@ import { FaPen, FaTrash } from 'react-icons/fa';
 import { useDetectDevice } from '@lib/useDetectDevice';
 import Button from '@components/Button/Button';
 import { fromUrl, parseDomain } from 'parse-domain';
+import clsx from 'clsx';
+
 import ActionButton from './ActionButton/ActionButton';
 import {
     addBookmarksToAll,
@@ -31,6 +33,9 @@ interface Props {
     triggerEditing: (id: number) => void;
     isDeleted?: boolean;
     withFolder?: boolean;
+    isSelecting?: boolean;
+    addToSelected?: (id: number) => void;
+    removeFromSelected?: (id: number) => void;
 }
 
 const bookmarkSoftDeletionCacheUpdate = (cache: ApolloCache<any>, bookmark: Bookmark, folderId: number | null) => {
@@ -47,6 +52,9 @@ const BookmarkCard = ({
     triggerEditing,
     isDeleted,
     withFolder = false,
+    addToSelected,
+    removeFromSelected,
+    isSelecting,
 }: Props) => {
     const [, drag] = useDrag(() => ({
         type: 'Bookmark',
@@ -64,6 +72,20 @@ const BookmarkCard = ({
             cache.evict({ id: cache.identify({ __typename: 'Bookmark', id: bookmark.id }) });
         },
     });
+    const [isSelected, setIsSelected] = useState(false);
+    const select = () => {
+        if (addToSelected) {
+            addToSelected(bookmark.id);
+            setIsSelected(true);
+        }
+    };
+
+    const unselect = () => {
+        if (removeFromSelected) {
+            removeFromSelected(bookmark.id);
+            setIsSelected(false);
+        }
+    };
 
     const { folder } = useFolderCache(bookmark.folderId || 0);
 
@@ -106,7 +128,50 @@ const BookmarkCard = ({
             className="relative block overflow-hidden border-b border-gray-200 hover:bg-gray-50 group"
             ref={device.isDesktop() ? drag : undefined}
         >
-            <div className="grid gap-2 p-3 ">
+            {isSelecting ? (
+                <div
+                    role="button"
+                    tabIndex={0}
+                    className={clsx('absolute w-full h-full', isSelected && 'bg-blue-300 bg-opacity-25')}
+                    onKeyPress={(e) => {
+                        if (e.key === 'enter') {
+                            if (isSelected) {
+                                unselect();
+                            } else {
+                                select();
+                            }
+                        }
+                    }}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (isSelected) {
+                            unselect();
+                        } else {
+                            select();
+                        }
+                    }}
+                >
+                    <input
+                        type="checkbox"
+                        className="absolute top-[17px] left-2 "
+                        checked={isSelected}
+                        onChange={(e) => {
+                            if (addToSelected && removeFromSelected) {
+                                if (e.target.checked) {
+                                    select();
+                                } else {
+                                    unselect();
+                                }
+                            }
+                        }}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                        }}
+                    />
+                </div>
+            ) : null}
+            <div className={clsx('grid gap-2 p-3', isSelecting && 'pl-8')}>
                 <div className="grid justify-between pr-4 bookmark-card-header grid-cols-[1fr] sm:grid-cols-[8fr,1fr]">
                     <h3 className="pr-5 text-base font-medium sm:line-clamp-3 line-clamp-2 ">
                         {decode(bookmark.title)}
@@ -151,4 +216,4 @@ const BookmarkCard = ({
     );
 };
 
-export default BookmarkCard;
+export default React.memo(BookmarkCard);

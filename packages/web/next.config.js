@@ -6,7 +6,7 @@ module.exports = withBundleAnalyzer({
     future: {
         webpack5: true,
     },
-    webpack(config) {
+    webpack: (config) => {
         config.module.rules.push({
             test: /\.svg$/,
             use: ['@svgr/webpack'],
@@ -17,7 +17,6 @@ module.exports = withBundleAnalyzer({
             exclude: /node_modules/,
             loader: 'graphql-tag/loader',
         });
-
         return config;
     },
     // typescript: {

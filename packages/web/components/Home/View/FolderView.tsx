@@ -1,6 +1,6 @@
 import { useFolderQuery } from '@graphql/generated/graphql';
 import { isBaseError } from '@graphql/helpers';
-import React from 'react';
+import React, { useState } from 'react';
 import { cloneDeep } from 'lodash';
 import { bookmarkDateSort } from '@lib/sortFuncs';
 import { useEditing } from '@lib/useEditing';
@@ -9,6 +9,7 @@ import BookmarkCard from '../BookmarkCard';
 import NotFoundView from './NotFoundView';
 import View from './View';
 import { useDropdown } from './useDropdown';
+import { useSelectedBookmarks } from './useSelectedBookmarks';
 
 interface Props {
     folderId: number;
@@ -23,6 +24,7 @@ const FolderView = ({ folderId }: Props) => {
 
     const { currentEditingBookmark, stopEditing, triggerEditing } = useEditing();
     const { closeDropdown, isDropdownOpen, openDropdown } = useDropdown();
+    const { addToSelected, removedFromSelected, selectedBookmarks } = useSelectedBookmarks();
 
     if (loading) return null;
     if (!data || isBaseError(data.folder)) return <NotFoundView />;
@@ -51,6 +53,8 @@ const FolderView = ({ folderId }: Props) => {
                 return (
                     bookmark && (
                         <BookmarkCard
+                            addToSelected={addToSelected}
+                            removeFromSelected={removedFromSelected}
                             triggerEditing={triggerEditing}
                             folderId={folderId}
                             bookmark={bookmark}
