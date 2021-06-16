@@ -36,3 +36,13 @@ export const REQUEST_FORGOT = gql`
         sendForgotPassword(email: $email)
     }
 `;
+
+export const CHANGE_PASSWORD = gql`
+    mutation changePassword($email: String!, $password: String!, $resetToken: String!) {
+        changePassword(email: $email, password: $password, resetToken: $resetToken) {
+            ... on BaseError {
+                message
+            }
+        }
+    }
+`;

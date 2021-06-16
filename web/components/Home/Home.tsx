@@ -10,7 +10,7 @@ import NotFoundView from './View/NotFoundView';
 import Sidebar from './Sidebar/Sidebar';
 
 const Home = () => {
-    const { data, loading } = useUserNameQuery();
+    const { data, loading } = useUserNameQuery({ fetchPolicy: 'network-only' });
     const router = useRouter();
 
     useEffect(() => {

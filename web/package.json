@@ -5,7 +5,8 @@
         "dev": "next",
         "build": "next build",
         "start": "next start",
-        "lint": "eslint --ext .ts,.tsx  -c ./.eslintrc .",
+        "lint": "eslint --ext .ts,.tsx  -c ./.eslintrc",
+        "lint:all": "eslint --ext .ts,.tsx  -c ./.eslintrc .",
         "generate": "graphql-codegen --config codegen.yml",
         "migrate": "TS_NODE_PROJECT=tsconfig.ts-node.json ts-node -r tsconfig-paths/register --transpile-only ./node_modules/typeorm/cli.js -c development migration:run",
         "test": "NODE_ENV=test jest --runInBand",
@@ -13,7 +14,8 @@
         "analyze:server": "cross-env BUNDLE_ANALYZE=server next build",
         "analyze:browser": "cross-env BUNDLE_ANALYZE=browser next build",
         "prepare": "cd .. && husky install web/.husky",
-        "debug": "NODE_OPTIONS='--inspect' next dev"
+        "debug": "NODE_OPTIONS='--inspect' next dev",
+        "lint-staged": "lint-staged"
     },
     "dependencies": {
         "@apollo/client": "^3.3.13",
@@ -102,15 +104,13 @@
         "husky": "^6.0.0",
         "jest": "^26.6.3",
         "jest-transform-graphql": "^2.1.0",
+        "lint-staged": "^11.0.0",
         "postcss": "^8.2.9",
         "tailwindcss": "^2.0.4",
         "tailwindcss-theme-swapper": "^0.3.0",
         "ts-jest": "^26.5.6",
         "tsconfig-paths": "^3.9.0",
         "typescript": "4.0"
-    },
-    "engines": {
-        "node": ">=12.x"
     },
     "license": "MIT"
 }
