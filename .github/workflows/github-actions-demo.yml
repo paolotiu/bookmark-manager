@@ -9,10 +9,10 @@ jobs:
         with:
           cmd: install # will run `yarn install` command
 
-      - name: Node 12
+      - name: Node 14
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: '14.x'
 
       - name: Install dependencies
         run: npm install
