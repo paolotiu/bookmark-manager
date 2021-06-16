@@ -1,6 +1,6 @@
 import { useFolderQuery } from '@graphql/generated/graphql';
 import { isBaseError } from '@graphql/helpers';
-import React, { useState } from 'react';
+import React from 'react';
 import { cloneDeep } from 'lodash';
 import { bookmarkDateSort } from '@lib/sortFuncs';
 import { useEditing } from '@lib/useEditing';
@@ -24,7 +24,7 @@ const FolderView = ({ folderId }: Props) => {
 
     const { currentEditingBookmark, stopEditing, triggerEditing } = useEditing();
     const { closeDropdown, isDropdownOpen, openDropdown } = useDropdown();
-    const { addToSelected, removedFromSelected, selectedBookmarks } = useSelectedBookmarks();
+    const { addToSelected, removedFromSelected } = useSelectedBookmarks();
 
     if (loading) return null;
     if (!data || isBaseError(data.folder)) return <NotFoundView />;
