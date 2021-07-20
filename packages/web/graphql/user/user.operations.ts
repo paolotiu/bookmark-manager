@@ -10,3 +10,14 @@ export const USERNAME = gql`
         }
     }
 `;
+
+export const ME = gql`
+    query me {
+        me {
+            ... on User {
+                email
+                name
+            }
+        }
+    }
+`;
