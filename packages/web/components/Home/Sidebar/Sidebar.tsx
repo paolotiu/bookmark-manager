@@ -62,7 +62,7 @@ const Sidebar = () => {
                 </button>
             </div>
             <div
-                className={`fixed w-[300px] z-10 pt-5 top-0 left-0  h-screen bg-sidebar transition-transform transform  ${
+                className={`fixed w-[300px] z-20 pt-5 top-0 left-0  h-screen bg-sidebar transition-transform transform  ${
                     isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
                 }`}
             >
