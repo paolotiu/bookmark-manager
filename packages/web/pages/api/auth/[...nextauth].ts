@@ -4,7 +4,6 @@ import { ensureConnection } from '@lib/server/ensureConnection';
 import NextAuth from 'next-auth';
 import Providers from 'next-auth/providers';
 
-const protocol = process.env.NODE_ENV === 'development' ? 'http://' : 'https://';
 export default NextAuth({
     // Configure one or more authentication providers
     providers: [
@@ -59,7 +58,7 @@ export default NextAuth({
             session.userId = token.userId;
             return session;
         },
-        redirect: () => protocol + process.env.VERCEL_URL + '/home',
+        redirect: (_url, baseUrl) => baseUrl + '/home',
     },
     secret: process.env.JWT_SECRET,
 });
