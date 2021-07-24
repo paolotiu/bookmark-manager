@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { FcGoogle } from 'react-icons/fc';
 import Input from '@components/Form/Input';
 import { useForm } from '@lib/useForm';
-import { useLoginMutation } from '@graphql/generated/graphql';
 import Link from 'next/link';
 import { checkObjEqual } from '@lib/checks';
 import * as yup from 'yup';
 import { useRouter } from 'next/router';
+import { signIn } from 'next-auth/client';
 import Auth from './Auth';
 
 // Inital form state
@@ -28,8 +28,6 @@ const Login = () => {
     const [willShowErrors, setWillShowErrors] = useState(false);
     const router = useRouter();
 
-    const [loginMutation] = useLoginMutation();
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setWillShowErrors(true);
@@ -43,11 +41,13 @@ const Login = () => {
         // Update previous inputs
         setLastInputs(inputs);
 
-        const { data } = await loginMutation({ variables: inputs });
+        const res = await signIn('credentials', { redirect: false, ...inputs }, {});
 
-        if (data?.login?.__typename === 'BaseError') {
-            // Wrong email/password
-            setError(data.login.message);
+        if (!res) {
+            return;
+        }
+        if (!res.ok) {
+            if (res.status === 401) setError('Email or password incorrect');
             setIsSubmitting(false);
             return;
         }
@@ -55,10 +55,13 @@ const Login = () => {
         setError('');
         router.push('/home/all');
     };
-
     return (
         <Auth title="Log in" subtitle="Start collection bookmarks now!">
-            <Auth.SocialButton Icon={<FcGoogle size="16px" />} label="Log in with Google" />
+            <Auth.SocialButton
+                Icon={<FcGoogle size="16px" />}
+                label="Log in with Google"
+                onClick={() => signIn('google')}
+            />
 
             <Auth.Divider />
             <Auth.Form handleSubmit={handleSubmit}>

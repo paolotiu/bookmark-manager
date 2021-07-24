@@ -15,11 +15,12 @@ const Wrapper = ({ children }: { children?: React.ReactNode }) => {
     );
 };
 
-const SocialButton = ({ Icon, label }: { Icon?: React.ReactNode; label?: string }) => {
+const SocialButton = ({ Icon, label, onClick }: { Icon?: React.ReactNode; label?: string; onClick: () => void }) => {
     return (
         <button
             type="button"
             className="flex items-center justify-center w-full px-4 py-2 border rounded-sm no-outline"
+            onClick={onClick}
         >
             {Icon}
             <span className="mt-[2px] pl-3">{label}</span>

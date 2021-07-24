@@ -247,7 +247,7 @@ describe('Happy Path :)', () => {
         expect(bookmark).toBeUndefined();
     });
 
-    test.only('Soft deletes bookmarks', async () => {
+    test('Soft deletes bookmarks', async () => {
         const {
             data: { createBookmark: b1 },
         } = await createBookmarkMutation({ url: 'https://kasdksa.com', title: 'Hey' });

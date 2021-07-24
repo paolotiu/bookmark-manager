@@ -2,27 +2,16 @@ import 'reflect-metadata';
 import microCors from 'micro-cors';
 import { ApolloServer } from 'apollo-server-micro';
 import { schema } from '@graphql/genSchema';
-import { NextApiRequest, NextApiResponse } from 'next';
-import jwt from 'jsonwebtoken';
-import { User } from 'entity/User';
-import { setTokenCookies } from '@graphql/auth/auth.resolvers';
+import { NextApiRequest } from 'next';
 import { ensureConnection } from '@lib/server/ensureConnection';
-import { createTokens } from '@lib/server/createTokens';
 import { processRequest } from 'graphql-upload';
+import { getSession } from 'next-auth/client';
 
 const cors = microCors({ origin: '*', allowCredentials: true });
-interface AccessTokenPayload {
-    userId: number;
-    iat: number;
-    exp: number;
-}
-
-interface RefreshTokenPayload extends AccessTokenPayload {
-    count: number;
-}
 
 process.setMaxListeners(0);
-const getApolloServerHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+
+const getApolloServerHandler = async (req: NextApiRequest) => {
     await ensureConnection();
 
     const server = (userId?: number) =>
@@ -37,35 +26,11 @@ const getApolloServerHandler = async (req: NextApiRequest, res: NextApiResponse)
             uploads: false,
         }).createHandler({ path: '/api/graphql' });
 
-    const accessToken = req.cookies['access-token'];
-    const refreshToken = req.cookies['refresh-token'];
-
-    try {
-        const data = jwt.verify(accessToken, process.env.JWT_SECRET as string) as AccessTokenPayload;
-        const { userId } = data;
-
-        return server(userId);
-    } catch {}
-
-    let refreshData;
-    try {
-        refreshData = jwt.verify(refreshToken, process.env.JWT_SECRET as string) as RefreshTokenPayload;
-    } catch {
+    const session = await getSession({ req });
+    if (!session) {
         return server();
     }
-
-    // Refresh token is valid
-    const user = await User.findOne(refreshData.userId);
-
-    // token is invalidated
-    if (!user || user.count !== refreshData.count) return server();
-
-    // Get tokens
-    const tokens = createTokens(user);
-    // Set tokens
-    setTokenCookies(res, tokens);
-
-    return server(user.id);
+    return server(session.userId as number);
 };
 
 export const config = {
@@ -84,7 +49,7 @@ export default cors(async (req, res) => {
     if (contentType && contentType.startsWith('multipart/form-data')) {
         (req as any).filePayload = await processRequest(req, res);
     }
-    const serverHandler = await getApolloServerHandler(req as any, res as any);
 
+    const serverHandler = await getApolloServerHandler(req as any);
     return serverHandler(req, res);
 });

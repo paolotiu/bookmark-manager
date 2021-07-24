@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useUserNameQuery } from '@graphql/generated/graphql';
 import { BiUser } from 'react-icons/bi';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { FiBookmark, FiSettings, FiTrash, FiMenu } from 'react-icons/fi';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/client';
 import AddFolderForm from '../AddFolderForm/AddFolderForm';
 import Tree from '../Tree/Tree';
 import AccountPopup from '../AccountPopup';
@@ -41,7 +41,7 @@ const Sidebar = () => {
     const [willShowActions, setWillShowActions] = useState<false | SidebarItemType>(false);
     const [actionClickLocation, setActionClickLocation] = useState({ x: 0, y: 0 });
     const [actionFolderId, setActionFolderId] = useState(0);
-    const { data: userNameData } = useUserNameQuery();
+    const [session] = useSession();
     const closePopup = () => setWillShowActions(false);
 
     const handleSidebarItemClick = (e: React.MouseEvent<any>, item: SidebarItemType) => {
@@ -69,7 +69,7 @@ const Sidebar = () => {
                 <div className="relative">
                     <SidebarItem
                         icon={<BiUser size="20px" />}
-                        label={userNameData?.me?.__typename === 'User' ? userNameData.me.name : ''}
+                        label={session?.user?.name || ''}
                         onClick={(e) => {
                             handleSidebarItemClick(e, 'account');
                         }}
