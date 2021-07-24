@@ -27,11 +27,13 @@ const AddFolderForm = ({ closeForm }: Props) => {
             onSubmit={async (e) => {
                 setIsSubmitting(true);
                 e.preventDefault();
-                await createFolder({
-                    variables: { name: inputs.name },
-                    refetchQueries: ['getTree'],
-                    awaitRefetchQueries: true,
-                });
+                if (!(inputs.name.trim() === '')) {
+                    await createFolder({
+                        variables: { name: inputs.name },
+                        refetchQueries: ['getTree'],
+                        awaitRefetchQueries: true,
+                    });
+                }
 
                 clearForm();
                 setIsSubmitting(false);
