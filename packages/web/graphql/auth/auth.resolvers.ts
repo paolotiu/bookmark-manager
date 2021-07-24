@@ -45,6 +45,8 @@ export const authResolvers: Resolvers = {
             const user = await User.findOne({ where: { email } });
             if (!user) return loginError;
 
+            if (!user.password) return loginError;
+
             const isValid = await bcrypt.compare(password, user.password);
             if (!isValid) return loginError;
 
@@ -59,17 +61,22 @@ export const authResolvers: Resolvers = {
             if (!user) return false;
 
             const token = uuid();
+
             // 1 day expiry
             const expiry = new Date();
             expiry.setDate(new Date().getDate() + 1);
+
             user.resetPasswordExpiry = expiry;
             user.resetPasswordToken = token;
 
             const jwtToken = jwt.sign({ email: user.email, token }, process.env.JWT_SECRET as string, {
                 expiresIn: '1d',
             });
+
             await user.save();
-            sendEmail({ to: email, text: `http://localhost:3000/forgot/${jwtToken}` });
+
+            await sendEmail({ to: email, text: `http://localhost:3000/forgot/${jwtToken}` });
+
             return true;
         },
         changePassword: async (_, { email, password, resetToken }, { res }) => {

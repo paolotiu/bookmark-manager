@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useUserNameQuery } from '@graphql/generated/graphql';
 import { DndProvider } from 'react-dnd-multi-backend';
 import HTML5toTouch from 'react-dnd-multi-backend/dist/cjs/HTML5toTouch'; // or any other pipeline
+import { useSession } from 'next-auth/client';
 import AllBookmarksView from './View/AllBookmarksView';
 import DeletedBookmarksView from './View/DeletedBookmarksView';
 import FolderView from './View/FolderView';
@@ -10,14 +10,15 @@ import NotFoundView from './View/NotFoundView';
 import Sidebar from './Sidebar/Sidebar';
 
 const Home = () => {
-    const { data, loading } = useUserNameQuery({ fetchPolicy: 'network-only' });
+    const [session, loading] = useSession();
+
     const router = useRouter();
 
     useEffect(() => {
-        if (data?.me?.__typename === 'BaseError') {
+        if (!session && !loading) {
             router.push('/login');
         }
-    }, [data, router]);
+    }, [loading, router, session]);
 
     const { id: folderId } = router.query as { id: string | undefined };
 
@@ -34,7 +35,7 @@ const Home = () => {
         return <NotFoundView />;
     };
 
-    if (loading || !data || data.me?.__typename === 'BaseError') return null;
+    if (loading) return null;
 
     return (
         <DndProvider options={HTML5toTouch} key={1}>

@@ -32,7 +32,7 @@ export interface IUser {
 
     count: number;
 
-    password: string;
+    password: string | null;
 
     bookmarks: IBookmark[];
 

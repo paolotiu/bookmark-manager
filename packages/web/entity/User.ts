@@ -25,8 +25,8 @@ export class User extends BaseEntity implements IUser {
     @Column({ type: 'int', default: 0 })
     count: number;
 
-    @Column()
-    password: string;
+    @Column({ nullable: true, type: 'varchar', length: 255 })
+    password: string | null;
 
     @Column('int', { array: true, default: [] })
     rootOrder: number[];

@@ -4,6 +4,8 @@ import { FcGoogle } from 'react-icons/fc';
 import * as yup from 'yup';
 import { useRegisterMutation } from '@graphql/generated/graphql';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { signIn } from 'next-auth/client';
 import Auth from './Auth';
 
 const schema = yup.object().shape({
@@ -17,6 +19,7 @@ const Register = () => {
     const [error, setError] = useState('');
     const [willShowErrors, setWillShowErrors] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const router = useRouter();
     const [register] = useRegisterMutation();
 
     const handleSubmit: React.FormEventHandler = async (e) => {
@@ -31,12 +34,17 @@ const Register = () => {
             setIsSubmitting(false);
             return;
         }
+        router.push('/login');
         setError('');
     };
 
     return (
         <Auth title="Register">
-            <Auth.SocialButton Icon={<FcGoogle size="16px" />} label="Continue with Google" />
+            <Auth.SocialButton
+                Icon={<FcGoogle size="16px" />}
+                label="Continue with Google"
+                onClick={() => signIn('google')}
+            />
 
             <Auth.Divider />
             <Auth.Form handleSubmit={handleSubmit}>
