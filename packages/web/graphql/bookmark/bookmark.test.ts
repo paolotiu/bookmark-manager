@@ -267,7 +267,7 @@ describe('Happy Path :)', () => {
 
         expect(softDeleteBookmarks.bookmarks).toEqual([b1, b2, b3]);
 
-        await hardDeleteBookmarksMutation({ ids });
+        await hardDeleteBookmarksMutation({ ids: [...ids, testBookmark1.id as number] });
         const res = await Bookmark.find();
         expect(res.length).toEqual(0);
     });
