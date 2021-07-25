@@ -1,90 +1,93 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { createApolloTestClient } from '@lib/server/createApolloTestClient';
-import { gql } from 'apollo-server-micro';
+// Remove when using this file
+export {};
 
-// Get test client
-const testClient = createApolloTestClient();
-const { mutate } = testClient;
+// /* eslint-disable @typescript-eslint/no-explicit-any */
+// import { createApolloTestClient } from '@lib/server/createApolloTestClient';
+// import { gql } from 'apollo-server-micro';
 
-const REGISTER_MUTATION = gql`
-    mutation REGISTER_MUTATION($name: String!, $email: String!, $password: String!) {
-        register(name: $name, email: $email, password: $password) {
-            ... on User {
-                email
-                name
-            }
+// // Get test client
+// const testClient = createApolloTestClient();
+// const { mutate } = testClient;
 
-            ... on BaseError {
-                path
-                message
-            }
-        }
-    }
-`;
+// const REGISTER_MUTATION = gql`
+//     mutation REGISTER_MUTATION($name: String!, $email: String!, $password: String!) {
+//         register(name: $name, email: $email, password: $password) {
+//             ... on User {
+//                 email
+//                 name
+//             }
 
-const LOGIN_MUTATION = gql`
-    mutation LOGIN_MUTATION($email: String!, $password: String!) {
-        login(email: $email, password: $password) {
-            ... on User {
-                email
-                name
-            }
+//             ... on BaseError {
+//                 path
+//                 message
+//             }
+//         }
+//     }
+// `;
 
-            ... on BaseError {
-                path
-                message
-            }
-        }
-    }
-`;
+// const LOGIN_MUTATION = gql`
+//     mutation LOGIN_MUTATION($email: String!, $password: String!) {
+//         login(email: $email, password: $password) {
+//             ... on User {
+//                 email
+//                 name
+//             }
 
-const registerMutation = (variables: any) => mutate<{ data: { register: any } }>(REGISTER_MUTATION, { variables });
-const loginMutation = (variables: any) => mutate<{ data: { login: any } }>(LOGIN_MUTATION, { variables });
+//             ... on BaseError {
+//                 path
+//                 message
+//             }
+//         }
+//     }
+// `;
 
-describe('Happy Path', () => {
-    const testUser = { name: 'bob', email: 'bob@bob.com', password: 'password' };
+// const registerMutation = (variables: any) => mutate<{ data: { register: any } }>(REGISTER_MUTATION, { variables });
+// const loginMutation = (variables: any) => mutate<{ data: { login: any } }>(LOGIN_MUTATION, { variables });
 
-    test('Register User', async () => {
-        const res = await registerMutation(testUser);
-        expect(res.data.register).toEqual({ name: testUser.name, email: testUser.email });
-    });
+// describe('Happy Path', () => {
+//     const testUser = { name: 'bob', email: 'bob@bob.com', password: 'password' };
 
-    test('Login user', async () => {
-        const res = await loginMutation(testUser);
+//     test('Register User', async () => {
+//         const res = await registerMutation(testUser);
+//         expect(res.data.register).toEqual({ name: testUser.name, email: testUser.email });
+//     });
 
-        expect(res.data.login).toEqual({ email: testUser.email, name: testUser.name });
-    });
-});
+//     test('Login user', async () => {
+//         const res = await loginMutation(testUser);
 
-describe('Catches errors', () => {
-    const testUser = { name: 'badBob', email: 'bob@bob.com', password: 'password' };
+//         expect(res.data.login).toEqual({ email: testUser.email, name: testUser.name });
+//     });
+// });
 
-    test('Rejects duplciate email', async () => {
-        const res = (await registerMutation(testUser)) as any;
-        expect(res.data.register).toEqual({
-            path: 'register',
-            message: 'A user with that email already exists',
-        });
-    });
+// describe('Catches errors', () => {
+//     const testUser = { name: 'badBob', email: 'bob@bob.com', password: 'password' };
 
-    test('Rejects invalid email', async () => {
-        // Mutate testUser
-        testUser.email = 'notanemail.com';
+//     test('Rejects duplciate email', async () => {
+//         const res = (await registerMutation(testUser)) as any;
+//         expect(res.data.register).toEqual({
+//             path: 'register',
+//             message: 'A user with that email already exists',
+//         });
+//     });
 
-        const res = (await registerMutation(testUser)) as any;
-        expect(res.data.register).toEqual({
-            path: 'register',
-            message: 'The email is invalid',
-        });
-    });
+//     test('Rejects invalid email', async () => {
+//         // Mutate testUser
+//         testUser.email = 'notanemail.com';
 
-    test('Rejects short password', async () => {
-        // Mutate password property
-        testUser.password = 's';
-        const res = (await registerMutation(testUser)) as any;
-        expect(res.data.register).toEqual({
-            path: 'register',
-            message: 'The password is too short - Minimum of 8 characters required',
-        });
-    });
-});
+//         const res = (await registerMutation(testUser)) as any;
+//         expect(res.data.register).toEqual({
+//             path: 'register',
+//             message: 'The email is invalid',
+//         });
+//     });
+
+//     test('Rejects short password', async () => {
+//         // Mutate password property
+//         testUser.password = 's';
+//         const res = (await registerMutation(testUser)) as any;
+//         expect(res.data.register).toEqual({
+//             path: 'register',
+//             message: 'The password is too short - Minimum of 8 characters required',
+//         });
+//     });
+// });

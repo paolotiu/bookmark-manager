@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { User } from '@entity/User';
 import bcrypt from 'bcryptjs';
 import { ensureConnection } from '@lib/server/ensureConnection';

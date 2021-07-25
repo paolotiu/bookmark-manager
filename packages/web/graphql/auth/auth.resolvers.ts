@@ -6,15 +6,9 @@ import { User } from '@entity/User';
 import { createBaseError, createUnexpectedError, isBaseError } from '@graphql/shared/errorMessages';
 import { NextApiResponse } from 'next';
 import { CookieSerializeOptions } from 'cookie';
-import { createTokens } from '@lib/server/createTokens';
-import { BaseError, Resolvers } from '@graphql/generated/graphql';
+import { Resolvers } from '@graphql/generated/graphql';
 import { sendEmail } from '@lib/server/sendEmail';
 import { registerSchema } from './yupSchemas';
-
-const loginError: BaseError = {
-    path: 'login',
-    message: 'Email or password is incorrect',
-};
 
 export const authResolvers: Resolvers = {
     BooleanOrError: {
@@ -41,20 +35,7 @@ export const authResolvers: Resolvers = {
                 return createUnexpectedError('register');
             }
         },
-        login: async (_, { email, password }, { res }) => {
-            const user = await User.findOne({ where: { email } });
-            if (!user) return loginError;
 
-            if (!user.password) return loginError;
-
-            const isValid = await bcrypt.compare(password, user.password);
-            if (!isValid) return loginError;
-
-            const { refreshToken, accessToken } = createTokens(user);
-            setTokenCookies(res, { refreshToken, accessToken });
-
-            return user;
-        },
         sendForgotPassword: async (_, { email }) => {
             const user = await User.findOne({ where: { email } });
 
@@ -97,11 +78,6 @@ export const authResolvers: Resolvers = {
 
             return { success: true };
         },
-        logout: (_, __, { res }) => {
-            removeCookies(res);
-            return true;
-        },
-
         invalidateTokens: async (_, _a, { userId }) => {
             if (!userId) return false;
 

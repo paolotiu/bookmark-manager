@@ -6,11 +6,7 @@ union BooleanOrError = BaseError | Success
 type Mutation {
     "true => success | false => fail"
     register(email: String!, name: String!, password: String!): UserResult!
-    "Returns null if login failed"
-    login(email: String!, password: String!): UserResult!
-
     sendForgotPassword(email: String!): Boolean!
     changePassword(email: String!, password: String!, resetToken: String!): BooleanOrError!
     invalidateTokens: Boolean!
-    logout: Boolean!
 }
