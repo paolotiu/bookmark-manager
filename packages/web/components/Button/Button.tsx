@@ -1,4 +1,3 @@
-import { checkWordInSentence } from '@lib/checks';
 import clsx from 'clsx';
 import React from 'react';
 
@@ -9,21 +8,8 @@ export interface ButtonProps
 }
 
 const Button = ({ label, children, className, isSecondary, ...props }: ButtonProps) => {
-    clsx({
-        'px-3': !className?.includes('px'),
-    });
     return (
-        <button
-            type="button"
-            className={clsx(
-                { 'px-3': !checkWordInSentence(className, 'px') },
-                { 'py-1': !checkWordInSentence(className, 'py') },
-                ['flex items-center text-sm font-bold rounded-sm justify-center disabled:opacity-50'],
-                isSecondary ? 'text-primary border border-primary' : 'text-white bg-primary',
-                className,
-            )}
-            {...props}
-        >
+        <button type="button" className={clsx('btn', isSecondary && 'btn-secondary', className)} {...props}>
             {label}
             {children}
         </button>
