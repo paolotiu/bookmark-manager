@@ -15,7 +15,8 @@
         "analyze:browser": "cross-env BUNDLE_ANALYZE=browser next build",
         "prepare": "cd ../.. && husky install packages/web/.husky",
         "debug": "NODE_OPTIONS='--inspect' next dev",
-        "lint-staged": "lint-staged"
+        "lint-staged": "lint-staged",
+        "type-check": "tsc"
     },
     "dependencies": {
         "@apollo/client": "^3.3.13",
