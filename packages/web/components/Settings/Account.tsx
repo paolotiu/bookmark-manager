@@ -1,7 +1,6 @@
-import { User } from '@entity/User';
-import { useMeQuery } from '@graphql/generated/graphql';
-import { isBaseError } from '@graphql/shared/errorMessages';
-import React from 'react';
+import { useSession } from 'next-auth/client';
+import { useRouter } from 'next/router';
+import React, { useEffect } from 'react';
 import SettingsLayout from './SettingsLayout';
 
 interface FieldProps {
@@ -17,20 +16,25 @@ const Field = ({ label, value }: FieldProps) => {
     );
 };
 const Account = () => {
-    const { data, loading } = useMeQuery();
+    const [session, loading] = useSession();
 
-    if (!data || isBaseError(data.me) || loading || !data.me) {
+    const router = useRouter();
+    useEffect(() => {
+        if (!loading && !session) {
+            router.push('/');
+        }
+    }, [loading, router, session]);
+
+    if (loading || !session) {
         return null;
     }
-
-    const { email, name } = data.me as Pick<User, 'email' | 'name'>;
 
     return (
         <>
             <SettingsLayout>
                 <div className="flex flex-col space-y-4">
-                    <Field label="Email" value={email} />
-                    <Field label="Name" value={name} />
+                    <Field label="Email" value={session.user?.email || ''} />
+                    <Field label="Name" value={session.user?.name || ''} />
                 </div>
             </SettingsLayout>
         </>
