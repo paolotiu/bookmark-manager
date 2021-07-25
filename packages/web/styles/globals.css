@@ -6,11 +6,30 @@
     .no-outline {
         @apply focus:outline-none focus-visible:outline-default;
     }
+
+    .btn {
+        @apply flex items-center justify-center px-3 py-1 text-sm font-bold text-white rounded-sm disabled:opacity-50 bg-primary;
+    }
+    .btn-secondary {
+        @apply border text-primary border-primary;
+    }
 }
 
 @layer utilities {
     .outline-default {
         outline: 2px solid black;
+    }
+}
+
+@keyframes bounce {
+    0%,
+    100% {
+        transform: translateX(25%);
+        animationtimingfunction: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+        transform: translateX(0);
+        animationtimingfunction: cubic-bezier(0, 0, 0.2, 1);
     }
 }
 
